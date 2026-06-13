@@ -1,0 +1,26 @@
+[package]
+name = "NukeAV1"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Контейнери (Demux/Mux)
+symphonia = { version = "0.5", features = ["all"] }
+mp4 = "0.14"
+webm-iterable = "0.6"
+
+# Декодери / Енкодери
+
+# Інше
+yuv = "0.1"
+libc = "0.2"
+
+[build-dependencies]
+bindgen = "0.70"
+cc = "1.0"
+vcpkg = "0.2.15"
+zip = "8.6.0"

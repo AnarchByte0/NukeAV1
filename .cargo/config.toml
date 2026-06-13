@@ -1,0 +1,3 @@
+[env]
+FFMPEG_LIBS_DIR = { value = "ffmpeg_sdk/lib", relative = true }
+FFMPEG_INCLUDE_DIR = { value = "ffmpeg_sdk/include", relative = true }
