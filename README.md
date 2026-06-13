@@ -8,9 +8,12 @@ A high-performance **AV1 & VP9 Importer and Exporter plugin for Adobe Premiere P
 
 - **High-Performance Importer (Decoder):** Decode AV1 and VP9 streams natively within the Premiere Pro timeline.
 - **Advanced Exporter (Encoder):** Encode sequences into AV1, VP8, and VP9 video streams.
-- **Hardware/GPU Acceleration (VRAM):** Harness hardware capabilities (`nvcodec`, `amf`, `qsv`) to shift resource processing directly from RAM to VRAM.
+- **Dynamic Adobe Preferences Synchronization:**
+  - **Automatic Audio Cache Bypass:** Dynamically checks Premiere Pro's "Save media cache files next to originals" setting. If enabled, the plugin bypasses conforming `.cfa`/`.pek` files to prevent folder clutter; if disabled, it allows conformed cache in a centralized folder for better performance.
+  - **Dynamic RAM Cache Allocation:** Uses Windows FFI to fetch system RAM and automatically scales the timeline scrubbing cache size (from 4 up to 32 frames) for smooth navigation.
+  - **Global GPU Acceleration Sync:** Disables hardware-accelerated decoding fallbacks automatically if Premiere Pro's project renderer is set to Software Only.
+  - **Sequence Auto-fill:** Auto-populates default export parameters (width, height, FPS) matching your most recent sequence settings in Premiere Pro.
 - **Multiplexer Control:** Dynamic multiplexer options (`MP4`, `3GPP`, `None`), with automated audio stream silencing when `None` is selected.
-- **Audio Conforming Bypass:** Optimized to reduce CPU rendering overhead for audio configurations.
 
 ---
 
@@ -18,9 +21,14 @@ A high-performance **AV1 & VP9 Importer and Exporter plugin for Adobe Premiere P
 
 The project is structured as follows:
 - **`src/lib.rs`**: Main entry points (`xImportEntry` and `xSDKExport`) registered for Premiere Pro SDK FFI.
-- **`src/importer/`**: Handles importing, frame-by-frame decoding, pixel format conversions, and asynchronous parsing of AV1/VP9 video.
-- **`src/exporter/`**: Manages exporting configurations, multiplexer preferences, and interfacing with FFmpeg encoders.
-- **`src/ffmpeg_ffi.rs`**: Direct FFI bindings to static FFmpeg libraries.
+- **`src/ffi/`**: Isolated direct FFI bindings.
+  - `adobe.rs`: Auto-generated bindings to Premiere Pro C++ SDK.
+  - `ffmpeg.rs`: FFI bindings to static FFmpeg libraries.
+- **`src/plugin/`**: Core video plugin logic.
+  - `importer/`: Handles importing, frame-by-frame decoding, and asynchronous parsing of AV1/VP9 video.
+  - `exporter/`: Manages exporting configurations, multiplexer preferences, and interfacing with FFmpeg encoders.
+  - `shared.rs`: Common pixel format and color space conversion utilities shared between importer and exporter to minimize binary size.
+- **`src/utils/`**: Shared helper files (UIBuilder, cache preference check, string conversions).
 
 ---
 
@@ -62,5 +70,6 @@ Restart Adobe Premiere Pro to load the new plugin.
 
 ## License 📄
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GNU General Public License v3.0** with the **Adobe SDK Linking Exception** under the name **AnarchByte**. See the [LICENSE](LICENSE) file for details.
+
 FFmpeg is licensed under the LGPL/GPL; compilation artifacts must respect individual third-party licenses when packaged.
