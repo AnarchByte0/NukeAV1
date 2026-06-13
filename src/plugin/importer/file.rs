@@ -3,7 +3,7 @@ use std::ptr;
 use crate::*;
 use crate::ffmpeg_ffi::*;
 use crate::importer::types::*;
-use crate::importer::utils::get_utf16_string;
+use crate::utils::get_utf16_string;
 use std::sync::{Arc, Mutex, Condvar};
 use std::collections::HashSet;
 

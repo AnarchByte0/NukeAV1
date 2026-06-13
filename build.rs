@@ -51,7 +51,7 @@ fn run_command_streaming(cmd_program: &Path, cmd_args: &[&str], current_dir: &Pa
 }
 
 fn main() {
-    println!("cargo:rerun-if-changed=src/wrapper.hpp");
+    println!("cargo:rerun-if-changed=src/ffi/wrapper.hpp");
     println!("cargo:rerun-if-changed=sdk/Premiere Pro 26.0 C++ SDK Windows.zip");
 
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
@@ -154,7 +154,7 @@ fn main() {
 
     // 4. Generate Premiere Pro Bindings
     let bindings = bindgen::Builder::default()
-        .header("src/wrapper.hpp")
+        .header("src/ffi/wrapper.hpp")
         .clang_arg(format!("-I{}", sdk_headers.display()))
         .clang_arg("-x")
         .clang_arg("c++")

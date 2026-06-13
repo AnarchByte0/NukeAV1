@@ -587,9 +587,7 @@ impl FFmpegEncoder {
             if self.colorspace == 1 || self.colorspace == 2 {
                 let f32_len = bgra_data.len() / 4;
                 let f32_slice = core::slice::from_raw_parts(bgra_data.as_ptr() as *const f32, f32_len);
-                for (s, d) in f32_slice.iter().zip(self.temp_bgra64.iter_mut()) {
-                    *d = (*s * 65535.0).clamp(0.0, 65535.0) as u16;
-                }
+                crate::plugin::shared::f32_to_bgra64(f32_slice, &mut self.temp_bgra64);
                 
                 // Flip vertically for HDR: point to start of last row and use negative stride
                 let stride = (*self.codec_ctx).width * 8;

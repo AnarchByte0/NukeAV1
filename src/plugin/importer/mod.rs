@@ -9,7 +9,6 @@ use crate::importer::image::handle_import_image;
 use crate::importer::audio::handle_import_audio;
 
 pub mod types;
-pub mod utils;
 pub mod format;
 pub mod info;
 pub mod file;
@@ -36,7 +35,7 @@ pub unsafe fn handle_import_selector(
                 (*import_info).canProvidePeakAudio = 0;
                 (*import_info).canAsync = 1;
                 (*import_info).keepLoaded = 1;
-                if crate::importer::utils::should_avoid_audio_conform() {
+                if crate::utils::importer::should_avoid_audio_conform() {
                     (*import_info).avoidAudioConform = 1;
                 } else {
                     (*import_info).avoidAudioConform = 0;

@@ -303,9 +303,7 @@ pub unsafe fn handle_import_image(param1: *mut c_void, param2: *mut c_void) -> p
             sws_freeContext(sws_ctx);
             
             let dest_slice = core::slice::from_raw_parts_mut(import_image.pix as *mut f32, num_pixels * 4);
-            for (s, d) in temp_buf[..num_pixels * 4].iter().zip(dest_slice.iter_mut()) {
-                *d = *s as f32 / 65535.0;
-            }
+            crate::plugin::shared::bgra64_to_f32(&temp_buf[..num_pixels * 4], dest_slice);
             return_error = malNoError as prMALError;
         }
     } else if target_pix_fmt == PrPixelFormat_PrPixelFormat_BGRA_4444_16u {
@@ -346,9 +344,7 @@ pub unsafe fn handle_import_image(param1: *mut c_void, param2: *mut c_void) -> p
             sws_freeContext(sws_ctx);
             
             let dest_slice = core::slice::from_raw_parts_mut(import_image.pix as *mut u16, num_pixels * 4);
-            for (s, d) in temp_buf[..num_pixels * 4].iter().zip(dest_slice.iter_mut()) {
-                *d = *s >> 1;
-            }
+            crate::plugin::shared::bgra64_to_u16_shift(&temp_buf[..num_pixels * 4], dest_slice);
             return_error = malNoError as prMALError;
         }
     } else {

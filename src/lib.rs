@@ -1,11 +1,9 @@
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
 #![allow(dead_code)]
 #![allow(unsafe_op_in_unsafe_fn)]
 
-// Include generated structures from bindgen
-include!(concat!(env!("OUT_DIR"), "/pr_sdk_bindings.rs"));
+pub mod ffi;
+pub use crate::ffi::adobe::*;
+pub use crate::ffi::ffmpeg as ffmpeg_ffi;
 
 use std::ffi::c_void;
 use std::os::raw::c_int;
@@ -24,10 +22,12 @@ macro_rules! log_debug {
     };
 }
 
-pub mod exporter;
-pub mod importer;
+pub mod plugin;
 pub mod utils;
-pub mod ffmpeg_ffi;
+
+pub use crate::plugin::importer;
+pub use crate::plugin::exporter;
+pub use crate::utils::{str_to_utf16, leak_utf16};
 
 /// Main entry point for IMPORTER (AV1/VP9 reading)
 #[no_mangle]
@@ -62,24 +62,4 @@ pub unsafe extern "C" fn xSDKExport(
     }
 
     exporter::handle_export_selector(selector, std_parms, param1, param2)
-}
-
-/// Utility to copy Rust string into Adobe UTF-16 buffer
-pub unsafe fn str_to_utf16(s: &str, out: *mut prUTF16Char, max_len: usize) {
-    let mut i = 0;
-    for c in s.encode_utf16() {
-        if i >= max_len - 1 {
-            break;
-        }
-        *out.add(i) = c;
-        i += 1;
-    }
-    *out.add(i) = 0; // null-terminator
-}
-
-/// Utility to create a persistent UTF-16 string (for SDK)
-pub fn leak_utf16(s: &str) -> *const prUTF16Char {
-    let mut vec: Vec<prUTF16Char> = s.encode_utf16().collect();
-    vec.push(0); // null-terminator
-    Box::leak(vec.into_boxed_slice()).as_ptr()
 }
