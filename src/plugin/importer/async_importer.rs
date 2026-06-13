@@ -288,6 +288,14 @@ unsafe fn handle_ai_get_frame(param: *mut c_void) -> prMALError {
 
     // ── Create a new PPix with the correct format and size ───────────────────
 
+    #[cfg(target_os = "windows")]
+    let bounds = prRect {
+        top:    0,
+        left:   0,
+        bottom: height,
+        right:  width,
+    };
+    #[cfg(not(target_os = "windows"))]
     let bounds = prRect {
         top:    0,
         left:   0,
@@ -535,6 +543,14 @@ pub unsafe fn handle_get_source_video(param1: *mut c_void, param2: *mut c_void) 
         }
     };
     
+    #[cfg(target_os = "windows")]
+    let bounds = prRect {
+        top: 0,
+        left: 0,
+        bottom: height,
+        right: width,
+    };
+    #[cfg(not(target_os = "windows"))]
     let bounds = prRect {
         top: 0,
         left: 0,

@@ -74,6 +74,8 @@ jobs:
       with:
         name: NukeAV1-${{ steps.get_version.outputs.version }}-Windows
         path: output/NukeAV1.prm
+        compression-level: 0
+        if-no-files-found: error
 
   build-macos:
     name: Build Plugin (macOS)
@@ -98,7 +100,7 @@ jobs:
 
     - name: Install System Dependencies (macOS)
       run: |
-        brew install cmake ninja
+        brew install cmake ninja nasm
 
     - name: Download Adobe Premiere Pro SDK (macOS)
       shell: bash
@@ -170,3 +172,5 @@ jobs:
       with:
         name: NukeAV1-${{ steps.get_version.outputs.version }}-macOS
         path: output/NukeAV1.bundle
+        compression-level: 0
+        if-no-files-found: error
