@@ -15,7 +15,7 @@ fn main() {
 
     let status = Command::new("cargo")
         .args(&args)
-        .env("SKIP_FFMPEG_UPDATE", "1") // <- Забороняємо подвійну перевірку!
+        .env("SKIP_FFMPEG_UPDATE", "1") // <- Disable double verification check
         .status()
         .expect("Failed to run cargo build");
 

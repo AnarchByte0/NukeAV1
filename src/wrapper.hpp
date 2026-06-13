@@ -1,6 +1,6 @@
 #pragma once
 
-// Вимикаємо попередження C++ для чистоти консолі
+// Disable C++ warnings to keep the console clean
 #pragma warning(disable: 4819)
 
 // Adobe Premiere Pro SDK Headers

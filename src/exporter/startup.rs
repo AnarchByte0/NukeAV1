@@ -14,7 +14,7 @@ pub unsafe fn handle_startup(param1: *mut c_void) -> prMALError {
             crate::str_to_utf16("AV1 (Nuke)", core::ptr::addr_of_mut!(info.fileTypeName) as *mut prUTF16Char, 256);
             crate::str_to_utf16("mp4", core::ptr::addr_of_mut!(info.fileTypeDefaultExtension) as *mut prUTF16Char, 256);
             
-            // Замість info.exportReqIndex = ..., ми маємо ПОВЕРНУТИ IterateExporter в кінці
+            // Instead of info.exportReqIndex = ..., we must return IterateExporter at the end
         } else if info.exportReqIndex == 1 {
             info.fileType = u32::from_be_bytes(*b"Nuk8");
             info.classID = class_id;

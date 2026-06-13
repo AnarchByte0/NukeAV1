@@ -12,7 +12,7 @@ pub mod query;
 pub mod export;
 pub mod ffmpeg;
 
-/// Обробник селекторів для Експортера
+/// Selector handler for Exporter
 pub unsafe fn handle_export_selector(
     selector: c_int,
     std_parms: *mut exportStdParms,
