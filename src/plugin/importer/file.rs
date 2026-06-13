@@ -119,29 +119,33 @@ pub unsafe fn handle_open_file8(std_parms: *mut imStdParms, param1: *mut c_void,
     let mut hw_device_ctx: *mut AVBufferRef = ptr::null_mut();
     let mut chosen_hw_name = "disabled (software fallback)";
 
-    // Try initializing D3D11VA
-    let mut err = av_hwdevice_ctx_create(
-        &mut hw_device_ctx,
-        AV_HWDEVICE_TYPE_D3D11VA,
-        ptr::null(),
-        ptr::null_mut(),
-        0
-    );
-
-    if err == 0 {
-        chosen_hw_name = "D3D11VA";
-    } else {
-        // Try CUDA
-        err = av_hwdevice_ctx_create(
+    if crate::utils::importer::is_gpu_acceleration_enabled() {
+        // Try initializing D3D11VA
+        let mut err = av_hwdevice_ctx_create(
             &mut hw_device_ctx,
-            AV_HWDEVICE_TYPE_CUDA,
+            AV_HWDEVICE_TYPE_D3D11VA,
             ptr::null(),
             ptr::null_mut(),
             0
         );
+
         if err == 0 {
-            chosen_hw_name = "CUDA";
+            chosen_hw_name = "D3D11VA";
+        } else {
+            // Try CUDA
+            err = av_hwdevice_ctx_create(
+                &mut hw_device_ctx,
+                AV_HWDEVICE_TYPE_CUDA,
+                ptr::null(),
+                ptr::null_mut(),
+                0
+            );
+            if err == 0 {
+                chosen_hw_name = "CUDA";
+            }
         }
+    } else {
+        chosen_hw_name = "disabled (disabled via global Adobe GPU preference)";
     }
 
     if !hw_device_ctx.is_null() {

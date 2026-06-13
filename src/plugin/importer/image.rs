@@ -115,7 +115,8 @@ pub fn worker_thread_loop(
                                 let cloned = av_frame_clone(target_frame);
                                 if !cloned.is_null() {
                                     let mut cache_guard = cache.0.lock().unwrap();
-                                    if cache_guard.frame_cache.len() >= 16 {
+                                    let limit = crate::utils::importer::get_dynamic_cache_size();
+                                    if cache_guard.frame_cache.len() >= limit {
                                         let mut oldest = cache_guard.frame_cache.remove(0);
                                         av_frame_free(&mut oldest.frame);
                                     }
@@ -141,7 +142,8 @@ pub fn worker_thread_loop(
                                 let cloned = av_frame_clone(target_frame);
                                 if !cloned.is_null() {
                                     let mut cache_guard = cache.0.lock().unwrap();
-                                    if cache_guard.frame_cache.len() >= 16 {
+                                    let limit = crate::utils::importer::get_dynamic_cache_size();
+                                    if cache_guard.frame_cache.len() >= limit {
                                         let mut oldest = cache_guard.frame_cache.remove(0);
                                         av_frame_free(&mut oldest.frame);
                                     }

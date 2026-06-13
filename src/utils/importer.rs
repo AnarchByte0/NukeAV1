@@ -1,4 +1,23 @@
-fn get_adobe_files_side_by_side() -> Option<bool> {
+#[repr(C)]
+#[allow(non_snake_case)]
+struct MEMORYSTATUSEX {
+    dwLength: u32,
+    dwMemoryLoad: u32,
+    ullTotalPhys: u64,
+    ullAvailPhys: u64,
+    ullTotalPageFile: u64,
+    ullAvailPageFile: u64,
+    ullTotalVirtual: u64,
+    ullAvailVirtual: u64,
+    ullAvailExtendedVirtual: u64,
+}
+
+unsafe extern "system" {
+    fn GlobalMemoryStatusEx(lpBuffer: *mut MEMORYSTATUSEX) -> i32;
+}
+
+
+pub fn get_adobe_pref_str(key: &str) -> Option<String> {
     let user_profile = std::env::var("USERPROFILE").ok()?;
     let path = std::path::PathBuf::from(user_profile)
         .join("Documents")
@@ -45,11 +64,15 @@ fn get_adobe_files_side_by_side() -> Option<bool> {
                         let prefs_file = version_path.join(name_str.as_ref()).join("Adobe Premiere Pro Prefs");
                         if prefs_file.exists() {
                             if let Ok(content) = std::fs::read_to_string(&prefs_file) {
-                                if content.contains("<BE.Prefs.MediaCache.FilesSideBySide>true</BE.Prefs.MediaCache.FilesSideBySide>") {
-                                    return Some(true);
-                                }
-                                if content.contains("<BE.Prefs.MediaCache.FilesSideBySide>false</BE.Prefs.MediaCache.FilesSideBySide>") {
-                                    return Some(false);
+                                let start_tag = format!("<{}>", key);
+                                let end_tag = format!("</{}>", key);
+                                if let Some(start_idx) = content.find(&start_tag) {
+                                    if let Some(end_idx) = content.find(&end_tag) {
+                                        let val_start = start_idx + start_tag.len();
+                                        if end_idx > val_start {
+                                            return Some(content[val_start..end_idx].to_string());
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -59,6 +82,44 @@ fn get_adobe_files_side_by_side() -> Option<bool> {
         }
     }
     None
+}
+
+pub fn get_adobe_pref_bool(key: &str) -> Option<bool> {
+    get_adobe_pref_str(key).map(|s| s.trim() == "true")
+}
+
+pub fn is_gpu_acceleration_enabled() -> bool {
+    get_adobe_pref_bool("MZ.Prefs.UseGpuAcceleration").unwrap_or(true)
+}
+
+pub fn get_dynamic_cache_size() -> usize {
+    let mut mem_info = MEMORYSTATUSEX {
+        dwLength: std::mem::size_of::<MEMORYSTATUSEX>() as u32,
+        dwMemoryLoad: 0,
+        ullTotalPhys: 0,
+        ullAvailPhys: 0,
+        ullTotalPageFile: 0,
+        ullAvailPageFile: 0,
+        ullTotalVirtual: 0,
+        ullAvailVirtual: 0,
+        ullAvailExtendedVirtual: 0,
+    };
+    
+    let res = unsafe { GlobalMemoryStatusEx(&mut mem_info) };
+    if res != 0 {
+        let total_gb = mem_info.ullTotalPhys / (1024 * 1024 * 1024);
+        if total_gb < 8 {
+            4
+        } else if total_gb < 16 {
+            8
+        } else if total_gb < 32 {
+            16
+        } else {
+            32 // 32 GB or more: cache up to 32 frames for smooth scrubbing
+        }
+    } else {
+        16 // Default fallback
+    }
 }
 
 pub fn should_avoid_audio_conform() -> bool {
@@ -92,7 +153,7 @@ pub fn should_avoid_audio_conform() -> bool {
     }
     
     // In "auto" mode:
-    if let Some(side_by_side) = get_adobe_files_side_by_side() {
+    if let Some(side_by_side) = get_adobe_pref_bool("BE.Prefs.MediaCache.FilesSideBySide") {
         return side_by_side; // if side-by-side (next to originals) is true, we avoid conforming.
     }
     

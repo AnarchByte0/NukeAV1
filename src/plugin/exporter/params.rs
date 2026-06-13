@@ -24,12 +24,24 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                         let param_suite = &*(param_suite_ptr as *const PrSDKExportParamSuite);
                         
                         if let Some(builder) = crate::utils::UIBuilder::new(param_suite, param_rec.exporterPluginID) {
+                            let default_width = crate::utils::importer::get_adobe_pref_str("recent.sequence.video.frame.width")
+                                .and_then(|s| s.parse::<i32>().ok())
+                                .unwrap_or(1920);
+
+                            let default_height = crate::utils::importer::get_adobe_pref_str("recent.sequence.video.frame.height")
+                                .and_then(|s| s.parse::<i32>().ok())
+                                .unwrap_or(1080);
+
+                            let default_fps = crate::utils::importer::get_adobe_pref_str("recent.sequence.video.framerate")
+                                .and_then(|s| s.parse::<i64>().ok())
+                                .unwrap_or(4233600000);
+
                             // 1. Video Settings
                             builder.add_group(ADBETopParamGroup, ADBEVideoTabGroup, "Video");
                             builder.add_group(ADBEVideoTabGroup, ADBEBasicVideoGroup, "Basic Video Settings");
 
                             // Frame Size presets using width and height as constrained value pairs
-                            builder.add_int_param(ADBEBasicVideoGroup, ADBEVideoWidth, "Frame Width", 1920, 16, 8192);
+                            builder.add_int_param(ADBEBasicVideoGroup, ADBEVideoWidth, "Frame Width", default_width, 16, 8192);
                             builder.add_dropdown_item(ADBEVideoWidth, 4096, "4K (4096)");
                             builder.add_dropdown_item(ADBEVideoWidth, 3840, "UHD (3840)");
                             builder.add_dropdown_item(ADBEVideoWidth, 2560, "Quad HD (2560)");
@@ -39,7 +51,7 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             builder.add_dropdown_item(ADBEVideoWidth, 720, "SD NTSC (720)");
                             builder.add_dropdown_item(ADBEVideoWidth, -1, "Custom");
 
-                            builder.add_int_param(ADBEBasicVideoGroup, ADBEVideoHeight, "Frame Height", 1080, 16, 8192);
+                            builder.add_int_param(ADBEBasicVideoGroup, ADBEVideoHeight, "Frame Height", default_height, 16, 8192);
                             builder.add_dropdown_item(ADBEVideoHeight, 2160, "4K / UHD (2160)");
                             builder.add_dropdown_item(ADBEVideoHeight, 1440, "Quad HD (1440)");
                             builder.add_dropdown_item(ADBEVideoHeight, 1080, "Full HD (1080)");
@@ -48,7 +60,7 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             builder.add_dropdown_item(ADBEVideoHeight, -1, "Custom");
                             
                             // Frame rate
-                            builder.add_time_dropdown(ADBEBasicVideoGroup, ADBEVideoFPS, "Frame Rate", 4233600000); // default 60 fps
+                            builder.add_time_dropdown(ADBEBasicVideoGroup, ADBEVideoFPS, "Frame Rate", default_fps); // default sequence fps
                             builder.add_dropdown_item_time(ADBEVideoFPS, 10594627200, "23.976");
                             builder.add_dropdown_item_time(ADBEVideoFPS, 10584000000, "24");
                             builder.add_dropdown_item_time(ADBEVideoFPS, 10160640000, "25");
