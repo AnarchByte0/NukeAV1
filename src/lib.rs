@@ -1,5 +1,8 @@
 #![allow(dead_code)]
 #![allow(unsafe_op_in_unsafe_fn)]
+#![allow(non_snake_case)]
+#![allow(non_upper_case_globals)]
+#![allow(unused_imports)]
 
 pub mod ffi;
 pub use crate::ffi::adobe::*;

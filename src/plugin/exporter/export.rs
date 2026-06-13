@@ -1,7 +1,5 @@
 use std::ffi::c_void;
 use std::os::raw::c_char;
-#[cfg(target_os = "windows")]
-use std::os::windows::ffi::OsStringExt;
 use crate::*;
 
 #[allow(unused_variables)]
