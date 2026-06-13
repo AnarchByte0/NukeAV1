@@ -240,6 +240,19 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                                 builder.add_float_param(adv_group, b"NukeVP9KeyFrame\0", "Key Frame Distance", 33.0, 1.0, 300.0);
                              }
                             
+                            // 4. Multiplexer Settings
+                            let multiplexer_tab = b"ADBEExporterMultiplexerTab\0";
+                            let multiplexer_group = b"ADBEExporterMultiplexerGroup\0";
+                            let multiplexer_dropdown = b"ADBEExporterMultiplexerDropdown\0";
+
+                            builder.add_group(ADBETopParamGroup, multiplexer_tab, "Multiplexer");
+                            builder.add_group(multiplexer_tab, multiplexer_group, "Basic Settings");
+                            
+                            builder.add_dropdown(multiplexer_group, multiplexer_dropdown, "Multiplexer", 0);
+                            builder.add_dropdown_item(multiplexer_dropdown, 0, "MP4");
+                            builder.add_dropdown_item(multiplexer_dropdown, 1, "3GPP");
+                            builder.add_dropdown_item(multiplexer_dropdown, 2, "None");
+
                             builder.set_params_version(1);
                         }
                         
@@ -307,6 +320,10 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                         
                         set_name(b"NukeBitrateGroup\0", "Encoder Settings");
                         set_name(ADBEVideoBitrateEncoding, "Rate Control");
+                        
+                        set_name(b"ADBEExporterMultiplexerTab\0", "Multiplexer");
+                        set_name(b"ADBEExporterMultiplexerGroup\0", "Basic Settings");
+                        set_name(b"ADBEExporterMultiplexerDropdown\0", "Multiplexer");
 
                         // Get current Rate Control choice to dynamically rename bitrate parameters
                         let mut rc_val: exParamValues = core::mem::zeroed();
@@ -372,6 +389,8 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                             set_name(b"NukeVP9KeyFrame\0", "Key Frame Distance");
                         }
                         
+                        rebuild_dropdowns(rec.exporterPluginID, file_type, param_suite);
+                        
                         if let Some(release_suite) = basic_suite.ReleaseSuite {
                             release_suite(kPrSDKExportParamSuite.as_ptr() as *const i8, kPrSDKExportParamSuiteVersion as i32);
                         }
@@ -382,3 +401,251 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
     }
     malNoError as prMALError
 }
+
+unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_suite: &PrSDKExportParamSuite) {
+    use std::os::raw::c_char;
+
+    let clear_constrained = |param_id: &[u8]| {
+        if let Some(clear_values) = param_suite.ClearConstrainedValues {
+            clear_values(ex_id, 0, param_id.as_ptr() as *const c_char);
+        }
+    };
+
+    let add_val = |param_id: &[u8], value: i32, name: &str| {
+        if let Some(add_pair) = param_suite.AddConstrainedValuePair {
+            let mut val_rec: exOneParamValueRec = core::mem::zeroed();
+            val_rec.__bindgen_anon_1.intValue = value;
+            add_pair(
+                ex_id,
+                0,
+                param_id.as_ptr() as *const c_char,
+                &val_rec,
+                crate::leak_utf16(name),
+            );
+        }
+    };
+
+    let add_val_float = |param_id: &[u8], value: f64, name: &str| {
+        if let Some(add_pair) = param_suite.AddConstrainedValuePair {
+            let mut val_rec: exOneParamValueRec = core::mem::zeroed();
+            val_rec.__bindgen_anon_1.floatValue = value;
+            add_pair(
+                ex_id,
+                0,
+                param_id.as_ptr() as *const c_char,
+                &val_rec,
+                crate::leak_utf16(name),
+            );
+        }
+    };
+
+    let add_val_time = |param_id: &[u8], value: i64, name: &str| {
+        if let Some(add_pair) = param_suite.AddConstrainedValuePair {
+            let mut val_rec: exOneParamValueRec = core::mem::zeroed();
+            val_rec.__bindgen_anon_1.timeValue = value;
+            add_pair(
+                ex_id,
+                0,
+                param_id.as_ptr() as *const c_char,
+                &val_rec,
+                crate::leak_utf16(name),
+            );
+        }
+    };
+
+    let add_val_ratio = |param_id: &[u8], num: i32, den: i32, name: &str| {
+        if let Some(add_pair) = param_suite.AddConstrainedValuePair {
+            let mut val_rec: exOneParamValueRec = core::mem::zeroed();
+            val_rec.__bindgen_anon_1.ratioValue.numerator = num;
+            val_rec.__bindgen_anon_1.ratioValue.denominator = den;
+            add_pair(
+                ex_id,
+                0,
+                param_id.as_ptr() as *const c_char,
+                &val_rec,
+                crate::leak_utf16(name),
+            );
+        }
+    };
+
+    // Width
+    clear_constrained(ADBEVideoWidth);
+    add_val(ADBEVideoWidth, 4096, "4K (4096)");
+    add_val(ADBEVideoWidth, 3840, "UHD (3840)");
+    add_val(ADBEVideoWidth, 2560, "Quad HD (2560)");
+    add_val(ADBEVideoWidth, 1920, "Full HD (1920)");
+    add_val(ADBEVideoWidth, 1280, "HD (1280)");
+    add_val(ADBEVideoWidth, 854, "SD NTSC Wide (854)");
+    add_val(ADBEVideoWidth, 720, "SD NTSC (720)");
+    add_val(ADBEVideoWidth, -1, "Custom");
+
+    // Height
+    clear_constrained(ADBEVideoHeight);
+    add_val(ADBEVideoHeight, 2160, "4K / UHD (2160)");
+    add_val(ADBEVideoHeight, 1440, "Quad HD (1440)");
+    add_val(ADBEVideoHeight, 1080, "Full HD (1080)");
+    add_val(ADBEVideoHeight, 720, "HD (720)");
+    add_val(ADBEVideoHeight, 480, "SD NTSC (480)");
+    add_val(ADBEVideoHeight, -1, "Custom");
+
+    // Frame Rate
+    clear_constrained(ADBEVideoFPS);
+    add_val_time(ADBEVideoFPS, 10594627200, "23.976");
+    add_val_time(ADBEVideoFPS, 10584000000, "24");
+    add_val_time(ADBEVideoFPS, 10160640000, "25");
+    add_val_time(ADBEVideoFPS, 8475283200, "29.97");
+    add_val_time(ADBEVideoFPS, 8467200000, "30");
+    add_val_time(ADBEVideoFPS, 5080320000, "50");
+    add_val_time(ADBEVideoFPS, 4237641600, "59.94");
+    add_val_time(ADBEVideoFPS, 4233600000, "60");
+    add_val_time(ADBEVideoFPS, 2822400000, "90");
+    add_val_time(ADBEVideoFPS, 2540160000, "100");
+    add_val_time(ADBEVideoFPS, 2118820800, "119.88");
+    add_val_time(ADBEVideoFPS, 2116800000, "120");
+    add_val_time(ADBEVideoFPS, 1764000000, "144");
+    add_val_time(ADBEVideoFPS, 1058400000, "240");
+    add_val_time(ADBEVideoFPS, 846720000, "300");
+    add_val_time(ADBEVideoFPS, -1, "Custom");
+
+    // Aspect
+    clear_constrained(ADBEVideoAspect);
+    add_val_ratio(ADBEVideoAspect, 1, 1, "Square Pixels (1.0)");
+    add_val_ratio(ADBEVideoAspect, 10, 11, "D1/DV NTSC (0.9091)");
+    add_val_ratio(ADBEVideoAspect, 40, 33, "D1/DV NTSC Widescreen 16:9 (1.2121)");
+    add_val_ratio(ADBEVideoAspect, 59, 54, "D1/DV PAL (1.0940)");
+    add_val_ratio(ADBEVideoAspect, 118, 81, "D1/DV PAL Widescreen 16:9 (1.4587)");
+    add_val_ratio(ADBEVideoAspect, 2, 1, "Anamorphic 2:1 (2.0)");
+    add_val_ratio(ADBEVideoAspect, 4, 3, "HD Anamorphic 1080 (1.333)");
+    add_val_ratio(ADBEVideoAspect, 3, 2, "DVCPRO HD (1.5)");
+    add_val_ratio(ADBEVideoAspect, -1, -1, "Custom");
+
+    // Field Type
+    clear_constrained(ADBEVideoFieldType);
+    add_val(ADBEVideoFieldType, 0, "Progressive");
+
+    // Container File Extension
+    let container_id = b"ADBEVideoContainer\0";
+    clear_constrained(container_id);
+    add_val(container_id, 0, "Matroska Video (.mkv)");
+    add_val(container_id, 1, "MPEG-4 (.mp4)");
+    add_val(container_id, 2, "Hybrid MP4 (.mp4)");
+    add_val(container_id, 3, "Fragmented MP4 (.mp4)");
+    add_val(container_id, 4, "QuickTime (.mov)");
+    add_val(container_id, 5, "Hybrid MOV (.mov)");
+    add_val(container_id, 6, "Fragmented MOV (.mov)");
+
+    // Color Space
+    let colorspace_id = b"NukeVideoColorSpace\0";
+    clear_constrained(colorspace_id);
+    add_val(colorspace_id, 0, "Rec.709 (SDR 8-bit)");
+    add_val(colorspace_id, 1, "Rec.2020 PQ (HDR 10-bit)");
+    add_val(colorspace_id, 2, "Rec.2020 HLG (HDR 10-bit)");
+
+    // Audio Rate Per Second
+    clear_constrained(ADBEAudioRatePerSecond);
+    add_val_float(ADBEAudioRatePerSecond, 32000.0, "32000 Hz");
+    add_val_float(ADBEAudioRatePerSecond, 44100.0, "44100 Hz");
+    add_val_float(ADBEAudioRatePerSecond, 48000.0, "48000 Hz");
+    add_val_float(ADBEAudioRatePerSecond, 88200.0, "88200 Hz");
+    add_val_float(ADBEAudioRatePerSecond, 96000.0, "96000 Hz");
+
+    // Audio Channels
+    clear_constrained(ADBEAudioNumChannels);
+    add_val(ADBEAudioNumChannels, 1, "Mono");
+    add_val(ADBEAudioNumChannels, 2, "Stereo");
+    add_val(ADBEAudioNumChannels, 3, "5.1");
+
+    // Audio Bitrate
+    clear_constrained(ADBEAudioBitrate);
+    add_val(ADBEAudioBitrate, 0, "96 kbps");
+    add_val(ADBEAudioBitrate, 1, "128 kbps");
+    add_val(ADBEAudioBitrate, 2, "160 kbps");
+    add_val(ADBEAudioBitrate, 3, "192 kbps");
+    add_val(ADBEAudioBitrate, 4, "256 kbps");
+    add_val(ADBEAudioBitrate, 5, "320 kbps");
+
+    // Rate Control
+    clear_constrained(ADBEVideoBitrateEncoding);
+    add_val(ADBEVideoBitrateEncoding, 0, "Constant Bitrate");
+    add_val(ADBEVideoBitrateEncoding, 1, "Constant QP");
+    add_val(ADBEVideoBitrateEncoding, 2, "Variable Bitrate");
+    add_val(ADBEVideoBitrateEncoding, 3, "Variable Bitrate with Target Quality");
+
+    // Presets
+    let nuke_preset_id = b"NukePreset\0";
+    clear_constrained(nuke_preset_id);
+    add_val(nuke_preset_id, 0, "P1: Fastest (Lowest Quality)");
+    add_val(nuke_preset_id, 1, "P2: Faster");
+    add_val(nuke_preset_id, 2, "P3: Fast");
+    add_val(nuke_preset_id, 3, "P4: Medium");
+    add_val(nuke_preset_id, 4, "P5: Slow (Good Quality)");
+    add_val(nuke_preset_id, 5, "P6: Slower");
+    add_val(nuke_preset_id, 6, "P7: Slowest (Best Quality)");
+
+    // Tuning
+    let nuke_tuning_id = b"NukeTuning\0";
+    clear_constrained(nuke_tuning_id);
+    add_val(nuke_tuning_id, 0, "High Quality");
+    add_val(nuke_tuning_id, 1, "Low Latency");
+    add_val(nuke_tuning_id, 2, "Ultra Low Latency");
+
+    // Multipass Mode
+    let nuke_multipass_id = b"NukeMultipass\0";
+    clear_constrained(nuke_multipass_id);
+    add_val(nuke_multipass_id, 0, "Disabled");
+    add_val(nuke_multipass_id, 1, "Two Passes (Quarter Resolution)");
+    add_val(nuke_multipass_id, 2, "Two Passes (Full Resolution)");
+
+    // B-Frame Ref
+    let bframe_ref_id = b"NukeBFrameRef\0";
+    clear_constrained(bframe_ref_id);
+    add_val(bframe_ref_id, 0, "Disabled");
+    add_val(bframe_ref_id, 1, "Each B-Frame");
+    add_val(bframe_ref_id, 2, "Middle B-Frame");
+
+    // Exporter Multiplexer
+    let multiplexer_dropdown = b"ADBEExporterMultiplexerDropdown\0";
+    clear_constrained(multiplexer_dropdown);
+    add_val(multiplexer_dropdown, 0, "MP4");
+    add_val(multiplexer_dropdown, 1, "3GPP");
+    add_val(multiplexer_dropdown, 2, "None");
+
+    let nuka = u32::from_be_bytes(*b"NukA");
+    let nuk9 = u32::from_be_bytes(*b"Nuk9");
+
+    if file_type == nuka {
+        let encoder_id = b"NukeAV1Encoder\0";
+        clear_constrained(encoder_id);
+        add_val(encoder_id, 0, "Auto (Recommended)");
+        add_val(encoder_id, 1, "Software Only (CPU)");
+        add_val(encoder_id, 2, "Hardware Encoding (NVENC)");
+        add_val(encoder_id, 3, "Hardware Encoding (AMF)");
+        add_val(encoder_id, 4, "Hardware Encoding (QSV)");
+
+        let profile_id = b"NukeAV1Profile\0";
+        clear_constrained(profile_id);
+        add_val(profile_id, 0, "Main");
+        add_val(profile_id, 1, "High");
+        add_val(profile_id, 2, "Professional");
+
+        let level_id = b"NukeAV1Level\0";
+        clear_constrained(level_id);
+        add_val(level_id, 0, "5.0");
+        add_val(level_id, 1, "5.1");
+        add_val(level_id, 2, "5.2");
+        add_val(level_id, 3, "6.0");
+
+        let tier_id = b"NukeAV1Tier\0";
+        clear_constrained(tier_id);
+        add_val(tier_id, 0, "Main");
+        add_val(tier_id, 1, "High");
+    } else if file_type == nuk9 {
+        let profile_id = b"NukeVP9Profile\0";
+        clear_constrained(profile_id);
+        add_val(profile_id, 0, "Profile 0 (8-bit 4:2:0)");
+        add_val(profile_id, 1, "Profile 1 (8-bit 4:2:2/4:4:4)");
+        add_val(profile_id, 2, "Profile 2 (10/12-bit 4:2:0)");
+        add_val(profile_id, 3, "Profile 3 (10/12-bit 4:2:2/4:4:4)");
+    }
+}
+

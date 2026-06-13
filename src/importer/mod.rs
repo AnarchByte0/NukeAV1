@@ -15,6 +15,7 @@ pub mod info;
 pub mod file;
 pub mod image;
 pub mod audio;
+pub mod async_importer;
 
 pub unsafe fn handle_import_selector(
     selector: c_int,
@@ -32,6 +33,9 @@ pub unsafe fn handle_import_selector(
                 (*import_info).hasSetup = 0;
                 (*import_info).setupOnDblClk = 0;
                 (*import_info).priority = 100;
+                (*import_info).canProvidePeakAudio = 0;
+                (*import_info).canAsync = 1;
+                (*import_info).keepLoaded = 1;
                 if crate::importer::utils::should_avoid_audio_conform() {
                     (*import_info).avoidAudioConform = 1;
                 } else {
@@ -43,13 +47,16 @@ pub unsafe fn handle_import_selector(
         PrImporterSelector_imShutdown => malNoError as prMALError,
         PrImporterSelector_imGetIndFormat => handle_get_ind_format(param1, param2),
         PrImporterSelector_imGetIndPixelFormat => handle_get_ind_pixel_format(param1, param2),
-        PrImporterSelector_imGetInfo8 => handle_get_info8(param1, param2),
-        PrImporterSelector_imGetInfo9 => handle_get_info9(param1, param2),
-        PrImporterSelector_imOpenFile8 => handle_open_file8(param1, param2),
+        PrImporterSelector_imGetInfo8 => handle_get_info8(_std_parms, param1, param2),
+        PrImporterSelector_imGetInfo9 => handle_get_info9(_std_parms, param1, param2),
+        PrImporterSelector_imOpenFile8 => handle_open_file8(_std_parms, param1, param2),
         PrImporterSelector_imQuietFile => handle_quiet_file(param1),
         PrImporterSelector_imCloseFile => handle_close_file(param2),
         PrImporterSelector_imImportImage => handle_import_image(param1, param2),
         PrImporterSelector_imImportAudio7 => handle_import_audio(param1, param2),
+        PrImporterSelector_imGetPeakAudio => crate::importer::audio::handle_get_peak_audio(param1, param2),
+        PrImporterSelector_imCreateAsyncImporter => crate::importer::async_importer::handle_create_async_importer(_std_parms, param1, param2),
+        PrImporterSelector_imGetSourceVideo => crate::importer::async_importer::handle_get_source_video(param1, param2),
         PrImporterSelector_imGetSupports7 => malSupports7 as prMALError,
         PrImporterSelector_imGetSupports8 => malSupports8 as prMALError,
         PrImporterSelector_imGetSupportsPerInstancePrefs => malSupportsPerInstancePrefs as prMALError,

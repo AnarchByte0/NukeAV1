@@ -17,6 +17,6 @@
 #include "PrSDKSequenceAudioSuite.h"
 #include "PrSDKExportFileSuite.h"
 #include "PrSDKMALErrors.h"
-
+#include "PrSDKAsyncImporter.h"
 
 

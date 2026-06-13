@@ -1,3 +1,6 @@
 /target
 /output
 *.log
+.idea/
+sdk/*.zip
+/vcpkg/

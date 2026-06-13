@@ -1,0 +1,76 @@
+name: Rust CI & Release Build
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build Plugin (Windows)
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache vcpkg
+      uses: actions/cache@v4
+      with:
+        path: |
+          target/vcpkg
+          target/release/build
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('Cargo.toml', 'build.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-
+
+    - name: Set up Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Set up MSVC & CMake
+      uses: aseprite/get-ninja@main
+
+    - name: Download Adobe Premiere Pro SDK
+      shell: bash
+      env:
+        ADOBE_SDK_URL: ${{ secrets.ADOBE_SDK_URL }}
+      run: |
+        mkdir -p sdk
+        if [ -n "$ADOBE_SDK_URL" ]; then
+          echo "Downloading Adobe SDK from secrets..."
+          curl -L -o sdk/SDK.zip "$ADOBE_SDK_URL"
+          mv sdk/SDK.zip "sdk/Premiere Pro 26.0 C++ SDK Windows.zip"
+        else
+          echo "No ADOBE_SDK_URL secret provided. Checking if SDK zip is cached or present..."
+          if [ ! -f "sdk/Premiere Pro 26.0 C++ SDK Windows.zip" ]; then
+            echo "ERROR: Adobe Premiere Pro SDK zip not found! Please set the ADOBE_SDK_URL secret or place the zip in 'sdk/'."
+            exit 1
+          fi
+        fi
+
+    - name: Build plugin in Release Mode
+      run: cargo build --release
+
+    - name: Parse cargo version
+      id: get_version
+      shell: bash
+      run: |
+        VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Package Release Artifact
+      shell: bash
+      run: |
+        mkdir -p output
+        cp target/release/NukeAV1.dll output/NukeAV1.prm
+        echo "Artifact prepared at output/NukeAV1.prm"
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: NukeAV1-${{ steps.get_version.outputs.version }}-windows
+        path: output/NukeAV1.prm

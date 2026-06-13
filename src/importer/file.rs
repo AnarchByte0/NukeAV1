@@ -2,13 +2,24 @@ use std::ffi::{c_void, CString};
 use std::ptr;
 use crate::*;
 use crate::ffmpeg_ffi::*;
-use crate::importer::types::ImporterData;
+use crate::importer::types::*;
 use crate::importer::utils::get_utf16_string;
+use std::sync::{Arc, Mutex, Condvar};
+use std::collections::HashSet;
 
 pub unsafe extern "C" fn get_format(
     ctx: *mut AVCodecContext,
     pix_fmts: *const AVPixelFormat,
 ) -> AVPixelFormat {
+    let mut offered = Vec::new();
+    let mut i = 0;
+    while *pix_fmts.add(i) != AV_PIX_FMT_NONE {
+        let fmt = *pix_fmts.add(i);
+        offered.push(fmt);
+        i += 1;
+    }
+    crate::log_debug!("get_format: offered formats = {:?}", offered);
+    
     let mut i = 0;
     while *pix_fmts.add(i) != AV_PIX_FMT_NONE {
         let fmt = *pix_fmts.add(i);
@@ -18,6 +29,7 @@ pub unsafe extern "C" fn get_format(
             || fmt == AV_PIX_FMT_CUDA 
         {
             if !(*ctx).hw_device_ctx.is_null() {
+                crate::log_debug!("get_format: SELECTED HW FORMAT = {}", fmt);
                 return fmt;
             }
         }
@@ -26,7 +38,7 @@ pub unsafe extern "C" fn get_format(
     *pix_fmts
 }
 
-pub unsafe fn handle_open_file8(param1: *mut c_void, param2: *mut c_void) -> prMALError {
+pub unsafe fn handle_open_file8(std_parms: *mut imStdParms, param1: *mut c_void, param2: *mut c_void) -> prMALError {
     let file_ref_ptr = param1 as *mut *mut c_void;
     let file_open = param2 as *mut imFileOpenRec8;
     if file_open.is_null() {
@@ -73,17 +85,10 @@ pub unsafe fn handle_open_file8(param1: *mut c_void, param2: *mut c_void) -> prM
         "unknown".to_string()
     };
     
-    // Write debug logs even in release for this troubleshooting phase
-    if let Ok(mut file) = std::fs::OpenOptions::new().create(true).append(true).open("C:\\Users\\maksi\\NukeAV1_debug.log") {
-        use std::io::Write;
-        let _ = writeln!(file, "Importer opened file: {}, video codec: {} ({})", path_str, codec_name, codec_id);
-    }
+    crate::log_debug!("Importer opened file: {}, video codec: {} ({})", path_str, codec_name, codec_id);
 
     if codec_id != AV_CODEC_ID_AV1 && codec_id != AV_CODEC_ID_VP9 && codec_id != AV_CODEC_ID_VP8 {
-        if let Ok(mut file) = std::fs::OpenOptions::new().create(true).append(true).open("C:\\Users\\maksi\\NukeAV1_debug.log") {
-            use std::io::Write;
-            let _ = writeln!(file, "Importer rejected file: codec not AV1/VP9/VP8");
-        }
+        crate::log_debug!("Importer rejected file: codec not AV1/VP9/VP8");
         avformat_close_input(&mut fmt_ctx);
         return PrImporterReturnValue_imBadFile as prMALError;
     }
@@ -100,34 +105,51 @@ pub unsafe fn handle_open_file8(param1: *mut c_void, param2: *mut c_void) -> prM
         return malUnknownError as prMALError;
     }
 
+    let video_codec_par = (*(*(*fmt_ctx).streams.add(video_stream_idx as usize))).codecpar;
     if avcodec_parameters_to_context(codec_ctx, video_codec_par) < 0 {
         avcodec_free_context(&mut codec_ctx);
         avformat_close_input(&mut fmt_ctx);
         return malUnknownError as prMALError;
     }
 
+    // Configure multi-threaded slice decoding (zero latency, high CPU parallelization)
+    (*codec_ctx).thread_count = 0; // Auto-detect core count
+    (*codec_ctx).thread_type = crate::ffmpeg_ffi::FF_THREAD_SLICE as i32;
+
     let mut hw_device_ctx: *mut AVBufferRef = ptr::null_mut();
-    let hw_types = [
+    let mut chosen_hw_name = "disabled (software fallback)";
+
+    // Try initializing D3D11VA
+    let mut err = av_hwdevice_ctx_create(
+        &mut hw_device_ctx,
         AV_HWDEVICE_TYPE_D3D11VA,
-        AV_HWDEVICE_TYPE_DXVA2,
-        AV_HWDEVICE_TYPE_CUDA,
-    ];
-    for &hw_type in &hw_types {
-        let mut ctx_ptr: *mut AVBufferRef = ptr::null_mut();
-        let err = av_hwdevice_ctx_create(
-            &mut ctx_ptr,
-            hw_type,
+        ptr::null(),
+        ptr::null_mut(),
+        0
+    );
+
+    if err == 0 {
+        chosen_hw_name = "D3D11VA";
+    } else {
+        // Try CUDA
+        err = av_hwdevice_ctx_create(
+            &mut hw_device_ctx,
+            AV_HWDEVICE_TYPE_CUDA,
             ptr::null(),
             ptr::null_mut(),
             0
         );
-        if err >= 0 && !ctx_ptr.is_null() {
-            hw_device_ctx = ctx_ptr;
-            (*codec_ctx).hw_device_ctx = av_buffer_ref(hw_device_ctx);
-            (*codec_ctx).get_format = Some(get_format);
-            break;
+        if err == 0 {
+            chosen_hw_name = "CUDA";
         }
     }
+
+    if !hw_device_ctx.is_null() {
+        (*codec_ctx).hw_device_ctx = av_buffer_ref(hw_device_ctx);
+        (*codec_ctx).get_format = Some(get_format);
+    }
+
+    crate::log_debug!("Selected HW Decoder: {}", chosen_hw_name);
 
     if avcodec_open2(codec_ctx, codec, ptr::null_mut()) < 0 {
         if !hw_device_ctx.is_null() {
@@ -206,20 +228,50 @@ pub unsafe fn handle_open_file8(param1: *mut c_void, param2: *mut c_void) -> prM
     let frame = av_frame_alloc();
     let packet = av_packet_alloc();
 
-    let importer_data = Box::new(ImporterData {
+    let ffmpeg_ctx = Arc::new(Mutex::new(FFmpegContext {
         format_ctx: fmt_ctx,
         codec_ctx,
-        video_stream_idx,
         frame,
         packet,
-        audio_stream_idx,
         audio_codec_ctx,
         audio_frame,
         swr_ctx,
+    }));
+
+    let cache = Arc::new((
+        Mutex::new(CacheState {
+            frame_cache: Vec::new(),
+            decoding_in_progress: HashSet::new(),
+        }),
+        Condvar::new(),
+    ));
+
+    let (worker_tx, rx) = std::sync::mpsc::channel();
+    
+    // Spawn background worker thread
+    let ffmpeg_clone = Arc::clone(&ffmpeg_ctx);
+    let cache_clone = Arc::clone(&cache);
+    let video_stream_idx_val = video_stream_idx;
+    
+    let worker_thread = std::thread::spawn(move || {
+        crate::importer::image::worker_thread_loop(ffmpeg_clone, video_stream_idx_val, cache_clone, rx);
+    });
+
+    let importer_data = Box::new(ImporterData {
+        ffmpeg: ffmpeg_ctx,
+        video_stream_idx,
+        audio_stream_idx,
+        cache,
+        worker_tx,
+        worker_thread: Some(worker_thread),
         audio_buffer,
         audio_buffer_start_sample: 0,
         needs_first_pts: false,
         hw_device_ctx,
+        last_decoded_frame: Mutex::new(-999999),
+        temp_bgra64_buffer: Mutex::new(Vec::new()),
+        std_parms,
+        async_data_ptr: std::ptr::null_mut(),
     });
 
     let raw_data = Box::into_raw(importer_data);
@@ -241,3 +293,4 @@ pub unsafe fn handle_close_file(param1: *mut c_void) -> prMALError {
     }
     malNoError as prMALError
 }
+

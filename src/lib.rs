@@ -2,12 +2,27 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(dead_code)]
+#![allow(unsafe_op_in_unsafe_fn)]
 
 // Include generated structures from bindgen
 include!(concat!(env!("OUT_DIR"), "/pr_sdk_bindings.rs"));
 
 use std::ffi::c_void;
 use std::os::raw::c_int;
+
+#[macro_export]
+macro_rules! log_debug {
+    ($($arg:tt)*) => {
+        if let Ok(mut file) = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(std::env::temp_dir().join("NukeAV1_debug.log"))
+        {
+            use std::io::Write;
+            let _ = writeln!(file, $($arg)*);
+        }
+    };
+}
 
 pub mod exporter;
 pub mod importer;
@@ -22,16 +37,15 @@ pub unsafe extern "C" fn xImportEntry(
     param1: *mut c_void,
     param2: *mut c_void,
 ) -> prMALError {
-    if let Ok(mut file) = std::fs::OpenOptions::new().create(true).append(true).open("C:\\Users\\maksi\\NukeAV1_debug.log") {
-        use std::io::Write;
-        let _ = writeln!(file, "xImportEntry called: selector = {}, param1 = {:?}, param2 = {:?}", selector, param1, param2);
-    }
+    log_debug!("xImportEntry called: selector = {}, param1 = {:?}, param2 = {:?}", selector, param1, param2);
 
     if std_parms.is_null() {
         return malUnknownError as prMALError;
     }
     
-    importer::handle_import_selector(selector, std_parms, param1, param2)
+    let res = importer::handle_import_selector(selector, std_parms, param1, param2);
+    log_debug!("xImportEntry returned: {} for selector = {}", res, selector);
+    res
 }
 
 /// Entry point for exporter module (AV1/VP8/VP9 encoding)

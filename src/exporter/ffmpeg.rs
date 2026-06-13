@@ -298,11 +298,13 @@ impl FFmpegEncoder {
             }
         }
 
-        (*stream).time_base = (*codec_ctx).time_base;
+        (*codec_ctx).time_base = (*stream).time_base;
 
         if ((*(*fmt_ctx).oformat).flags as u32 & AVFMT_GLOBALHEADER) != 0 {
             (*codec_ctx).flags |= AV_CODEC_FLAG_GLOBAL_HEADER as i32;
         }
+
+        (*codec_ctx).thread_count = 0;
 
         let err = avcodec_open2(codec_ctx, codec, ptr::null_mut());
         if err < 0 {

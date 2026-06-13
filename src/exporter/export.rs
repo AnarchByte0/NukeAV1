@@ -13,7 +13,11 @@ fn log_debug(msg: &str) {
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_secs_f64())
             .unwrap_or(0.0);
-        if let Ok(mut file) = OpenOptions::new().create(true).append(true).open("C:\\Users\\maksi\\NukeAV1_debug.log") {
+        if let Ok(mut file) = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(std::env::temp_dir().join("NukeAV1_debug.log"))
+        {
             let _ = writeln!(file, "[{:.4}] {}", time, msg);
         }
     }
@@ -126,6 +130,7 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                             let mut sample_rate = 48000.0;
                             let mut channels = 2; // stereo
                             let mut container_choice = 0; // mp4
+                            let mut multiplexer_choice = 0; // MP4
                             let mut bitrate_mode = 0; // default VBR
                             let mut max_bitrate = 12.0;
                             let mut audio_bitrate_choice = 1; // default 128 kbps
@@ -182,6 +187,8 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
 
                                 get_param_value(export_rec.exporterPluginID, 0, b"ADBEVideoContainer\0".as_ptr() as *const c_char, &mut val);
                                 container_choice = val.value.__bindgen_anon_1.intValue;
+                                get_param_value(export_rec.exporterPluginID, 0, b"ADBEExporterMultiplexerDropdown\0".as_ptr() as *const c_char, &mut val);
+                                multiplexer_choice = val.value.__bindgen_anon_1.intValue;
                                 get_param_value(export_rec.exporterPluginID, 0, b"NukeVideoColorSpace\0".as_ptr() as *const c_char, &mut val);
                                 colorspace = val.value.__bindgen_anon_1.intValue;
 
@@ -332,7 +339,7 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                             height as i32,
                                             fps as i32,
                                             (target_bitrate * 1000000.0) as i64,
-                                            audio_render_initialized,
+                                            audio_render_initialized && multiplexer_choice != 2,
                                             audio_codec,
                                             sample_rate as i32,
                                             channels as i32,

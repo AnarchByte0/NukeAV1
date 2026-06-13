@@ -103,26 +103,26 @@ fn main() {
             panic!("Failed to install ffmpeg via vcpkg");
         }
     } else if env::var("SKIP_FFMPEG_UPDATE").is_err() {
-        // --- АВТОМАТИЧНЕ ОНОВЛЕННЯ FFmpeg ---
+        // --- AUTOMATIC FFMPEG UPDATE ---
         println!("cargo:warning=Checking for FFmpeg updates in vcpkg...");
         
-        // 1. Відкочуємо наші хаки, щоб git pull не конфліктував
+        // 1. Revert our hacks to avoid git pull conflicts
         let _ = Command::new("git")
             .args(&["checkout", "--", "ports/ffmpeg/portfile.cmake"])
             .current_dir(&vcpkg_dir)
             .status();
 
-        // 2. Отримуємо нові версії з репозиторію
+        // 2. Fetch new versions from the repository
         let pull_status = Command::new("git")
             .args(&["pull"])
             .current_dir(&vcpkg_dir)
             .status().unwrap();
 
         if pull_status.success() {
-            // 3. Накатуємо наші хаки назад
+            // 3. Re-apply our hacks
             hack_portfile(&vcpkg_dir);
 
-            // 4. Оновлюємо FFmpeg (якщо вийшла нова версія)
+            // 4. Update FFmpeg (if a new version is available)
             let _ = run_command_streaming(
                 &vcpkg_dir.join("vcpkg.exe"),
                 &[
@@ -135,8 +135,9 @@ fn main() {
         }
     }
 
-    // 3. Link FFmpeg via VCPKG Rust crate
-    env::set_var("VCPKG_ROOT", &vcpkg_dir);
+    unsafe {
+        env::set_var("VCPKG_ROOT", &vcpkg_dir);
+    }
     vcpkg::Config::new()
         .target_triplet("x64-windows-static")
         .find_package("ffmpeg")
