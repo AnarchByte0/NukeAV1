@@ -291,8 +291,8 @@ unsafe fn handle_ai_get_frame(param: *mut c_void) -> prMALError {
     let bounds = prRect {
         top:    0,
         left:   0,
-        bottom: height,
-        right:  width,
+        bottom: height as i16,
+        right:  width as i16,
     };
 
     let create_ppix_fn = match ppix_creator.CreatePPix {
@@ -538,8 +538,8 @@ pub unsafe fn handle_get_source_video(param1: *mut c_void, param2: *mut c_void) 
     let bounds = prRect {
         top: 0,
         left: 0,
-        bottom: height,
-        right: width,
+        bottom: height as i16,
+        right: width as i16,
     };
     
     let create_ppix_fn = match ppix_creator.CreatePPix {

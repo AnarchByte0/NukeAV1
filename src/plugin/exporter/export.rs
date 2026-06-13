@@ -1,5 +1,6 @@
 use std::ffi::c_void;
 use std::os::raw::c_char;
+#[cfg(target_os = "windows")]
 use std::os::windows::ffi::OsStringExt;
 use crate::*;
 
@@ -328,9 +329,10 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                     let mut utf16_path: Vec<u16> = vec![0; path_len as usize];
                                     get_path(export_rec.fileObject, &mut path_len, utf16_path.as_mut_ptr());
                                     
-                                    let os_string = std::ffi::OsString::from_wide(&utf16_path[..path_len as usize - 1]);
-                                    if let Ok(output_path) = os_string.into_string() {
-                                        log_debug(&format!("output_path: {}", output_path));
+                                    let os_string = crate::utils::get_utf16_string(utf16_path.as_ptr());
+                                     if true {
+                                         let output_path = os_string;
+                                         log_debug(&format!("output_path: {}", output_path));
                                         
                                         match crate::exporter::ffmpeg::FFmpegEncoder::new(
                                             &output_path,

@@ -22,7 +22,7 @@ pub unsafe fn handle_import_selector(
     param1: *mut c_void,
     param2: *mut c_void,
 ) -> prMALError {
-    match selector {
+    match selector as PrImporterSelector {
         PrImporterSelector_imInit => {
             let import_info = param1 as *mut imImportInfoRec;
             if !import_info.is_null() {
