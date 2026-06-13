@@ -92,6 +92,12 @@ fn main() {
         "x64-osx"
     };
 
+    let ffmpeg_features = if target_os == "windows" {
+        "ffmpeg[core,avcodec,avformat,swscale,swresample,vpx,dav1d,aom,nvcodec,amf,qsv]"
+    } else {
+        "ffmpeg[core,avcodec,avformat,swscale,swresample,vpx,dav1d,aom]"
+    };
+
     if !vcpkg_dir.exists() {
         println!("cargo:warning=Cloning vcpkg and compiling FFmpeg from source. This will take 15-40 minutes!");
         
@@ -125,7 +131,7 @@ fn main() {
             &vcpkg_binary,
             &[
                 "install",
-                &format!("ffmpeg[core,avcodec,avformat,swscale,swresample,vpx,dav1d,aom,nvcodec,amf,qsv]:{}", triplet),
+                &format!("{}:{}", ffmpeg_features, triplet),
                 "--no-binarycaching"
             ],
             &vcpkg_dir
@@ -161,7 +167,7 @@ fn main() {
                 &vcpkg_binary,
                 &[
                     "install",
-                    &format!("ffmpeg[core,avcodec,avformat,swscale,swresample,vpx,dav1d,aom,nvcodec,amf,qsv]:{}", triplet),
+                    &format!("{}:{}", ffmpeg_features, triplet),
                     "--no-binarycaching"
                 ],
                 &vcpkg_dir
