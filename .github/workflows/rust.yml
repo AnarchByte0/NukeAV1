@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build-windows:
     name: Build Plugin (Windows)
     runs-on: windows-latest
 
@@ -34,7 +34,7 @@ jobs:
     - name: Set up MSVC & CMake
       uses: aseprite/get-ninja@main
 
-    - name: Download Adobe Premiere Pro SDK
+    - name: Download Adobe Premiere Pro SDK (Windows)
       shell: bash
       env:
         ADOBE_SDK_URL: ${{ secrets.ADOBE_SDK_URL }}
@@ -69,8 +69,104 @@ jobs:
         cp target/release/NukeAV1.dll output/NukeAV1.prm
         echo "Artifact prepared at output/NukeAV1.prm"
 
-    - name: Upload Build Artifact
+    - name: Upload Windows Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: NukeAV1-${{ steps.get_version.outputs.version }}-windows
+        name: NukeAV1-${{ steps.get_version.outputs.version }}-Windows
         path: output/NukeAV1.prm
+
+  build-macos:
+    name: Build Plugin (macOS)
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache vcpkg
+      uses: actions/cache@v4
+      with:
+        path: |
+          target/vcpkg
+          target/release/build
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('Cargo.toml', 'build.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-
+
+    - name: Set up Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install System Dependencies (macOS)
+      run: |
+        brew install cmake ninja
+
+    - name: Download Adobe Premiere Pro SDK (macOS)
+      shell: bash
+      env:
+        ADOBE_SDK_URL: ${{ secrets.ADOBE_SDK_URL }}
+      run: |
+        mkdir -p sdk
+        if [ -n "$ADOBE_SDK_URL" ]; then
+          echo "Downloading Adobe SDK from secrets..."
+          curl -L -o sdk/SDK.zip "$ADOBE_SDK_URL"
+          # Supports both Mac and Windows archive layouts
+          mv sdk/SDK.zip "sdk/Premiere Pro 26.0 C++ SDK Mac.zip"
+        else
+          echo "No ADOBE_SDK_URL secret provided. Checking if cached SDK is present..."
+          if [ ! -f "sdk/Premiere Pro 26.0 C++ SDK Mac.zip" ] && [ ! -f "sdk/Premiere Pro 26.0 C++ SDK Windows.zip" ]; then
+            echo "ERROR: Adobe Premiere Pro SDK zip not found! Please set the ADOBE_SDK_URL secret."
+            exit 1
+          fi
+        fi
+
+    - name: Build plugin in Release Mode (macOS)
+      run: cargo build --release
+
+    - name: Parse cargo version
+      id: get_version
+      shell: bash
+      run: |
+        VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Package macOS Bundle
+      shell: bash
+      run: |
+        VERSION="${{ steps.get_version.outputs.version }}"
+        mkdir -p output/NukeAV1.bundle/Contents/MacOS
+        
+        # Copy compiled dynamic library as the bundle executable
+        cp target/release/libNukeAV1.dylib output/NukeAV1.bundle/Contents/MacOS/NukeAV1
+        
+        # Generate Info.plist dynamically
+        cat <<EOF > output/NukeAV1.bundle/Contents/Info.plist
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleDevelopmentRegion</key>
+            <string>English</string>
+            <key>CFBundleExecutable</key>
+            <string>NukeAV1</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.anarchbyte.nukeav1</string>
+            <key>CFBundleInfoDictionaryVersion</key>
+            <string>6.0</string>
+            <key>CFBundleName</key>
+            <string>NukeAV1</string>
+            <key>CFBundlePackageType</key>
+            <string>Bndl</string>
+            <key>CFBundleSignature</key>
+            <string>????</string>
+            <key>CFBundleVersion</key>
+            <string>$VERSION</string>
+        </dict>
+        </plist>
+        EOF
+        echo "macOS Bundle prepared at output/NukeAV1.bundle"
+
+    - name: Upload macOS Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: NukeAV1-${{ steps.get_version.outputs.version }}-macOS
+        path: output/NukeAV1.bundle

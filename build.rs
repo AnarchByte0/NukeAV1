@@ -26,7 +26,7 @@ fn hack_portfile(vcpkg_dir: &Path) {
 
 fn run_command_streaming(cmd_program: &Path, cmd_args: &[&str], current_dir: &Path) -> std::process::ExitStatus {
     use std::io::{BufRead, BufReader};
-    use std::process::{Command, Stdio};
+    use std::process::Stdio;
 
     println!("cargo:warning=Running: {} {}", cmd_program.display(), cmd_args.join(" "));
 
@@ -52,27 +52,46 @@ fn run_command_streaming(cmd_program: &Path, cmd_args: &[&str], current_dir: &Pa
 
 fn main() {
     println!("cargo:rerun-if-changed=src/ffi/wrapper.hpp");
-    println!("cargo:rerun-if-changed=sdk/Premiere Pro 26.0 C++ SDK Windows.zip");
+    
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
 
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     
-    // 1. Setup Adobe SDK
+    // 1. Setup Adobe SDK (Find Windows or Mac SDK zip file)
     let adobe_sdk_dir = out_dir.join("Adobe_Premiere_Pro_SDK");
     if !adobe_sdk_dir.exists() {
-        let zip_path = PathBuf::from(&manifest_dir).join("sdk").join("Premiere Pro 26.0 C++ SDK Windows.zip");
+        let mut zip_path = PathBuf::from(&manifest_dir).join("sdk").join("Premiere Pro 26.0 C++ SDK Windows.zip");
+        if !zip_path.exists() {
+            zip_path = PathBuf::from(&manifest_dir).join("sdk").join("Premiere Pro 26.0 C++ SDK Mac.zip");
+        }
+        
         fs::create_dir_all(&adobe_sdk_dir).unwrap();
         
-        let file = std::fs::File::open(&zip_path).expect("Failed to open Adobe SDK zip");
+        let file = std::fs::File::open(&zip_path).expect("Failed to open Adobe SDK zip (Neither Windows nor Mac zip found)");
         let mut archive = zip::ZipArchive::new(file).expect("Failed to parse zip archive");
         archive.extract(&adobe_sdk_dir).expect("Failed to extract Adobe SDK");
     }
     
-    // The zip crate preserves the top-level directory "Premiere Pro 26.0 C++ SDK"
+    // The zip crate preserves the top-level directory "Premiere Pro 26.0 C++ SDK" (same layout in both zips)
     let sdk_headers = adobe_sdk_dir.join("Premiere Pro 26.0 C++ SDK").join("Examples").join("Headers");
 
     // 2. Setup VCPKG and Compile FFmpeg statically
     let vcpkg_dir = out_dir.join("vcpkg");
+    
+    let triplet = if target_os == "windows" {
+        "x64-windows-static"
+    } else if target_os == "macos" {
+        if target_arch == "aarch64" {
+            "arm64-osx"
+        } else {
+            "x64-osx"
+        }
+    } else {
+        "x64-osx"
+    };
+
     if !vcpkg_dir.exists() {
         println!("cargo:warning=Cloning vcpkg and compiling FFmpeg from source. This will take 15-40 minutes!");
         
@@ -81,19 +100,32 @@ fn main() {
             .status().unwrap();
         if !status.success() { panic!("Failed to clone vcpkg"); }
 
-        let status = Command::new("cmd")
-            .args(&["/C", "bootstrap-vcpkg.bat"])
-            .current_dir(&vcpkg_dir)
-            .status().unwrap();
-        if !status.success() { panic!("Failed to bootstrap vcpkg"); }
+        let bootstrap_status = if target_os == "windows" {
+            Command::new("cmd")
+                .args(&["/C", "bootstrap-vcpkg.bat"])
+                .current_dir(&vcpkg_dir)
+                .status().unwrap()
+        } else {
+            Command::new("sh")
+                .arg("bootstrap-vcpkg.sh")
+                .current_dir(&vcpkg_dir)
+                .status().unwrap()
+        };
+        if !bootstrap_status.success() { panic!("Failed to bootstrap vcpkg"); }
 
         hack_portfile(&vcpkg_dir);
 
+        let vcpkg_binary = if target_os == "windows" {
+            vcpkg_dir.join("vcpkg.exe")
+        } else {
+            vcpkg_dir.join("vcpkg")
+        };
+
         let status = run_command_streaming(
-            &vcpkg_dir.join("vcpkg.exe"),
+            &vcpkg_binary,
             &[
                 "install",
-                "ffmpeg[core,avcodec,avformat,swscale,swresample,vpx,dav1d,aom,nvcodec,amf,qsv]:x64-windows-static",
+                &format!("ffmpeg[core,avcodec,avformat,swscale,swresample,vpx,dav1d,aom,nvcodec,amf,qsv]:{}", triplet),
                 "--no-binarycaching"
             ],
             &vcpkg_dir
@@ -106,28 +138,30 @@ fn main() {
         // --- AUTOMATIC FFMPEG UPDATE ---
         println!("cargo:warning=Checking for FFmpeg updates in vcpkg...");
         
-        // 1. Revert our hacks to avoid git pull conflicts
         let _ = Command::new("git")
             .args(&["checkout", "--", "ports/ffmpeg/portfile.cmake"])
             .current_dir(&vcpkg_dir)
             .status();
 
-        // 2. Fetch new versions from the repository
         let pull_status = Command::new("git")
             .args(&["pull"])
             .current_dir(&vcpkg_dir)
             .status().unwrap();
 
         if pull_status.success() {
-            // 3. Re-apply our hacks
             hack_portfile(&vcpkg_dir);
 
-            // 4. Update FFmpeg (if a new version is available)
+            let vcpkg_binary = if target_os == "windows" {
+                vcpkg_dir.join("vcpkg.exe")
+            } else {
+                vcpkg_dir.join("vcpkg")
+            };
+
             let _ = run_command_streaming(
-                &vcpkg_dir.join("vcpkg.exe"),
+                &vcpkg_binary,
                 &[
                     "install",
-                    "ffmpeg[core,avcodec,avformat,swscale,swresample,vpx,dav1d,aom,nvcodec,amf,qsv]:x64-windows-static",
+                    &format!("ffmpeg[core,avcodec,avformat,swscale,swresample,vpx,dav1d,aom,nvcodec,amf,qsv]:{}", triplet),
                     "--no-binarycaching"
                 ],
                 &vcpkg_dir
@@ -139,18 +173,31 @@ fn main() {
         env::set_var("VCPKG_ROOT", &vcpkg_dir);
     }
     vcpkg::Config::new()
-        .target_triplet("x64-windows-static")
+        .target_triplet(triplet)
         .find_package("ffmpeg")
         .expect("Failed to link ffmpeg from vcpkg");
 
-    // Manually link required Windows system libraries for static FFmpeg
-    println!("cargo:rustc-link-lib=Secur32");
-    println!("cargo:rustc-link-lib=Ncrypt");
-    println!("cargo:rustc-link-lib=Crypt32");
-    println!("cargo:rustc-link-lib=Bcrypt");
-    println!("cargo:rustc-link-lib=Ole32");
-    println!("cargo:rustc-link-lib=User32");
-    println!("cargo:rustc-link-lib=Advapi32");
+    // Link target-specific libraries
+    if target_os == "windows" {
+        println!("cargo:rustc-link-lib=Secur32");
+        println!("cargo:rustc-link-lib=Ncrypt");
+        println!("cargo:rustc-link-lib=Crypt32");
+        println!("cargo:rustc-link-lib=Bcrypt");
+        println!("cargo:rustc-link-lib=Ole32");
+        println!("cargo:rustc-link-lib=User32");
+        println!("cargo:rustc-link-lib=Advapi32");
+    } else if target_os == "macos" {
+        println!("cargo:rustc-link-lib=framework=CoreFoundation");
+        println!("cargo:rustc-link-lib=framework=CoreVideo");
+        println!("cargo:rustc-link-lib=framework=CoreMedia");
+        println!("cargo:rustc-link-lib=framework=VideoToolbox");
+        println!("cargo:rustc-link-lib=framework=AudioToolbox");
+        println!("cargo:rustc-link-lib=framework=Security");
+        println!("cargo:rustc-link-lib=framework=AppKit");
+        println!("cargo:rustc-link-lib=iconv");
+        println!("cargo:rustc-link-lib=bz2");
+        println!("cargo:rustc-link-lib=z");
+    }
 
     // 4. Generate Premiere Pro Bindings
     let bindings = bindgen::Builder::default()
