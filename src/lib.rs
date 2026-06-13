@@ -30,7 +30,7 @@ pub use crate::plugin::exporter;
 pub use crate::utils::{str_to_utf16, leak_utf16};
 
 /// Main entry point for IMPORTER (AV1/VP9 reading)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn xImportEntry(
     selector: c_int,
     std_parms: *mut imStdParms,
@@ -49,7 +49,7 @@ pub unsafe extern "C" fn xImportEntry(
 }
 
 /// Entry point for exporter module (AV1/VP8/VP9 encoding)
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn xSDKExport(
     selector: c_int,
     std_parms: *mut exportStdParms,

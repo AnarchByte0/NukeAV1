@@ -1552,7 +1552,7 @@ pub type uint_fast32_t = ::std::os::raw::c_ulong;
 pub type uint_fast64_t = ::std::os::raw::c_ulong;
 pub type intmax_t = __intmax_t;
 pub type uintmax_t = __uintmax_t;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Extract the bitstream ID and the frame size from AC-3 data."]
     pub fn av_ac3_parse_header(
         buf: *const u8,
@@ -1561,7 +1561,7 @@ extern "C" {
         frame_size: *mut u16,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Extract the number of samples and frames from AAC data.\n @param[in]  buf     pointer to AAC data buffer\n @param[out] samples Pointer to where number of samples is written\n @param[out] frames  Pointer to where number of frames is written\n @return Returns 0 on success, error code on failure."]
     pub fn av_adts_header_parse(
         buf: *const u8,
@@ -1598,30 +1598,30 @@ pub const AV_SAMPLE_FMT_S64P: AVSampleFormat = 11;
 pub const AV_SAMPLE_FMT_NB: AVSampleFormat = 12;
 #[doc = " Audio sample formats\n\n - The data described by the sample format is always in native-endian order.\n   Sample values can be expressed by native C types, hence the lack of a signed\n   24-bit sample format even though it is a common raw audio data format.\n\n - The floating-point formats are based on full volume being in the range\n   [-1.0, 1.0]. Any values outside this range are beyond full volume level.\n\n - The data layout as used in av_samples_fill_arrays() and elsewhere in FFmpeg\n   (such as AVFrame in libavcodec) is as follows:\n\n @par\n For planar sample formats, each audio channel is in a separate data plane,\n and linesize is the buffer size, in bytes, for a single plane. All data\n planes must be the same size. For packed sample formats, only the first data\n plane is used, and samples for each channel are interleaved. In this case,\n linesize is the buffer size, in bytes, for the 1 plane.\n"]
 pub type AVSampleFormat = ::std::os::raw::c_int;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the name of sample_fmt, or NULL if sample_fmt is not\n recognized."]
     pub fn av_get_sample_fmt_name(sample_fmt: AVSampleFormat) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a sample format corresponding to name, or AV_SAMPLE_FMT_NONE\n on error."]
     pub fn av_get_sample_fmt(name: *const ::std::os::raw::c_char) -> AVSampleFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the planar<->packed alternative form of the given sample format, or\n AV_SAMPLE_FMT_NONE on error. If the passed sample_fmt is already in the\n requested planar/packed format, the format returned is the same as the\n input."]
     pub fn av_get_alt_sample_fmt(
         sample_fmt: AVSampleFormat,
         planar: ::std::os::raw::c_int,
     ) -> AVSampleFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the packed alternative form of the given sample format.\n\n If the passed sample_fmt is already in packed format, the format returned is\n the same as the input.\n\n @return  the packed alternative form of the given sample format or\nAV_SAMPLE_FMT_NONE on error."]
     pub fn av_get_packed_sample_fmt(sample_fmt: AVSampleFormat) -> AVSampleFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the planar alternative form of the given sample format.\n\n If the passed sample_fmt is already in planar format, the format returned is\n the same as the input.\n\n @return  the planar alternative form of the given sample format or\nAV_SAMPLE_FMT_NONE on error."]
     pub fn av_get_planar_sample_fmt(sample_fmt: AVSampleFormat) -> AVSampleFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Generate a string corresponding to the sample format with\n sample_fmt, or a header if sample_fmt is negative.\n\n @param buf the buffer where to write the string\n @param buf_size the size of buf\n @param sample_fmt the number of the sample format to print the\n corresponding info string, or a negative value to print the\n corresponding header.\n @return the pointer to the filled buffer or NULL if sample_fmt is\n unknown or in case of other errors"]
     pub fn av_get_sample_fmt_string(
         buf: *mut ::std::os::raw::c_char,
@@ -1629,15 +1629,15 @@ extern "C" {
         sample_fmt: AVSampleFormat,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return number of bytes per sample.\n\n @param sample_fmt the sample format\n @return number of bytes per sample or zero if unknown for the given\n sample format"]
     pub fn av_get_bytes_per_sample(sample_fmt: AVSampleFormat) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if the sample format is planar.\n\n @param sample_fmt the sample format to inspect\n @return 1 if the sample format is planar, 0 if it is interleaved"]
     pub fn av_sample_fmt_is_planar(sample_fmt: AVSampleFormat) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the required buffer size for the given audio parameters.\n\n @param[out] linesize calculated linesize, may be NULL\n @param nb_channels   the number of channels\n @param nb_samples    the number of samples in a single channel\n @param sample_fmt    the sample format\n @param align         buffer size alignment (0 = default, 1 = no alignment)\n @return              required buffer size, or negative error code on failure"]
     pub fn av_samples_get_buffer_size(
         linesize: *mut ::std::os::raw::c_int,
@@ -1647,7 +1647,7 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill plane data pointers and linesize for samples with sample\n format sample_fmt.\n\n The audio_data array is filled with the pointers to the samples data planes:\n for planar, set the start point of each channel's data within the buffer,\n for packed, set the start point of the entire buffer only.\n\n The value pointed to by linesize is set to the aligned size of each\n channel's data buffer for planar layout, or to the aligned size of the\n buffer for all channels for packed layout.\n\n The buffer in buf must be big enough to contain all the samples\n (use av_samples_get_buffer_size() to compute its minimum size),\n otherwise the audio_data pointers will point to invalid data.\n\n @see enum AVSampleFormat\n The documentation for AVSampleFormat describes the data layout.\n\n @param[out] audio_data  array to be filled with the pointer for each channel\n @param[out] linesize    calculated linesize, may be NULL\n @param buf              the pointer to a buffer containing the samples\n @param nb_channels      the number of channels\n @param nb_samples       the number of samples in a single channel\n @param sample_fmt       the sample format\n @param align            buffer size alignment (0 = default, 1 = no alignment)\n @return                 minimum size in bytes required for the buffer on success,\n                         or a negative error code on failure"]
     pub fn av_samples_fill_arrays(
         audio_data: *mut *mut u8,
@@ -1659,7 +1659,7 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a samples buffer for nb_samples samples, and fill data pointers and\n linesize accordingly.\n The allocated samples buffer can be freed by using av_freep(&audio_data[0])\n Allocated data will be initialized to silence.\n\n @see enum AVSampleFormat\n The documentation for AVSampleFormat describes the data layout.\n\n @param[out] audio_data  array to be filled with the pointer for each channel\n @param[out] linesize    aligned size for audio buffer(s), may be NULL\n @param nb_channels      number of audio channels\n @param nb_samples       number of samples per channel\n @param sample_fmt       the sample format\n @param align            buffer size alignment (0 = default, 1 = no alignment)\n @return                 >=0 on success or a negative error code on failure\n @todo return the size of the allocated buffer in case of success at the next bump\n @see av_samples_fill_arrays()\n @see av_samples_alloc_array_and_samples()"]
     pub fn av_samples_alloc(
         audio_data: *mut *mut u8,
@@ -1670,7 +1670,7 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a data pointers array, samples buffer for nb_samples\n samples, and fill data pointers and linesize accordingly.\n\n This is the same as av_samples_alloc(), but also allocates the data\n pointers array.\n\n @see av_samples_alloc()"]
     pub fn av_samples_alloc_array_and_samples(
         audio_data: *mut *mut *mut u8,
@@ -1681,7 +1681,7 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy samples from src to dst.\n\n @param dst destination array of pointers to data planes\n @param src source array of pointers to data planes\n @param dst_offset offset in samples at which the data will be written to dst\n @param src_offset offset in samples at which the data will be read from src\n @param nb_samples number of samples to be copied\n @param nb_channels number of audio channels\n @param sample_fmt audio sample format"]
     pub fn av_samples_copy(
         dst: *const *mut u8,
@@ -1693,7 +1693,7 @@ extern "C" {
         sample_fmt: AVSampleFormat,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill an audio buffer with silence.\n\n @param audio_data  array of pointers to data planes\n @param offset      offset in samples at which to start filling\n @param nb_samples  number of samples to fill\n @param nb_channels number of audio channels\n @param sample_fmt  audio sample format"]
     pub fn av_samples_set_silence(
         audio_data: *const *mut u8,
@@ -1703,19 +1703,19 @@ extern "C" {
         sample_fmt: AVSampleFormat,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the LIBAVUTIL_VERSION_INT constant."]
     pub fn avutil_version() -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return an informative version string. This usually is the actual release\n version number or a git commit description. This string has no fixed format\n and can change any time. It should never be parsed by code."]
     pub fn av_version_info() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavutil build-time configuration."]
     pub fn avutil_configuration() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavutil license."]
     pub fn avutil_license() -> *const ::std::os::raw::c_char;
 }
@@ -1731,7 +1731,7 @@ pub const AVMEDIA_TYPE_ATTACHMENT: AVMediaType = 4;
 pub const AVMEDIA_TYPE_NB: AVMediaType = 5;
 #[doc = " @addtogroup lavu_media Media Type\n @brief Media Type"]
 pub type AVMediaType = ::std::os::raw::c_int;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a string describing the media_type enum, NULL if media_type\n is unknown."]
     pub fn av_get_media_type_string(media_type: AVMediaType) -> *const ::std::os::raw::c_char;
 }
@@ -1753,11 +1753,11 @@ pub const AV_PICTURE_TYPE_SP: AVPictureType = 6;
 pub const AV_PICTURE_TYPE_BI: AVPictureType = 7;
 #[doc = " @}\n @}\n @defgroup lavu_picture Image related\n\n AVPicture types, pixel formats and basic image planes manipulation.\n\n @{"]
 pub type AVPictureType = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a single letter to describe the given picture type\n pict_type.\n\n @param[in] pict_type the picture type @return a single character\n representing the picture type, '?' if pict_type is unknown"]
     pub fn av_get_picture_type_char(pict_type: AVPictureType) -> ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __errno_location() -> *mut ::std::os::raw::c_int;
 }
 pub type __gwchar_t = ::std::os::raw::c_int;
@@ -1792,34 +1792,34 @@ fn bindgen_test_layout_imaxdiv_t() {
         "Offset of field: imaxdiv_t::rem"
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn imaxabs(__n: intmax_t) -> intmax_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn imaxdiv(__numer: intmax_t, __denom: intmax_t) -> imaxdiv_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtoimax(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
         __base: ::std::os::raw::c_int,
     ) -> intmax_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtoumax(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
         __base: ::std::os::raw::c_int,
     ) -> uintmax_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn wcstoimax(
         __nptr: *const __gwchar_t,
         __endptr: *mut *mut __gwchar_t,
         __base: ::std::os::raw::c_int,
     ) -> intmax_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn wcstoumax(
         __nptr: *const __gwchar_t,
         __endptr: *mut *mut __gwchar_t,
@@ -1834,1270 +1834,1270 @@ pub type _Float32x = f64;
 pub type _Float64x = u128;
 pub type float_t = f32;
 pub type double_t = f64;
-extern "C" {
+unsafe extern "C" {
     pub fn __fpclassify(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __signbit(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __isinf(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __finite(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __isnan(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __iseqsig(__x: f64, __y: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __issignaling(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn acos(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __acos(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asin(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __asin(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atan(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atan(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atan2(__y: f64, __x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atan2(__y: f64, __x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn cos(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __cos(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sin(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sin(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tan(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tan(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn cosh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __cosh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sinh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sinh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tanh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tanh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn acosh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __acosh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asinh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __asinh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atanh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atanh(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn exp(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __exp(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn frexp(__x: f64, __exponent: *mut ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __frexp(__x: f64, __exponent: *mut ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ldexp(__x: f64, __exponent: ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ldexp(__x: f64, __exponent: ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log10(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log10(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn modf(__x: f64, __iptr: *mut f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __modf(__x: f64, __iptr: *mut f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn expm1(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __expm1(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log1p(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log1p(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn logb(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __logb(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn exp2(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __exp2(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log2(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log2(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn pow(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __pow(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sqrt(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sqrt(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn hypot(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __hypot(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn cbrt(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __cbrt(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ceil(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fabs(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn floor(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmod(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fmod(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn isinf(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn finite(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn drem(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __drem(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn significand(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __significand(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn copysign(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nan(__tagb: *const ::std::os::raw::c_char) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nan(__tagb: *const ::std::os::raw::c_char) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn isnan(__value: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn j0(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __j0(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn j1(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __j1(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn jn(arg1: ::std::os::raw::c_int, arg2: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __jn(arg1: ::std::os::raw::c_int, arg2: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn y0(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __y0(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn y1(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __y1(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn yn(arg1: ::std::os::raw::c_int, arg2: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __yn(arg1: ::std::os::raw::c_int, arg2: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn erf(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __erf(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn erfc(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __erfc(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lgamma(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lgamma(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tgamma(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tgamma(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn gamma(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __gamma(arg1: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lgamma_r(arg1: f64, __signgamp: *mut ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lgamma_r(arg1: f64, __signgamp: *mut ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rint(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __rint(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nextafter(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nextafter(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nexttoward(__x: f64, __y: u128) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nexttoward(__x: f64, __y: u128) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn remainder(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __remainder(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalbn(__x: f64, __n: ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalbn(__x: f64, __n: ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ilogb(__x: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ilogb(__x: f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalbln(__x: f64, __n: ::std::os::raw::c_long) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalbln(__x: f64, __n: ::std::os::raw::c_long) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nearbyint(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nearbyint(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn round(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn trunc(__x: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn remquo(__x: f64, __y: f64, __quo: *mut ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __remquo(__x: f64, __y: f64, __quo: *mut ::std::os::raw::c_int) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lrint(__x: f64) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lrint(__x: f64) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn llrint(__x: f64) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __llrint(__x: f64) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lround(__x: f64) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lround(__x: f64) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn llround(__x: f64) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __llround(__x: f64) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fdim(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fdim(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmax(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmin(__x: f64, __y: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fma(__x: f64, __y: f64, __z: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fma(__x: f64, __y: f64, __z: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalb(__x: f64, __n: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalb(__x: f64, __n: f64) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fpclassifyf(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __signbitf(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __isinff(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __finitef(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __isnanf(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __iseqsigf(__x: f32, __y: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __issignalingf(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn acosf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __acosf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asinf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __asinf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atanf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atanf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atan2f(__y: f32, __x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atan2f(__y: f32, __x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn cosf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __cosf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sinf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sinf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tanf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tanf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn coshf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __coshf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sinhf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sinhf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tanhf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tanhf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn acoshf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __acoshf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asinhf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __asinhf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atanhf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atanhf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn expf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __expf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn frexpf(__x: f32, __exponent: *mut ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __frexpf(__x: f32, __exponent: *mut ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ldexpf(__x: f32, __exponent: ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ldexpf(__x: f32, __exponent: ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn logf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __logf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log10f(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log10f(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn modff(__x: f32, __iptr: *mut f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __modff(__x: f32, __iptr: *mut f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn expm1f(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __expm1f(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log1pf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log1pf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn logbf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __logbf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn exp2f(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __exp2f(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log2f(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log2f(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn powf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __powf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sqrtf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sqrtf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn hypotf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __hypotf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn cbrtf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __cbrtf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ceilf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fabsf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn floorf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmodf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fmodf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn isinff(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn finitef(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn dremf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __dremf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn significandf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __significandf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn copysignf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nanf(__tagb: *const ::std::os::raw::c_char) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nanf(__tagb: *const ::std::os::raw::c_char) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn isnanf(__value: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn j0f(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __j0f(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn j1f(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __j1f(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn jnf(arg1: ::std::os::raw::c_int, arg2: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __jnf(arg1: ::std::os::raw::c_int, arg2: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn y0f(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __y0f(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn y1f(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __y1f(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ynf(arg1: ::std::os::raw::c_int, arg2: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ynf(arg1: ::std::os::raw::c_int, arg2: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn erff(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __erff(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn erfcf(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __erfcf(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lgammaf(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lgammaf(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tgammaf(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tgammaf(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn gammaf(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __gammaf(arg1: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lgammaf_r(arg1: f32, __signgamp: *mut ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lgammaf_r(arg1: f32, __signgamp: *mut ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rintf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __rintf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nextafterf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nextafterf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nexttowardf(__x: f32, __y: u128) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nexttowardf(__x: f32, __y: u128) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn remainderf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __remainderf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalbnf(__x: f32, __n: ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalbnf(__x: f32, __n: ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ilogbf(__x: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ilogbf(__x: f32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalblnf(__x: f32, __n: ::std::os::raw::c_long) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalblnf(__x: f32, __n: ::std::os::raw::c_long) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nearbyintf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nearbyintf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn roundf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn truncf(__x: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn remquof(__x: f32, __y: f32, __quo: *mut ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __remquof(__x: f32, __y: f32, __quo: *mut ::std::os::raw::c_int) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lrintf(__x: f32) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lrintf(__x: f32) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn llrintf(__x: f32) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __llrintf(__x: f32) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lroundf(__x: f32) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lroundf(__x: f32) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn llroundf(__x: f32) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __llroundf(__x: f32) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fdimf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fdimf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmaxf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fminf(__x: f32, __y: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmaf(__x: f32, __y: f32, __z: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fmaf(__x: f32, __y: f32, __z: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalbf(__x: f32, __n: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalbf(__x: f32, __n: f32) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fpclassifyl(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __signbitl(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __isinfl(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __finitel(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __isnanl(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __iseqsigl(__x: u128, __y: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __issignalingl(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn acosl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __acosl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asinl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __asinl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atanl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atanl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atan2l(__y: u128, __x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atan2l(__y: u128, __x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn cosl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __cosl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sinl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sinl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tanl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tanl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn coshl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __coshl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sinhl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sinhl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tanhl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tanhl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn acoshl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __acoshl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asinhl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __asinhl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atanhl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __atanhl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn expl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __expl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn frexpl(__x: u128, __exponent: *mut ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __frexpl(__x: u128, __exponent: *mut ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ldexpl(__x: u128, __exponent: ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ldexpl(__x: u128, __exponent: ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn logl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __logl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log10l(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log10l(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn modfl(__x: u128, __iptr: *mut u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __modfl(__x: u128, __iptr: *mut u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn expm1l(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __expm1l(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log1pl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log1pl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn logbl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __logbl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn exp2l(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __exp2l(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn log2l(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __log2l(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn powl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __powl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sqrtl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __sqrtl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn hypotl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __hypotl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn cbrtl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __cbrtl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ceill(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fabsl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn floorl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmodl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fmodl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn isinfl(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn finitel(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn dreml(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __dreml(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn significandl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __significandl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn copysignl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nanl(__tagb: *const ::std::os::raw::c_char) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nanl(__tagb: *const ::std::os::raw::c_char) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn isnanl(__value: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn j0l(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __j0l(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn j1l(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __j1l(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn jnl(arg1: ::std::os::raw::c_int, arg2: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __jnl(arg1: ::std::os::raw::c_int, arg2: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn y0l(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __y0l(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn y1l(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __y1l(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ynl(arg1: ::std::os::raw::c_int, arg2: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ynl(arg1: ::std::os::raw::c_int, arg2: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn erfl(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __erfl(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn erfcl(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __erfcl(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lgammal(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lgammal(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tgammal(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __tgammal(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn gammal(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __gammal(arg1: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lgammal_r(arg1: u128, __signgamp: *mut ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lgammal_r(arg1: u128, __signgamp: *mut ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rintl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __rintl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nextafterl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nextafterl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nexttowardl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nexttowardl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn remainderl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __remainderl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalbnl(__x: u128, __n: ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalbnl(__x: u128, __n: ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ilogbl(__x: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ilogbl(__x: u128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalblnl(__x: u128, __n: ::std::os::raw::c_long) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalblnl(__x: u128, __n: ::std::os::raw::c_long) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nearbyintl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __nearbyintl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn roundl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn truncl(__x: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn remquol(__x: u128, __y: u128, __quo: *mut ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __remquol(__x: u128, __y: u128, __quo: *mut ::std::os::raw::c_int) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lrintl(__x: u128) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lrintl(__x: u128) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn llrintl(__x: u128) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __llrintl(__x: u128) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lroundl(__x: u128) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __lroundl(__x: u128) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn llroundl(__x: u128) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __llroundl(__x: u128) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fdiml(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fdiml(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmaxl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fminl(__x: u128, __y: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmal(__x: u128, __y: u128, __z: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fmal(__x: u128, __y: u128, __z: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scalbl(__x: u128, __n: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __scalbl(__x: u128, __n: u128) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __fpclassifyf128(__value: _Float128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __signbitf128(__value: _Float128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __isinff128(__value: _Float128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __finitef128(__value: _Float128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __isnanf128(__value: _Float128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __iseqsigf128(__x: _Float128, __y: _Float128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __issignalingf128(__value: _Float128) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut signgam: ::std::os::raw::c_int;
 }
 pub const FP_NAN: _bindgen_ty_1 = 0;
@@ -3595,25 +3595,25 @@ pub type cookie_io_functions_t = _IO_cookie_io_functions_t;
 pub type va_list = __gnuc_va_list;
 pub type off_t = __off_t;
 pub type fpos_t = __fpos_t;
-extern "C" {
+unsafe extern "C" {
     pub static mut stdin: *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut stdout: *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut stderr: *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn remove(__filename: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rename(
         __old: *const ::std::os::raw::c_char,
         __new: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn renameat(
         __oldfd: ::std::os::raw::c_int,
         __old: *const ::std::os::raw::c_char,
@@ -3621,71 +3621,71 @@ extern "C" {
         __new: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tmpfile() -> *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tmpnam(arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tmpnam_r(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tempnam(
         __dir: *const ::std::os::raw::c_char,
         __pfx: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fflush(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fflush_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fopen(
         __filename: *const ::std::os::raw::c_char,
         __modes: *const ::std::os::raw::c_char,
     ) -> *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn freopen(
         __filename: *const ::std::os::raw::c_char,
         __modes: *const ::std::os::raw::c_char,
         __stream: *mut FILE,
     ) -> *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fdopen(__fd: ::std::os::raw::c_int, __modes: *const ::std::os::raw::c_char)
         -> *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fopencookie(
         __magic_cookie: *mut ::std::os::raw::c_void,
         __modes: *const ::std::os::raw::c_char,
         __io_funcs: cookie_io_functions_t,
     ) -> *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fmemopen(
         __s: *mut ::std::os::raw::c_void,
         __len: usize,
         __modes: *const ::std::os::raw::c_char,
     ) -> *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn open_memstream(
         __bufloc: *mut *mut ::std::os::raw::c_char,
         __sizeloc: *mut usize,
     ) -> *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn setbuf(__stream: *mut FILE, __buf: *mut ::std::os::raw::c_char);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn setvbuf(
         __stream: *mut FILE,
         __buf: *mut ::std::os::raw::c_char,
@@ -3693,50 +3693,50 @@ extern "C" {
         __n: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn setbuffer(__stream: *mut FILE, __buf: *mut ::std::os::raw::c_char, __size: usize);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn setlinebuf(__stream: *mut FILE);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fprintf(
         __stream: *mut FILE,
         __format: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn printf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sprintf(
         __s: *mut ::std::os::raw::c_char,
         __format: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vfprintf(
         __s: *mut FILE,
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vprintf(
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vsprintf(
         __s: *mut ::std::os::raw::c_char,
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn snprintf(
         __s: *mut ::std::os::raw::c_char,
         __maxlen: ::std::os::raw::c_ulong,
@@ -3744,7 +3744,7 @@ extern "C" {
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vsnprintf(
         __s: *mut ::std::os::raw::c_char,
         __maxlen: ::std::os::raw::c_ulong,
@@ -3752,59 +3752,59 @@ extern "C" {
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vasprintf(
         __ptr: *mut *mut ::std::os::raw::c_char,
         __f: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __asprintf(
         __ptr: *mut *mut ::std::os::raw::c_char,
         __fmt: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asprintf(
         __ptr: *mut *mut ::std::os::raw::c_char,
         __fmt: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vdprintf(
         __fd: ::std::os::raw::c_int,
         __fmt: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn dprintf(
         __fd: ::std::os::raw::c_int,
         __fmt: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fscanf(
         __stream: *mut FILE,
         __format: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn scanf(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sscanf(
         __s: *const ::std::os::raw::c_char,
         __format: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}__isoc99_fscanf"]
     pub fn fscanf1(
         __stream: *mut FILE,
@@ -3812,11 +3812,11 @@ extern "C" {
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}__isoc99_scanf"]
     pub fn scanf1(__format: *const ::std::os::raw::c_char, ...) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}__isoc99_sscanf"]
     pub fn sscanf1(
         __s: *const ::std::os::raw::c_char,
@@ -3824,27 +3824,27 @@ extern "C" {
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vfscanf(
         __s: *mut FILE,
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vscanf(
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vsscanf(
         __s: *const ::std::os::raw::c_char,
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}__isoc99_vfscanf"]
     pub fn vfscanf1(
         __s: *mut FILE,
@@ -3852,14 +3852,14 @@ extern "C" {
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}__isoc99_vscanf"]
     pub fn vscanf1(
         __format: *const ::std::os::raw::c_char,
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}__isoc99_vsscanf"]
     pub fn vsscanf1(
         __s: *const ::std::os::raw::c_char,
@@ -3867,57 +3867,57 @@ extern "C" {
         __arg: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fgetc(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getc(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getchar() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getc_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getchar_unlocked() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fgetc_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fputc(__c: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn putc(__c: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn putchar(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fputc_unlocked(__c: ::std::os::raw::c_int, __stream: *mut FILE)
         -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn putc_unlocked(__c: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn putchar_unlocked(__c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getw(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn putw(__w: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fgets(
         __s: *mut ::std::os::raw::c_char,
         __n: ::std::os::raw::c_int,
         __stream: *mut FILE,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __getdelim(
         __lineptr: *mut *mut ::std::os::raw::c_char,
         __n: *mut usize,
@@ -3925,7 +3925,7 @@ extern "C" {
         __stream: *mut FILE,
     ) -> __ssize_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getdelim(
         __lineptr: *mut *mut ::std::os::raw::c_char,
         __n: *mut usize,
@@ -3933,23 +3933,23 @@ extern "C" {
         __stream: *mut FILE,
     ) -> __ssize_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getline(
         __lineptr: *mut *mut ::std::os::raw::c_char,
         __n: *mut usize,
         __stream: *mut FILE,
     ) -> __ssize_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fputs(__s: *const ::std::os::raw::c_char, __stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn puts(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ungetc(__c: ::std::os::raw::c_int, __stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fread(
         __ptr: *mut ::std::os::raw::c_void,
         __size: ::std::os::raw::c_ulong,
@@ -3957,7 +3957,7 @@ extern "C" {
         __stream: *mut FILE,
     ) -> ::std::os::raw::c_ulong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fwrite(
         __ptr: *const ::std::os::raw::c_void,
         __size: ::std::os::raw::c_ulong,
@@ -3965,7 +3965,7 @@ extern "C" {
         __s: *mut FILE,
     ) -> ::std::os::raw::c_ulong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fread_unlocked(
         __ptr: *mut ::std::os::raw::c_void,
         __size: usize,
@@ -3973,7 +3973,7 @@ extern "C" {
         __stream: *mut FILE,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fwrite_unlocked(
         __ptr: *const ::std::os::raw::c_void,
         __size: usize,
@@ -3981,87 +3981,87 @@ extern "C" {
         __stream: *mut FILE,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fseek(
         __stream: *mut FILE,
         __off: ::std::os::raw::c_long,
         __whence: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ftell(__stream: *mut FILE) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rewind(__stream: *mut FILE);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fseeko(
         __stream: *mut FILE,
         __off: __off_t,
         __whence: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ftello(__stream: *mut FILE) -> __off_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fgetpos(__stream: *mut FILE, __pos: *mut fpos_t) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fsetpos(__stream: *mut FILE, __pos: *const fpos_t) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clearerr(__stream: *mut FILE);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn feof(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ferror(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clearerr_unlocked(__stream: *mut FILE);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn feof_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ferror_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn perror(__s: *const ::std::os::raw::c_char);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fileno(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fileno_unlocked(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn pclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn popen(
         __command: *const ::std::os::raw::c_char,
         __modes: *const ::std::os::raw::c_char,
     ) -> *mut FILE;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ctermid(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn flockfile(__stream: *mut FILE);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ftrylockfile(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn funlockfile(__stream: *mut FILE);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __uflow(arg1: *mut FILE) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __overflow(arg1: *mut FILE, arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 #[repr(C)]
@@ -4145,85 +4145,85 @@ fn bindgen_test_layout_lldiv_t() {
         "Offset of field: lldiv_t::rem"
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __ctype_get_mb_cur_max() -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atof(__nptr: *const ::std::os::raw::c_char) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atoi(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atol(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atoll(__nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtod(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtof(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
     ) -> f32;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtold(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
     ) -> u128;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtol(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
         __base: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtoul(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
         __base: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_ulong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtoq(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
         __base: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtouq(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
         __base: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_ulonglong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtoll(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
         __base: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtoull(
         __nptr: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
         __base: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_ulonglong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn l64a(__n: ::std::os::raw::c_long) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn a64l(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
 }
 pub type u_char = __u_char;
@@ -4365,7 +4365,7 @@ fn bindgen_test_layout_fd_set() {
     );
 }
 pub type fd_mask = __fd_mask;
-extern "C" {
+unsafe extern "C" {
     pub fn select(
         __nfds: ::std::os::raw::c_int,
         __readfds: *mut fd_set,
@@ -4374,7 +4374,7 @@ extern "C" {
         __timeout: *mut timeval,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn pselect(
         __nfds: ::std::os::raw::c_int,
         __readfds: *mut fd_set,
@@ -5122,20 +5122,20 @@ impl ::std::fmt::Debug for pthread_barrierattr_t {
         write!(f, "pthread_barrierattr_t {{ union }}")
     }
 }
-extern "C" {
+unsafe extern "C" {
     pub fn random() -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn srandom(__seed: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn initstate(
         __seed: ::std::os::raw::c_uint,
         __statebuf: *mut ::std::os::raw::c_char,
         __statelen: usize,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn setstate(__statebuf: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 #[repr(C)]
@@ -5199,16 +5199,16 @@ fn bindgen_test_layout_random_data() {
         "Offset of field: random_data::end_ptr"
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn random_r(__buf: *mut random_data, __result: *mut i32) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn srandom_r(
         __seed: ::std::os::raw::c_uint,
         __buf: *mut random_data,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn initstate_r(
         __seed: ::std::os::raw::c_uint,
         __statebuf: *mut ::std::os::raw::c_char,
@@ -5216,46 +5216,46 @@ extern "C" {
         __buf: *mut random_data,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn setstate_r(
         __statebuf: *mut ::std::os::raw::c_char,
         __buf: *mut random_data,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rand() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn srand(__seed: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rand_r(__seed: *mut ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn drand48() -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn erand48(__xsubi: *mut ::std::os::raw::c_ushort) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lrand48() -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nrand48(__xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mrand48() -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn jrand48(__xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn srand48(__seedval: ::std::os::raw::c_long);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn seed48(__seed16v: *mut ::std::os::raw::c_ushort) -> *mut ::std::os::raw::c_ushort;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lcong48(__param: *mut ::std::os::raw::c_ushort);
 }
 #[repr(C)]
@@ -5307,125 +5307,125 @@ fn bindgen_test_layout_drand48_data() {
         "Offset of field: drand48_data::__a"
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn drand48_r(__buffer: *mut drand48_data, __result: *mut f64) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn erand48_r(
         __xsubi: *mut ::std::os::raw::c_ushort,
         __buffer: *mut drand48_data,
         __result: *mut f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lrand48_r(
         __buffer: *mut drand48_data,
         __result: *mut ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nrand48_r(
         __xsubi: *mut ::std::os::raw::c_ushort,
         __buffer: *mut drand48_data,
         __result: *mut ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mrand48_r(
         __buffer: *mut drand48_data,
         __result: *mut ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn jrand48_r(
         __xsubi: *mut ::std::os::raw::c_ushort,
         __buffer: *mut drand48_data,
         __result: *mut ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn srand48_r(
         __seedval: ::std::os::raw::c_long,
         __buffer: *mut drand48_data,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn seed48_r(
         __seed16v: *mut ::std::os::raw::c_ushort,
         __buffer: *mut drand48_data,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lcong48_r(
         __param: *mut ::std::os::raw::c_ushort,
         __buffer: *mut drand48_data,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn arc4random() -> __uint32_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn arc4random_buf(__buf: *mut ::std::os::raw::c_void, __size: usize);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn arc4random_uniform(__upper_bound: __uint32_t) -> __uint32_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn malloc(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn calloc(
         __nmemb: ::std::os::raw::c_ulong,
         __size: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn realloc(
         __ptr: *mut ::std::os::raw::c_void,
         __size: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn free(__ptr: *mut ::std::os::raw::c_void);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn reallocarray(
         __ptr: *mut ::std::os::raw::c_void,
         __nmemb: usize,
         __size: usize,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn alloca(__size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn valloc(__size: usize) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn posix_memalign(
         __memptr: *mut *mut ::std::os::raw::c_void,
         __alignment: usize,
         __size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn aligned_alloc(
         __alignment: ::std::os::raw::c_ulong,
         __size: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn abort() -> !;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn atexit(__func: ::std::option::Option<unsafe extern "C" fn()>) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn at_quick_exit(
         __func: ::std::option::Option<unsafe extern "C" fn()>,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn on_exit(
         __func: ::std::option::Option<
             unsafe extern "C" fn(
@@ -5436,53 +5436,53 @@ extern "C" {
         __arg: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn exit(__status: ::std::os::raw::c_int) -> !;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn quick_exit(__status: ::std::os::raw::c_int) -> !;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn _Exit(__status: ::std::os::raw::c_int) -> !;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getenv(__name: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn putenv(__string: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn setenv(
         __name: *const ::std::os::raw::c_char,
         __value: *const ::std::os::raw::c_char,
         __replace: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn unsetenv(__name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clearenv() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mktemp(__template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mkstemp(__template: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mkstemps(
         __template: *mut ::std::os::raw::c_char,
         __suffixlen: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mkdtemp(__template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn system(__command: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn realpath(
         __name: *const ::std::os::raw::c_char,
         __resolved: *mut ::std::os::raw::c_char,
@@ -5494,7 +5494,7 @@ pub type __compar_fn_t = ::std::option::Option<
         arg2: *const ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int,
 >;
-extern "C" {
+unsafe extern "C" {
     pub fn bsearch(
         __key: *const ::std::os::raw::c_void,
         __base: *const ::std::os::raw::c_void,
@@ -5503,7 +5503,7 @@ extern "C" {
         __compar: __compar_fn_t,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn qsort(
         __base: *mut ::std::os::raw::c_void,
         __nmemb: usize,
@@ -5511,28 +5511,28 @@ extern "C" {
         __compar: __compar_fn_t,
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn abs(__x: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn labs(__x: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn llabs(__x: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn div(__numer: ::std::os::raw::c_int, __denom: ::std::os::raw::c_int) -> div_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ldiv(__numer: ::std::os::raw::c_long, __denom: ::std::os::raw::c_long) -> ldiv_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn lldiv(
         __numer: ::std::os::raw::c_longlong,
         __denom: ::std::os::raw::c_longlong,
     ) -> lldiv_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ecvt(
         __value: f64,
         __ndigit: ::std::os::raw::c_int,
@@ -5540,7 +5540,7 @@ extern "C" {
         __sign: *mut ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fcvt(
         __value: f64,
         __ndigit: ::std::os::raw::c_int,
@@ -5548,14 +5548,14 @@ extern "C" {
         __sign: *mut ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn gcvt(
         __value: f64,
         __ndigit: ::std::os::raw::c_int,
         __buf: *mut ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn qecvt(
         __value: u128,
         __ndigit: ::std::os::raw::c_int,
@@ -5563,7 +5563,7 @@ extern "C" {
         __sign: *mut ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn qfcvt(
         __value: u128,
         __ndigit: ::std::os::raw::c_int,
@@ -5571,14 +5571,14 @@ extern "C" {
         __sign: *mut ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn qgcvt(
         __value: u128,
         __ndigit: ::std::os::raw::c_int,
         __buf: *mut ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ecvt_r(
         __value: f64,
         __ndigit: ::std::os::raw::c_int,
@@ -5588,7 +5588,7 @@ extern "C" {
         __len: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn fcvt_r(
         __value: f64,
         __ndigit: ::std::os::raw::c_int,
@@ -5598,7 +5598,7 @@ extern "C" {
         __len: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn qecvt_r(
         __value: u128,
         __ndigit: ::std::os::raw::c_int,
@@ -5608,7 +5608,7 @@ extern "C" {
         __len: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn qfcvt_r(
         __value: u128,
         __ndigit: ::std::os::raw::c_int,
@@ -5618,54 +5618,54 @@ extern "C" {
         __len: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mblen(__s: *const ::std::os::raw::c_char, __n: usize) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mbtowc(
         __pwc: *mut wchar_t,
         __s: *const ::std::os::raw::c_char,
         __n: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn wctomb(__s: *mut ::std::os::raw::c_char, __wchar: wchar_t) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mbstowcs(__pwcs: *mut wchar_t, __s: *const ::std::os::raw::c_char, __n: usize) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn wcstombs(__s: *mut ::std::os::raw::c_char, __pwcs: *const wchar_t, __n: usize) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rpmatch(__response: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getsubopt(
         __optionp: *mut *mut ::std::os::raw::c_char,
         __tokens: *const *mut ::std::os::raw::c_char,
         __valuep: *mut *mut ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn getloadavg(__loadavg: *mut f64, __nelem: ::std::os::raw::c_int)
         -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn memcpy(
         __dest: *mut ::std::os::raw::c_void,
         __src: *const ::std::os::raw::c_void,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn memmove(
         __dest: *mut ::std::os::raw::c_void,
         __src: *const ::std::os::raw::c_void,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn memccpy(
         __dest: *mut ::std::os::raw::c_void,
         __src: *const ::std::os::raw::c_void,
@@ -5673,80 +5673,80 @@ extern "C" {
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn memset(
         __s: *mut ::std::os::raw::c_void,
         __c: ::std::os::raw::c_int,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn memcmp(
         __s1: *const ::std::os::raw::c_void,
         __s2: *const ::std::os::raw::c_void,
         __n: ::std::os::raw::c_ulong,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __memcmpeq(
         __s1: *const ::std::os::raw::c_void,
         __s2: *const ::std::os::raw::c_void,
         __n: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn memchr(
         __s: *const ::std::os::raw::c_void,
         __c: ::std::os::raw::c_int,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strcpy(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strncpy(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strcat(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strncat(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strcmp(
         __s1: *const ::std::os::raw::c_char,
         __s2: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strncmp(
         __s1: *const ::std::os::raw::c_char,
         __s2: *const ::std::os::raw::c_char,
         __n: ::std::os::raw::c_ulong,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strcoll(
         __s1: *const ::std::os::raw::c_char,
         __s2: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strxfrm(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
@@ -5804,14 +5804,14 @@ fn bindgen_test_layout___locale_struct() {
 }
 pub type __locale_t = *mut __locale_struct;
 pub type locale_t = __locale_t;
-extern "C" {
+unsafe extern "C" {
     pub fn strcoll_l(
         __s1: *const ::std::os::raw::c_char,
         __s2: *const ::std::os::raw::c_char,
         __l: locale_t,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strxfrm_l(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
@@ -5819,84 +5819,84 @@ extern "C" {
         __l: locale_t,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strdup(__s: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strndup(
         __string: *const ::std::os::raw::c_char,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strchr(
         __s: *const ::std::os::raw::c_char,
         __c: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strrchr(
         __s: *const ::std::os::raw::c_char,
         __c: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strchrnul(
         __s: *const ::std::os::raw::c_char,
         __c: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strcspn(
         __s: *const ::std::os::raw::c_char,
         __reject: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_ulong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strspn(
         __s: *const ::std::os::raw::c_char,
         __accept: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_ulong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strpbrk(
         __s: *const ::std::os::raw::c_char,
         __accept: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strstr(
         __haystack: *const ::std::os::raw::c_char,
         __needle: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtok(
         __s: *mut ::std::os::raw::c_char,
         __delim: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __strtok_r(
         __s: *mut ::std::os::raw::c_char,
         __delim: *const ::std::os::raw::c_char,
         __save_ptr: *mut *mut ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strtok_r(
         __s: *mut ::std::os::raw::c_char,
         __delim: *const ::std::os::raw::c_char,
         __save_ptr: *mut *mut ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strcasestr(
         __haystack: *const ::std::os::raw::c_char,
         __needle: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn memmem(
         __haystack: *const ::std::os::raw::c_void,
         __haystacklen: usize,
@@ -5904,30 +5904,30 @@ extern "C" {
         __needlelen: usize,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __mempcpy(
         __dest: *mut ::std::os::raw::c_void,
         __src: *const ::std::os::raw::c_void,
         __n: usize,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mempcpy(
         __dest: *mut ::std::os::raw::c_void,
         __src: *const ::std::os::raw::c_void,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strlen(__s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulong;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strnlen(__string: *const ::std::os::raw::c_char, __maxlen: usize) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strerror(__errnum: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}__xpg_strerror_r"]
     pub fn strerror_r(
         __errnum: ::std::os::raw::c_int,
@@ -5935,71 +5935,71 @@ extern "C" {
         __buflen: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strerror_l(
         __errnum: ::std::os::raw::c_int,
         __l: locale_t,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn bcmp(
         __s1: *const ::std::os::raw::c_void,
         __s2: *const ::std::os::raw::c_void,
         __n: ::std::os::raw::c_ulong,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn bcopy(
         __src: *const ::std::os::raw::c_void,
         __dest: *mut ::std::os::raw::c_void,
         __n: ::std::os::raw::c_ulong,
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn bzero(__s: *mut ::std::os::raw::c_void, __n: ::std::os::raw::c_ulong);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn index(
         __s: *const ::std::os::raw::c_char,
         __c: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn rindex(
         __s: *const ::std::os::raw::c_char,
         __c: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ffs(__i: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ffsl(__l: ::std::os::raw::c_long) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ffsll(__ll: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strcasecmp(
         __s1: *const ::std::os::raw::c_char,
         __s2: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strncasecmp(
         __s1: *const ::std::os::raw::c_char,
         __s2: *const ::std::os::raw::c_char,
         __n: ::std::os::raw::c_ulong,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strcasecmp_l(
         __s1: *const ::std::os::raw::c_char,
         __s2: *const ::std::os::raw::c_char,
         __loc: locale_t,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strncasecmp_l(
         __s1: *const ::std::os::raw::c_char,
         __s2: *const ::std::os::raw::c_char,
@@ -6007,59 +6007,59 @@ extern "C" {
         __loc: locale_t,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn explicit_bzero(__s: *mut ::std::os::raw::c_void, __n: usize);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strsep(
         __stringp: *mut *mut ::std::os::raw::c_char,
         __delim: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strsignal(__sig: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __stpcpy(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn stpcpy(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn __stpncpy(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
         __n: usize,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn stpncpy(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
         __n: ::std::os::raw::c_ulong,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strlcpy(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
         __n: usize,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strlcat(
         __dest: *mut ::std::os::raw::c_char,
         __src: *const ::std::os::raw::c_char,
         __n: usize,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Put a description of the AVERROR code errnum in errbuf.\n In case of failure the global variable errno is set to indicate the\n error. Even in case of failure av_strerror() will print a generic\n error message indicating the errnum provided to errbuf.\n\n @param errnum      error code to describe\n @param errbuf      buffer to which description is written\n @param errbuf_size the size in bytes of errbuf\n @return 0 on success, a negative value if a description for errnum\n cannot be found"]
     pub fn av_strerror(
         errnum: ::std::os::raw::c_int,
@@ -6067,32 +6067,32 @@ extern "C" {
         errbuf_size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a memory block with alignment suitable for all memory accesses\n (including vectors if available on the CPU).\n\n @param size Size in bytes for the memory block to be allocated\n @return Pointer to the allocated block, or `NULL` if the block cannot\n         be allocated\n @see av_mallocz()"]
     pub fn av_malloc(size: usize) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a memory block with alignment suitable for all memory accesses\n (including vectors if available on the CPU) and zero all the bytes of the\n block.\n\n @param size Size in bytes for the memory block to be allocated\n @return Pointer to the allocated block, or `NULL` if it cannot be allocated\n @see av_malloc()"]
     pub fn av_mallocz(size: usize) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a memory block for an array with av_malloc().\n\n The allocated memory will have size `size * nmemb` bytes.\n\n @param nmemb Number of element\n @param size  Size of a single element\n @return Pointer to the allocated block, or `NULL` if the block cannot\n         be allocated\n @see av_malloc()"]
     pub fn av_malloc_array(nmemb: usize, size: usize) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a memory block for an array with av_mallocz().\n\n The allocated memory will have size `size * nmemb` bytes.\n\n @param nmemb Number of elements\n @param size  Size of the single element\n @return Pointer to the allocated block, or `NULL` if the block cannot\n         be allocated\n\n @see av_mallocz()\n @see av_malloc_array()"]
     pub fn av_calloc(nmemb: usize, size: usize) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate, reallocate, or free a block of memory.\n\n If `ptr` is `NULL` and `size` > 0, allocate a new block. Otherwise, expand or\n shrink that block of memory according to `size`.\n\n @param ptr  Pointer to a memory block already allocated with\n             av_realloc() or `NULL`\n @param size Size in bytes of the memory block to be allocated or\n             reallocated\n\n @return Pointer to a newly-reallocated block or `NULL` if the block\n         cannot be reallocated\n\n @warning Unlike av_malloc(), the returned pointer is not guaranteed to be\n          correctly aligned. The returned pointer must be freed after even\n          if size is zero.\n @see av_fast_realloc()\n @see av_reallocp()"]
     pub fn av_realloc(ptr: *mut ::std::os::raw::c_void, size: usize)
         -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate, reallocate, or free a block of memory through a pointer to a\n pointer.\n\n If `*ptr` is `NULL` and `size` > 0, allocate a new block. If `size` is\n zero, free the memory block pointed to by `*ptr`. Otherwise, expand or\n shrink that block of memory according to `size`.\n\n @param[in,out] ptr  Pointer to a pointer to a memory block already allocated\n                     with av_realloc(), or a pointer to `NULL`. The pointer\n                     is updated on success, or freed on failure.\n @param[in]     size Size in bytes for the memory block to be allocated or\n                     reallocated\n\n @return Zero on success, an AVERROR error code on failure\n\n @warning Unlike av_malloc(), the allocated memory is not guaranteed to be\n          correctly aligned."]
     pub fn av_reallocp(ptr: *mut ::std::os::raw::c_void, size: usize) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate, reallocate, or free a block of memory.\n\n This function does the same thing as av_realloc(), except:\n - It takes two size arguments and allocates `nelem * elsize` bytes,\n   after checking the result of the multiplication for integer overflow.\n - It frees the input block in case of failure, thus avoiding the memory\n   leak with the classic\n   @code{.c}\n   buf = realloc(buf);\n   if (!buf)\n       return -1;\n   @endcode\n   pattern."]
     pub fn av_realloc_f(
         ptr: *mut ::std::os::raw::c_void,
@@ -6100,7 +6100,7 @@ extern "C" {
         elsize: usize,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate, reallocate, or free an array.\n\n If `ptr` is `NULL` and `nmemb` > 0, allocate a new block.\n\n @param ptr   Pointer to a memory block already allocated with\n              av_realloc() or `NULL`\n @param nmemb Number of elements in the array\n @param size  Size of the single element of the array\n\n @return Pointer to a newly-reallocated block or NULL if the block\n         cannot be reallocated\n\n @warning Unlike av_malloc(), the allocated memory is not guaranteed to be\n          correctly aligned. The returned pointer must be freed after even if\n          nmemb is zero.\n @see av_reallocp_array()"]
     pub fn av_realloc_array(
         ptr: *mut ::std::os::raw::c_void,
@@ -6108,7 +6108,7 @@ extern "C" {
         size: usize,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate, reallocate an array through a pointer to a pointer.\n\n If `*ptr` is `NULL` and `nmemb` > 0, allocate a new block.\n\n @param[in,out] ptr   Pointer to a pointer to a memory block already\n                      allocated with av_realloc(), or a pointer to `NULL`.\n                      The pointer is updated on success, or freed on failure.\n @param[in]     nmemb Number of elements\n @param[in]     size  Size of the single element\n\n @return Zero on success, an AVERROR error code on failure\n\n @warning Unlike av_malloc(), the allocated memory is not guaranteed to be\n          correctly aligned. *ptr must be freed after even if nmemb is zero."]
     pub fn av_reallocp_array(
         ptr: *mut ::std::os::raw::c_void,
@@ -6116,7 +6116,7 @@ extern "C" {
         size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reallocate the given buffer if it is not large enough, otherwise do nothing.\n\n If the given buffer is `NULL`, then a new uninitialized buffer is allocated.\n\n If the given buffer is not large enough, and reallocation fails, `NULL` is\n returned and `*size` is set to 0, but the original buffer is not changed or\n freed.\n\n A typical use pattern follows:\n\n @code{.c}\n uint8_t *buf = ...;\n uint8_t *new_buf = av_fast_realloc(buf, &current_size, size_needed);\n if (!new_buf) {\n     // Allocation failed; clean up original buffer\n     av_freep(&buf);\n     return AVERROR(ENOMEM);\n }\n @endcode\n\n @param[in,out] ptr      Already allocated buffer, or `NULL`\n @param[in,out] size     Pointer to the size of buffer `ptr`. `*size` is\n                         updated to the new allocated size, in particular 0\n                         in case of failure.\n @param[in]     min_size Desired minimal size of buffer `ptr`\n @return `ptr` if the buffer is large enough, a pointer to newly reallocated\n         buffer if the buffer was not large enough, or `NULL` in case of\n         error\n @see av_realloc()\n @see av_fast_malloc()"]
     pub fn av_fast_realloc(
         ptr: *mut ::std::os::raw::c_void,
@@ -6124,7 +6124,7 @@ extern "C" {
         min_size: usize,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a buffer, reusing the given one if large enough.\n\n Contrary to av_fast_realloc(), the current buffer contents might not be\n preserved and on error the old buffer is freed, thus no special handling to\n avoid memleaks is necessary.\n\n `*ptr` is allowed to be `NULL`, in which case allocation always happens if\n `size_needed` is greater than 0.\n\n @code{.c}\n uint8_t *buf = ...;\n av_fast_malloc(&buf, &current_size, size_needed);\n if (!buf) {\n     // Allocation failed; buf already freed\n     return AVERROR(ENOMEM);\n }\n @endcode\n\n @param[in,out] ptr      Pointer to pointer to an already allocated buffer.\n                         `*ptr` will be overwritten with pointer to new\n                         buffer on success or `NULL` on failure\n @param[in,out] size     Pointer to the size of buffer `*ptr`. `*size` is\n                         updated to the new allocated size, in particular 0\n                         in case of failure.\n @param[in]     min_size Desired minimal size of buffer `*ptr`\n @see av_realloc()\n @see av_fast_mallocz()"]
     pub fn av_fast_malloc(
         ptr: *mut ::std::os::raw::c_void,
@@ -6132,7 +6132,7 @@ extern "C" {
         min_size: usize,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and clear a buffer, reusing the given one if large enough.\n\n Like av_fast_malloc(), but all newly allocated space is initially cleared.\n Reused buffer is not cleared.\n\n `*ptr` is allowed to be `NULL`, in which case allocation always happens if\n `size_needed` is greater than 0.\n\n @param[in,out] ptr      Pointer to pointer to an already allocated buffer.\n                         `*ptr` will be overwritten with pointer to new\n                         buffer on success or `NULL` on failure\n @param[in,out] size     Pointer to the size of buffer `*ptr`. `*size` is\n                         updated to the new allocated size, in particular 0\n                         in case of failure.\n @param[in]     min_size Desired minimal size of buffer `*ptr`\n @see av_fast_malloc()"]
     pub fn av_fast_mallocz(
         ptr: *mut ::std::os::raw::c_void,
@@ -6140,31 +6140,31 @@ extern "C" {
         min_size: usize,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free a memory block which has been allocated with a function of av_malloc()\n or av_realloc() family.\n\n @param ptr Pointer to the memory block which should be freed.\n\n @note `ptr = NULL` is explicitly allowed.\n @note It is recommended that you use av_freep() instead, to prevent leaving\n       behind dangling pointers.\n @see av_freep()"]
     pub fn av_free(ptr: *mut ::std::os::raw::c_void);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free a memory block which has been allocated with a function of av_malloc()\n or av_realloc() family, and set the pointer pointing to it to `NULL`.\n\n @code{.c}\n uint8_t *buf = av_malloc(16);\n av_free(buf);\n // buf now contains a dangling pointer to freed memory, and accidental\n // dereference of buf will result in a use-after-free, which may be a\n // security risk.\n\n uint8_t *buf = av_malloc(16);\n av_freep(&buf);\n // buf is now NULL, and accidental dereference will only result in a\n // NULL-pointer dereference.\n @endcode\n\n @param ptr Pointer to the pointer to the memory block which should be freed\n @note `*ptr = NULL` is safe and leads to no action.\n @see av_free()"]
     pub fn av_freep(ptr: *mut ::std::os::raw::c_void);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Duplicate a string.\n\n @param s String to be duplicated\n @return Pointer to a newly-allocated string containing a\n         copy of `s` or `NULL` if the string cannot be allocated\n @see av_strndup()"]
     pub fn av_strdup(s: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Duplicate a substring of a string.\n\n @param s   String to be duplicated\n @param len Maximum length of the resulting string (not counting the\n            terminating byte)\n @return Pointer to a newly-allocated string containing a\n         substring of `s` or `NULL` if the string cannot be allocated"]
     pub fn av_strndup(s: *const ::std::os::raw::c_char, len: usize) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Duplicate a buffer with av_malloc().\n\n @param p    Buffer to be duplicated\n @param size Size in bytes of the buffer copied\n @return Pointer to a newly allocated buffer containing a\n         copy of `p` or `NULL` if the buffer cannot be allocated"]
     pub fn av_memdup(p: *const ::std::os::raw::c_void, size: usize) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Overlapping memcpy() implementation.\n\n @param dst  Destination buffer\n @param back Number of bytes back to start copying (i.e. the initial size of\n             the overlapping window); must be > 0\n @param cnt  Number of bytes to copy; must be >= 0\n\n @note `cnt > back` is valid, this will copy the bytes we just copied,\n       thus creating a repeating pattern with a period length of `back`."]
     pub fn av_memcpy_backptr(dst: *mut u8, back: ::std::os::raw::c_int, cnt: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add the pointer to an element to a dynamic array.\n\n The array to grow is supposed to be an array of pointers to\n structures, and the element to add must be a pointer to an already\n allocated structure.\n\n The array is reallocated when its size reaches powers of 2.\n Therefore, the amortized cost of adding an element is constant.\n\n In case of success, the pointer to the array is updated in order to\n point to the new grown array, and the number pointed to by `nb_ptr`\n is incremented.\n In case of failure, the array is freed, `*tab_ptr` is set to `NULL` and\n `*nb_ptr` is set to 0.\n\n @param[in,out] tab_ptr Pointer to the array to grow\n @param[in,out] nb_ptr  Pointer to the number of elements in the array\n @param[in]     elem    Element to add\n @see av_dynarray_add_nofree(), av_dynarray2_add()"]
     pub fn av_dynarray_add(
         tab_ptr: *mut ::std::os::raw::c_void,
@@ -6172,7 +6172,7 @@ extern "C" {
         elem: *mut ::std::os::raw::c_void,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add an element to a dynamic array.\n\n Function has the same functionality as av_dynarray_add(),\n but it doesn't free memory on fails. It returns error code\n instead and leave current buffer untouched.\n\n @return >=0 on success, negative otherwise\n @see av_dynarray_add(), av_dynarray2_add()"]
     pub fn av_dynarray_add_nofree(
         tab_ptr: *mut ::std::os::raw::c_void,
@@ -6180,7 +6180,7 @@ extern "C" {
         elem: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add an element of size `elem_size` to a dynamic array.\n\n The array is reallocated when its number of elements reaches powers of 2.\n Therefore, the amortized cost of adding an element is constant.\n\n In case of success, the pointer to the array is updated in order to\n point to the new grown array, and the number pointed to by `nb_ptr`\n is incremented.\n In case of failure, the array is freed, `*tab_ptr` is set to `NULL` and\n `*nb_ptr` is set to 0.\n\n @param[in,out] tab_ptr   Pointer to the array to grow\n @param[in,out] nb_ptr    Pointer to the number of elements in the array\n @param[in]     elem_size Size in bytes of an element in the array\n @param[in]     elem_data Pointer to the data of the element to add. If\n                          `NULL`, the space of the newly added element is\n                          allocated but left uninitialized.\n\n @return Pointer to the data of the element to copy in the newly allocated\n         space\n @see av_dynarray_add(), av_dynarray_add_nofree()"]
     pub fn av_dynarray2_add(
         tab_ptr: *mut *mut ::std::os::raw::c_void,
@@ -6189,18 +6189,18 @@ extern "C" {
         elem_data: *const u8,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Multiply two `size_t` values checking for overflow.\n\n @param[in]  a   Operand of multiplication\n @param[in]  b   Operand of multiplication\n @param[out] r   Pointer to the result of the operation\n @return 0 on success, AVERROR(EINVAL) on overflow"]
     pub fn av_size_mult(a: usize, b: usize, r: *mut usize) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the maximum size that may be allocated in one block.\n\n The value specified with this function is effective for all libavutil's @ref\n lavu_mem_funcs \"heap management functions.\"\n\n By default, the max value is defined as `INT_MAX`.\n\n @param max Value to be set as the new maximum size\n\n @warning Exercise extreme caution when using this function. Don't touch\n          this if you do not understand the full consequence of doing so."]
     pub fn av_max_alloc(max: usize);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_log2(v: ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_log2_16bit(v: ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
 }
 #[doc = " Rational number (pair of numerator and denominator)."]
@@ -6237,7 +6237,7 @@ fn bindgen_test_layout_AVRational() {
         "Offset of field: AVRational::den"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reduce a fraction.\n\n This is useful for framerate calculations.\n\n @param[out] dst_num Destination numerator\n @param[out] dst_den Destination denominator\n @param[in]      num Source numerator\n @param[in]      den Source denominator\n @param[in]      max Maximum allowed values for `dst_num` & `dst_den`\n @return 1 if the operation is exact, 0 otherwise"]
     pub fn av_reduce(
         dst_num: *mut ::std::os::raw::c_int,
@@ -6247,40 +6247,40 @@ extern "C" {
         max: i64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Multiply two rationals.\n @param b First rational\n @param c Second rational\n @return b*c"]
     pub fn av_mul_q(b: AVRational, c: AVRational) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Divide one rational by another.\n @param b First rational\n @param c Second rational\n @return b/c"]
     pub fn av_div_q(b: AVRational, c: AVRational) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add two rationals.\n @param b First rational\n @param c Second rational\n @return b+c"]
     pub fn av_add_q(b: AVRational, c: AVRational) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Subtract one rational from another.\n @param b First rational\n @param c Second rational\n @return b-c"]
     pub fn av_sub_q(b: AVRational, c: AVRational) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert a double precision floating point number to a rational.\n\n In case of infinity, the returned value is expressed as `{1, 0}` or\n `{-1, 0}` depending on the sign.\n\n In general rational numbers with |num| <= 1<<26 && |den| <= 1<<26\n can be recovered exactly from their double representation.\n (no exceptions were found within 1B random ones)\n\n @param d   `double` to convert\n @param max Maximum allowed numerator and denominator\n @return `d` in AVRational form\n @see av_q2d()"]
     pub fn av_d2q(d: f64, max: ::std::os::raw::c_int) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find which of the two rationals is closer to another rational.\n\n @param q     Rational to be compared against\n @param q1    Rational to be tested\n @param q2    Rational to be tested\n @return One of the following values:\n         - 1 if `q1` is nearer to `q` than `q2`\n         - -1 if `q2` is nearer to `q` than `q1`\n         - 0 if they have the same distance"]
     pub fn av_nearer_q(q: AVRational, q1: AVRational, q2: AVRational) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find the value in a list of rationals nearest a given reference rational.\n\n @param q      Reference rational\n @param q_list Array of rationals terminated by `{0, 0}`\n @return Index of the nearest value found in the array"]
     pub fn av_find_nearest_q_idx(q: AVRational, q_list: *const AVRational)
         -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert an AVRational to a IEEE 32-bit `float` expressed in fixed-point\n format.\n\n @param q Rational to be converted\n @return Equivalent floating-point value, expressed as an unsigned 32-bit\n         integer.\n @note The returned value is platform-indepedant."]
     pub fn av_q2intfloat(q: AVRational) -> u32;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the best rational so that a and b are multiple of it.\n If the resulting denominator is larger than max_den, return def."]
     pub fn av_gcd_q(
         a: AVRational,
@@ -6375,27 +6375,27 @@ pub const AV_ROUND_NEAR_INF: AVRounding = 5;
 pub const AV_ROUND_PASS_MINMAX: AVRounding = 8192;
 #[doc = " Rounding methods."]
 pub type AVRounding = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Compute the greatest common divisor of two integer operands.\n\n @param a Operand\n @param b Operand\n @return GCD of a and b up to sign; if a >= 0 and b >= 0, return value is >= 0;\n if a == 0 and b == 0, returns 0."]
     pub fn av_gcd(a: i64, b: i64) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Rescale a 64-bit integer with rounding to nearest.\n\n The operation is mathematically equivalent to `a * b / c`, but writing that\n directly can overflow.\n\n This function is equivalent to av_rescale_rnd() with #AV_ROUND_NEAR_INF.\n\n @see av_rescale_rnd(), av_rescale_q(), av_rescale_q_rnd()"]
     pub fn av_rescale(a: i64, b: i64, c: i64) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Rescale a 64-bit integer with specified rounding.\n\n The operation is mathematically equivalent to `a * b / c`, but writing that\n directly can overflow, and does not support different rounding methods.\n If the result is not representable then INT64_MIN is returned.\n\n @see av_rescale(), av_rescale_q(), av_rescale_q_rnd()"]
     pub fn av_rescale_rnd(a: i64, b: i64, c: i64, rnd: AVRounding) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Rescale a 64-bit integer by 2 rational numbers.\n\n The operation is mathematically equivalent to `a * bq / cq`.\n\n This function is equivalent to av_rescale_q_rnd() with #AV_ROUND_NEAR_INF.\n\n @see av_rescale(), av_rescale_rnd(), av_rescale_q_rnd()"]
     pub fn av_rescale_q(a: i64, bq: AVRational, cq: AVRational) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Rescale a 64-bit integer by 2 rational numbers with specified rounding.\n\n The operation is mathematically equivalent to `a * bq / cq`.\n\n @see av_rescale(), av_rescale_rnd(), av_rescale_q()"]
     pub fn av_rescale_q_rnd(a: i64, bq: AVRational, cq: AVRational, rnd: AVRounding) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Compare two timestamps each in its own time base.\n\n @return One of the following values:\n         - -1 if `ts_a` is before `ts_b`\n         - 1 if `ts_a` is after `ts_b`\n         - 0 if they represent the same position\n\n @warning\n The result of the function is undefined if one of the timestamps is outside\n the `int64_t` range when represented in the other's timebase."]
     pub fn av_compare_ts(
         ts_a: i64,
@@ -6404,11 +6404,11 @@ extern "C" {
         tb_b: AVRational,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Compare the remainders of two integer operands divided by a common divisor.\n\n In other words, compare the least significant `log2(mod)` bits of integers\n `a` and `b`.\n\n @code{.c}\n av_compare_mod(0x11, 0x02, 0x10) < 0 // since 0x11 % 0x10  (0x1) < 0x02 % 0x10  (0x2)\n av_compare_mod(0x11, 0x02, 0x20) > 0 // since 0x11 % 0x20 (0x11) > 0x02 % 0x20 (0x02)\n @endcode\n\n @param a Operand\n @param b Operand\n @param mod Divisor; must be a power of 2\n @return\n         - a negative value if `a % mod < b % mod`\n         - a positive value if `a % mod > b % mod`\n         - zero             if `a % mod == b % mod`"]
     pub fn av_compare_mod(a: u64, b: u64, mod_: u64) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Rescale a timestamp while preserving known durations.\n\n This function is designed to be called per audio packet to scale the input\n timestamp to a different time base. Compared to a simple av_rescale_q()\n call, this function is robust against possible inconsistent frame durations.\n\n The `last` parameter is a state variable that must be preserved for all\n subsequent calls for the same stream. For the first call, `*last` should be\n initialized to #AV_NOPTS_VALUE.\n\n @param[in]     in_tb    Input time base\n @param[in]     in_ts    Input timestamp\n @param[in]     fs_tb    Duration time base; typically this is finer-grained\n                         (greater) than `in_tb` and `out_tb`\n @param[in]     duration Duration till the next call to this function (i.e.\n                         duration of the current packet/frame)\n @param[in,out] last     Pointer to a timestamp expressed in terms of\n                         `fs_tb`, acting as a state variable\n @param[in]     out_tb   Output timebase\n @return        Timestamp expressed in terms of `out_tb`\n\n @note In the context of this function, \"duration\" is in term of samples, not\n       seconds."]
     pub fn av_rescale_delta(
         in_tb: AVRational,
@@ -6419,11 +6419,11 @@ extern "C" {
         out_tb: AVRational,
     ) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a value to a timestamp.\n\n This function guarantees that when the same value is repeatedly added that\n no accumulation of rounding errors occurs.\n\n @param[in] ts     Input timestamp\n @param[in] ts_tb  Input timestamp time base\n @param[in] inc    Value to be added\n @param[in] inc_tb Time base of `inc`"]
     pub fn av_add_stable(ts_tb: AVRational, ts: i64, inc_tb: AVRational, inc: i64) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " 0th order modified bessel function of the first kind."]
     pub fn av_bessel_i0(x: f64) -> f64;
 }
@@ -6569,7 +6569,7 @@ fn bindgen_test_layout_AVClass() {
         "Offset of field: AVClass::state_flags_offset"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send the specified message to the log if the level is less than or equal\n to the current av_log_level. By default, all logging messages are sent to\n stderr. This behavior can be altered by setting a different logging callback\n function.\n @see av_log_set_callback\n\n @param avcl A pointer to an arbitrary struct of which the first field is a\n        pointer to an AVClass struct or NULL if general log.\n @param level The importance level of the message expressed using a @ref\n        lavu_log_constants \"Logging Constant\".\n @param fmt The format string (printf-compatible) that specifies how\n        subsequent arguments are converted to output."]
     pub fn av_log(
         avcl: *mut ::std::os::raw::c_void,
@@ -6578,7 +6578,7 @@ extern "C" {
         ...
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send the specified message to the log once with the initial_level and then with\n the subsequent_level. By default, all logging messages are sent to\n stderr. This behavior can be altered by setting a different logging callback\n function.\n @see av_log\n\n @param avcl A pointer to an arbitrary struct of which the first field is a\n        pointer to an AVClass struct or NULL if general log.\n @param initial_level importance level of the message expressed using a @ref\n        lavu_log_constants \"Logging Constant\" for the first occurrence.\n @param subsequent_level importance level of the message expressed using a @ref\n        lavu_log_constants \"Logging Constant\" after the first occurrence.\n @param fmt The format string (printf-compatible) that specifies how\n        subsequent arguments are converted to output.\n @param state a variable to keep trak of if a message has already been printed\n        this must be initialized to 0 before the first use. The same state\n        must not be accessed by 2 Threads simultaneously."]
     pub fn av_log_once(
         avcl: *mut ::std::os::raw::c_void,
@@ -6589,7 +6589,7 @@ extern "C" {
         ...
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send the specified message to the log if the level is less than or equal\n to the current av_log_level. By default, all logging messages are sent to\n stderr. This behavior can be altered by setting a different logging callback\n function.\n @see av_log_set_callback\n\n @param avcl A pointer to an arbitrary struct of which the first field is a\n        pointer to an AVClass struct.\n @param level The importance level of the message expressed using a @ref\n        lavu_log_constants \"Logging Constant\".\n @param fmt The format string (printf-compatible) that specifies how\n        subsequent arguments are converted to output.\n @param vl The arguments referenced by the format string."]
     pub fn av_vlog(
         avcl: *mut ::std::os::raw::c_void,
@@ -6598,15 +6598,15 @@ extern "C" {
         vl: *mut __va_list_tag,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the current log level\n\n @see lavu_log_constants\n\n @return Current log level"]
     pub fn av_log_get_level() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the log level\n\n @see lavu_log_constants\n\n @param level Logging level"]
     pub fn av_log_set_level(level: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the logging callback\n\n @note The callback must be thread safe, even if the application does not use\n       threads itself as some codecs are multithreaded.\n\n @see av_log_default_callback\n\n @param callback A logging function with a compatible signature."]
     pub fn av_log_set_callback(
         callback: ::std::option::Option<
@@ -6619,7 +6619,7 @@ extern "C" {
         >,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Default logging callback\n\n It prints the message to stderr, optionally colorizing it.\n\n @param avcl A pointer to an arbitrary struct of which the first field is a\n        pointer to an AVClass struct.\n @param level The importance level of the message expressed using a @ref\n        lavu_log_constants \"Logging Constant\".\n @param fmt The format string (printf-compatible) that specifies how\n        subsequent arguments are converted to output.\n @param vl The arguments referenced by the format string."]
     pub fn av_log_default_callback(
         avcl: *mut ::std::os::raw::c_void,
@@ -6628,14 +6628,14 @@ extern "C" {
         vl: *mut __va_list_tag,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the context name\n\n @param  ctx The AVClass context\n\n @return The AVClass class_name"]
     pub fn av_default_item_name(ctx: *mut ::std::os::raw::c_void) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_default_get_category(ptr: *mut ::std::os::raw::c_void) -> AVClassCategory;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Format a line of log the same way as the default callback.\n @param line          buffer to receive the formatted line\n @param line_size     size of the buffer\n @param print_prefix  used to store whether the prefix must be printed;\n                      must point to a persistent integer initially set to 1"]
     pub fn av_log_format_line(
         ptr: *mut ::std::os::raw::c_void,
@@ -6647,7 +6647,7 @@ extern "C" {
         print_prefix: *mut ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Format a line of log the same way as the default callback.\n @param line          buffer to receive the formatted line;\n                      may be NULL if line_size is 0\n @param line_size     size of the buffer; at most line_size-1 characters will\n                      be written to the buffer, plus one null terminator\n @param print_prefix  used to store whether the prefix must be printed;\n                      must point to a persistent integer initially set to 1\n @return Returns a negative value if an error occurred, otherwise returns\n         the number of characters that would have been written for a\n         sufficiently large buffer, not including the terminating null\n         character. If the return value is not less than line_size, it means\n         that the log message was truncated to fit the buffer."]
     pub fn av_log_format_line2(
         ptr: *mut ::std::os::raw::c_void,
@@ -6659,10 +6659,10 @@ extern "C" {
         print_prefix: *mut ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_log_set_flags(arg: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_log_get_flags() -> ::std::os::raw::c_int;
 }
 pub const AV_PIX_FMT_NONE: AVPixelFormat = -1;
@@ -7360,7 +7360,7 @@ pub const AVALPHA_MODE_STRAIGHT: AVAlphaMode = 2;
 pub const AVALPHA_MODE_NB: AVAlphaMode = 3;
 #[doc = " Correlation between the alpha channel and color values."]
 pub type AVAlphaMode = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Compute the length of an integer list.\n\n @param elsize  size in bytes of each list element (only 1, 2, 4 or 8)\n @param term    list terminator (usually 0 or -1)\n @param list    pointer to the list\n @return  length of the list, in elements, not counting the terminator"]
     pub fn av_int_list_length_for_size(
         elsize: ::std::os::raw::c_uint,
@@ -7368,11 +7368,11 @@ extern "C" {
         term: u64,
     ) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the fractional representation of the internal time base."]
     pub fn av_get_time_base_q() -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill the provided buffer with a string containing a FourCC (four-character\n code) representation.\n\n @param buf    a buffer with size in bytes of at least AV_FOURCC_MAX_STRING_SIZE\n @param fourcc the fourcc to represent\n @return the buffer in input"]
     pub fn av_fourcc_make_string(
         buf: *mut ::std::os::raw::c_char,
@@ -7424,15 +7424,15 @@ fn bindgen_test_layout_AVBufferRef() {
         "Offset of field: AVBufferRef::size"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVBuffer of the given size using av_malloc().\n\n @return an AVBufferRef of given size or NULL when out of memory"]
     pub fn av_buffer_alloc(size: usize) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Same as av_buffer_alloc(), except the returned buffer will be initialized\n to zero."]
     pub fn av_buffer_allocz(size: usize) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create an AVBuffer from an existing array.\n\n If this function is successful, data is owned by the AVBuffer. The caller may\n only access data through the returned AVBufferRef and references derived from\n it.\n If this function fails, data is left untouched.\n @param data   data array\n @param size   size of data in bytes\n @param free   a callback for freeing this buffer's data\n @param opaque parameter to be got for processing or passed to free\n @param flags  a combination of AV_BUFFER_FLAG_*\n\n @return an AVBufferRef referring to data on success, NULL on failure."]
     pub fn av_buffer_create(
         data: *mut u8,
@@ -7444,38 +7444,38 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Default free callback, which calls av_free() on the buffer data.\n This function is meant to be passed to av_buffer_create(), not called\n directly."]
     pub fn av_buffer_default_free(opaque: *mut ::std::os::raw::c_void, data: *mut u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create a new reference to an AVBuffer.\n\n @return a new AVBufferRef referring to the same AVBuffer as buf or NULL on\n failure."]
     pub fn av_buffer_ref(buf: *const AVBufferRef) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free a given reference and automatically free the buffer if there are no more\n references to it.\n\n @param buf the reference to be freed. The pointer is set to NULL on return."]
     pub fn av_buffer_unref(buf: *mut *mut AVBufferRef);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return 1 if the caller may write to the data referred to by buf (which is\n true if and only if buf is the only reference to the underlying AVBuffer).\n Return 0 otherwise.\n A positive answer is valid until av_buffer_ref() is called on buf."]
     pub fn av_buffer_is_writable(buf: *const AVBufferRef) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the opaque parameter set by av_buffer_create."]
     pub fn av_buffer_get_opaque(buf: *const AVBufferRef) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffer_get_ref_count(buf: *const AVBufferRef) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create a writable reference from a given buffer reference, avoiding data copy\n if possible.\n\n @param buf buffer reference to make writable. On success, buf is either left\n            untouched, or it is unreferenced and a new writable AVBufferRef is\n            written in its place. On failure, buf is left untouched.\n @return 0 on success, a negative AVERROR on failure."]
     pub fn av_buffer_make_writable(buf: *mut *mut AVBufferRef) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reallocate a given buffer.\n\n @param buf  a buffer reference to reallocate. On success, buf will be\n             unreferenced and a new reference with the required size will be\n             written in its place. On failure buf will be left untouched. *buf\n             may be NULL, then a new buffer is allocated.\n @param size required new buffer size.\n @return 0 on success, a negative AVERROR on failure.\n\n @note the buffer is actually reallocated with av_realloc() only if it was\n initially allocated through av_buffer_realloc(NULL) and there is only one\n reference to it (i.e. the one passed to this function). In all other cases\n a new buffer is allocated and the data is copied."]
     pub fn av_buffer_realloc(buf: *mut *mut AVBufferRef, size: usize) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Ensure dst refers to the same data as src.\n\n When *dst is already equivalent to src, do nothing. Otherwise unreference dst\n and replace it with a new reference to src.\n\n @param dst Pointer to either a valid buffer reference or NULL. On success,\n            this will point to a buffer reference equivalent to src. On\n            failure, dst will be left untouched.\n @param src A buffer reference to replace dst with. May be NULL, then this\n            function is equivalent to av_buffer_unref(dst).\n @return 0 on success\n         AVERROR(ENOMEM) on memory allocation failure."]
     pub fn av_buffer_replace(
         dst: *mut *mut AVBufferRef,
@@ -7487,14 +7487,14 @@ extern "C" {
 pub struct AVBufferPool {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and initialize a buffer pool.\n\n @param size size of each buffer in this pool\n @param alloc a function that will be used to allocate new buffers when the\n pool is empty. May be NULL, then the default allocator will be used\n (av_buffer_alloc()).\n @return newly created buffer pool on success, NULL on error."]
     pub fn av_buffer_pool_init(
         size: usize,
         alloc: ::std::option::Option<unsafe extern "C" fn(size: usize) -> *mut AVBufferRef>,
     ) -> *mut AVBufferPool;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and initialize a buffer pool with a more complex allocator.\n\n @param size size of each buffer in this pool\n @param opaque arbitrary user data used by the allocator\n @param alloc a function that will be used to allocate new buffers when the\n              pool is empty. May be NULL, then the default allocator will be\n              used (av_buffer_alloc()).\n @param pool_free a function that will be called immediately before the pool\n                  is freed. I.e. after av_buffer_pool_uninit() is called\n                  by the caller and all the frames are returned to the pool\n                  and freed. It is intended to uninitialize the user opaque\n                  data. May be NULL.\n @return newly created buffer pool on success, NULL on error."]
     pub fn av_buffer_pool_init2(
         size: usize,
@@ -7508,15 +7508,15 @@ extern "C" {
         pool_free: ::std::option::Option<unsafe extern "C" fn(opaque: *mut ::std::os::raw::c_void)>,
     ) -> *mut AVBufferPool;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Mark the pool as being available for freeing. It will actually be freed only\n once all the allocated buffers associated with the pool are released. Thus it\n is safe to call this function while some of the allocated buffers are still\n in use.\n\n @param pool pointer to the pool to be freed. It will be set to NULL."]
     pub fn av_buffer_pool_uninit(pool: *mut *mut AVBufferPool);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a new AVBuffer, reusing an old buffer from the pool when available.\n This function may be called simultaneously from multiple threads.\n\n @return a reference to the new buffer on success, NULL on error."]
     pub fn av_buffer_pool_get(pool: *mut AVBufferPool) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Query the original opaque parameter of an allocated buffer in the pool.\n\n @param ref a buffer reference to a buffer returned by av_buffer_pool_get.\n @return the opaque parameter set by the buffer allocator function of the\n         buffer pool.\n\n @note the opaque parameter of ref is used by the buffer pool implementation,\n therefore you have to use this function to access the original opaque\n parameter of an allocated buffer."]
     pub fn av_buffer_pool_buffer_get_opaque(
         ref_: *const AVBufferRef,
@@ -7758,7 +7758,7 @@ impl ::std::fmt::Debug for AVChannelLayout {
         )
     }
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a human readable string in an abbreviated form describing a given channel.\n This is the inverse function of @ref av_channel_from_string().\n\n @param buf pre-allocated buffer where to put the generated string\n @param buf_size size in bytes of the buffer.\n @param channel the AVChannel whose name to get\n @return amount of bytes needed to hold the output string, or a negative AVERROR\n         on failure. If the returned value is bigger than buf_size, then the\n         string was truncated."]
     pub fn av_channel_name(
         buf: *mut ::std::os::raw::c_char,
@@ -7766,11 +7766,11 @@ extern "C" {
         channel: AVChannel,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " bprint variant of av_channel_name().\n\n @note the string will be appended to the bprint buffer."]
     pub fn av_channel_name_bprint(bp: *mut AVBPrint, channel_id: AVChannel);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a human readable string describing a given channel.\n\n @param buf pre-allocated buffer where to put the generated string\n @param buf_size size in bytes of the buffer.\n @param channel the AVChannel whose description to get\n @return amount of bytes needed to hold the output string, or a negative AVERROR\n         on failure. If the returned value is bigger than buf_size, then the\n         string was truncated."]
     pub fn av_channel_description(
         buf: *mut ::std::os::raw::c_char,
@@ -7778,60 +7778,60 @@ extern "C" {
         channel: AVChannel,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " bprint variant of av_channel_description().\n\n @note the string will be appended to the bprint buffer."]
     pub fn av_channel_description_bprint(bp: *mut AVBPrint, channel_id: AVChannel);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " This is the inverse function of @ref av_channel_name().\n\n @return the channel with the given name\n         AV_CHAN_NONE when name does not identify a known channel"]
     pub fn av_channel_from_string(name: *const ::std::os::raw::c_char) -> AVChannel;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a custom channel layout with the specified number of channels.\n The channel map will be allocated and the designation of all channels will\n be set to AV_CHAN_UNKNOWN.\n\n This is only a convenience helper function, a custom channel layout can also\n be constructed without using this.\n\n @param channel_layout the layout structure to be initialized\n @param nb_channels the number of channels\n\n @return 0 on success\n         AVERROR(EINVAL) if the number of channels <= 0\n         AVERROR(ENOMEM) if the channel map could not be allocated"]
     pub fn av_channel_layout_custom_init(
         channel_layout: *mut AVChannelLayout,
         nb_channels: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a native channel layout from a bitmask indicating which channels\n are present.\n\n @param channel_layout the layout structure to be initialized\n @param mask bitmask describing the channel layout\n\n @return 0 on success\n         AVERROR(EINVAL) for invalid mask values"]
     pub fn av_channel_layout_from_mask(
         channel_layout: *mut AVChannelLayout,
         mask: u64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a channel layout from a given string description.\n The input string can be represented by:\n  - the formal channel layout name (returned by av_channel_layout_describe())\n  - single or multiple channel names (returned by av_channel_name(), eg. \"FL\",\n    or concatenated with \"+\", each optionally containing a custom name after\n    a \"@\", eg. \"FL@Left+FR@Right+LFE\")\n  - a decimal or hexadecimal value of a native channel layout (eg. \"4\" or \"0x4\")\n  - the number of channels with default layout (eg. \"4c\")\n  - the number of unordered channels (eg. \"4C\" or \"4 channels\")\n  - the ambisonic order followed by optional non-diegetic channels (eg.\n    \"ambisonic 2+stereo\")\n On error, the channel layout will remain uninitialized, but not necessarily\n untouched.\n\n @param channel_layout uninitialized channel layout for the result\n @param str string describing the channel layout\n @return 0 on success parsing the channel layout\n         AVERROR(EINVAL) if an invalid channel layout string was provided\n         AVERROR(ENOMEM) if there was not enough memory"]
     pub fn av_channel_layout_from_string(
         channel_layout: *mut AVChannelLayout,
         str_: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the default channel layout for a given number of channels.\n\n @param ch_layout the layout structure to be initialized\n @param nb_channels number of channels"]
     pub fn av_channel_layout_default(
         ch_layout: *mut AVChannelLayout,
         nb_channels: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all standard channel layouts.\n\n @param opaque a pointer where libavutil will store the iteration state. Must\n               point to NULL to start the iteration.\n\n @return the standard channel layout or NULL when the iteration is\n         finished"]
     pub fn av_channel_layout_standard(
         opaque: *mut *mut ::std::os::raw::c_void,
     ) -> *const AVChannelLayout;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free any allocated data in the channel layout and reset the channel\n count to 0.\n\n @param channel_layout the layout structure to be uninitialized"]
     pub fn av_channel_layout_uninit(channel_layout: *mut AVChannelLayout);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Make a copy of a channel layout. This differs from just assigning src to dst\n in that it allocates and copies the map for AV_CHANNEL_ORDER_CUSTOM.\n\n @note the destination channel_layout will be always uninitialized before copy.\n\n @param dst destination channel layout\n @param src source channel layout\n @return 0 on success, a negative AVERROR on error."]
     pub fn av_channel_layout_copy(
         dst: *mut AVChannelLayout,
         src: *const AVChannelLayout,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a human-readable string describing the channel layout properties.\n The string will be in the same format that is accepted by\n @ref av_channel_layout_from_string(), allowing to rebuild the same\n channel layout, except for opaque pointers.\n\n @param channel_layout channel layout to be described\n @param buf pre-allocated buffer where to put the generated string\n @param buf_size size in bytes of the buffer.\n @return amount of bytes needed to hold the output string, or a negative AVERROR\n         on failure. If the returned value is bigger than buf_size, then the\n         string was truncated."]
     pub fn av_channel_layout_describe(
         channel_layout: *const AVChannelLayout,
@@ -7839,64 +7839,64 @@ extern "C" {
         buf_size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " bprint variant of av_channel_layout_describe().\n\n @note the string will be appended to the bprint buffer.\n @return 0 on success, or a negative AVERROR value on failure."]
     pub fn av_channel_layout_describe_bprint(
         channel_layout: *const AVChannelLayout,
         bp: *mut AVBPrint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the channel with the given index in a channel layout.\n\n @param channel_layout input channel layout\n @param idx index of the channel\n @return channel with the index idx in channel_layout on success or\n         AV_CHAN_NONE on failure (if idx is not valid or the channel order is\n         unspecified)"]
     pub fn av_channel_layout_channel_from_index(
         channel_layout: *const AVChannelLayout,
         idx: ::std::os::raw::c_uint,
     ) -> AVChannel;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the index of a given channel in a channel layout. In case multiple\n channels are found, only the first match will be returned.\n\n @param channel_layout input channel layout\n @param channel the channel whose index to obtain\n @return index of channel in channel_layout on success or a negative number if\n         channel is not present in channel_layout."]
     pub fn av_channel_layout_index_from_channel(
         channel_layout: *const AVChannelLayout,
         channel: AVChannel,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the index in a channel layout of a channel described by the given string.\n In case multiple channels are found, only the first match will be returned.\n\n This function accepts channel names in the same format as\n @ref av_channel_from_string().\n\n @param channel_layout input channel layout\n @param name string describing the channel whose index to obtain\n @return a channel index described by the given string, or a negative AVERROR\n         value."]
     pub fn av_channel_layout_index_from_string(
         channel_layout: *const AVChannelLayout,
         name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a channel described by the given string.\n\n This function accepts channel names in the same format as\n @ref av_channel_from_string().\n\n @param channel_layout input channel layout\n @param name string describing the channel to obtain\n @return a channel described by the given string in channel_layout on success\n         or AV_CHAN_NONE on failure (if the string is not valid or the channel\n         order is unspecified)"]
     pub fn av_channel_layout_channel_from_string(
         channel_layout: *const AVChannelLayout,
         name: *const ::std::os::raw::c_char,
     ) -> AVChannel;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find out what channels from a given set are present in a channel layout,\n without regard for their positions.\n\n @param channel_layout input channel layout\n @param mask a combination of AV_CH_* representing a set of channels\n @return a bitfield representing all the channels from mask that are present\n         in channel_layout"]
     pub fn av_channel_layout_subset(channel_layout: *const AVChannelLayout, mask: u64) -> u64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check whether a channel layout is valid, i.e. can possibly describe audio\n data.\n\n @param channel_layout input channel layout\n @return 1 if channel_layout is valid, 0 otherwise."]
     pub fn av_channel_layout_check(channel_layout: *const AVChannelLayout)
         -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check whether two channel layouts are semantically the same, i.e. the same\n channels are present on the same positions in both.\n\n If one of the channel layouts is AV_CHANNEL_ORDER_UNSPEC, while the other is\n not, they are considered to be unequal. If both are AV_CHANNEL_ORDER_UNSPEC,\n they are considered equal iff the channel counts are the same in both.\n\n @param chl input channel layout\n @param chl1 input channel layout\n @return 0 if chl and chl1 are equal, 1 if they are not equal. A negative\n         AVERROR code if one or both are invalid."]
     pub fn av_channel_layout_compare(
         chl: *const AVChannelLayout,
         chl1: *const AVChannelLayout,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the order if the layout is n-th order standard-order ambisonic.\n The presence of optional extra non-diegetic channels at the end is not taken\n into account.\n\n @param channel_layout input channel layout\n @return the order of the layout, a negative error code otherwise."]
     pub fn av_channel_layout_ambisonic_order(
         channel_layout: *const AVChannelLayout,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Change the AVChannelOrder of a channel layout.\n\n Change of AVChannelOrder can be either lossless or lossy. In case of a\n lossless conversion all the channel designations and the associated channel\n names (if any) are kept. On a lossy conversion the channel names and channel\n designations might be lost depending on the capabilities of the desired\n AVChannelOrder. Note that some conversions are simply not possible in which\n case this function returns AVERROR(ENOSYS).\n\n The following conversions are supported:\n\n Any       -> Custom     : Always possible, always lossless.\n Any       -> Unspecified: Always possible, lossless if channel designations\n   are all unknown and channel names are not used, lossy otherwise.\n Custom    -> Ambisonic  : Possible if it contains ambisonic channels with\n   optional non-diegetic channels in the end. Lossy if the channels have\n   custom names, lossless otherwise.\n Custom    -> Native     : Possible if it contains native channels in native\n     order. Lossy if the channels have custom names, lossless otherwise.\n\n On error this function keeps the original channel layout untouched.\n\n @param channel_layout channel layout which will be changed\n @param order the desired channel layout order\n @param flags a combination of AV_CHANNEL_LAYOUT_RETYPE_FLAG_* constants\n @return 0 if the conversion was successful and lossless or if the channel\n           layout was already in the desired order\n         >0 if the conversion was successful but lossy\n         AVERROR(ENOSYS) if the conversion was not possible (or would be\n           lossy and AV_CHANNEL_LAYOUT_RETYPE_FLAG_LOSSLESS was specified)\n         AVERROR(EINVAL), AVERROR(ENOMEM) on error"]
     pub fn av_channel_layout_retype(
         channel_layout: *mut AVChannelLayout,
@@ -7941,7 +7941,7 @@ fn bindgen_test_layout_AVDictionaryEntry() {
 pub struct AVDictionary {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a dictionary entry with matching key.\n\n The returned entry key or value must not be changed, or it will\n cause undefined behavior.\n\n @param prev  Set to the previous matching element to find the next.\n              If set to NULL the first matching element is returned.\n @param key   Matching key\n @param flags A collection of AV_DICT_* flags controlling how the\n              entry is retrieved\n\n @return      Found entry or NULL in case no matching entry was found in the dictionary"]
     pub fn av_dict_get(
         m: *const AVDictionary,
@@ -7950,18 +7950,18 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> *mut AVDictionaryEntry;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over a dictionary\n\n Iterates through all entries in the dictionary.\n\n @warning The returned AVDictionaryEntry key/value must not be changed.\n\n @warning As av_dict_set() invalidates all previous entries returned\n by this function, it must not be called while iterating over the dict.\n\n Typical usage:\n @code\n const AVDictionaryEntry *e = NULL;\n while ((e = av_dict_iterate(m, e))) {\n     // ...\n }\n @endcode\n\n @param m     The dictionary to iterate over\n @param prev  Pointer to the previous AVDictionaryEntry, NULL initially\n\n @retval AVDictionaryEntry* The next element in the dictionary\n @retval NULL               No more elements in the dictionary"]
     pub fn av_dict_iterate(
         m: *const AVDictionary,
         prev: *const AVDictionaryEntry,
     ) -> *const AVDictionaryEntry;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get number of entries in dictionary.\n\n @param m dictionary\n @return  number of entries in dictionary"]
     pub fn av_dict_count(m: *const AVDictionary) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the given entry in *pm, overwriting an existing entry.\n\n Note: If AV_DICT_DONT_STRDUP_KEY or AV_DICT_DONT_STRDUP_VAL is set,\n these arguments will be freed on error.\n\n @warning Adding a new entry to a dictionary invalidates all existing entries\n previously returned with av_dict_get() or av_dict_iterate().\n\n @param pm        Pointer to a pointer to a dictionary struct. If *pm is NULL\n                  a dictionary struct is allocated and put in *pm.\n @param key       Entry key to add to *pm (will either be av_strduped or added as a new key depending on flags)\n @param value     Entry value to add to *pm (will be av_strduped or added as a new key depending on flags).\n                  Passing a NULL value will cause an existing entry to be deleted.\n\n @return          >= 0 on success otherwise an error code <0"]
     pub fn av_dict_set(
         pm: *mut *mut AVDictionary,
@@ -7970,7 +7970,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convenience wrapper for av_dict_set() that converts the value to a string\n and stores it.\n\n Note: If ::AV_DICT_DONT_STRDUP_KEY is set, key will be freed on error."]
     pub fn av_dict_set_int(
         pm: *mut *mut AVDictionary,
@@ -7979,7 +7979,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse the key/value pairs list and add the parsed entries to a dictionary.\n\n In case of failure, all the successfully set entries are stored in\n *pm. You may need to manually free the created dictionary.\n\n @param key_val_sep  A 0-terminated list of characters used to separate\n                     key from value\n @param pairs_sep    A 0-terminated list of characters used to separate\n                     two pairs from each other\n @param flags        Flags to use when adding to the dictionary.\n                     ::AV_DICT_DONT_STRDUP_KEY and ::AV_DICT_DONT_STRDUP_VAL\n                     are ignored since the key/value tokens will always\n                     be duplicated.\n\n @return             0 on success, negative AVERROR code on failure"]
     pub fn av_dict_parse_string(
         pm: *mut *mut AVDictionary,
@@ -7989,7 +7989,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy entries from one AVDictionary struct into another.\n\n @note Metadata is read using the ::AV_DICT_IGNORE_SUFFIX flag\n\n @param dst   Pointer to a pointer to a AVDictionary struct to copy into. If *dst is NULL,\n              this function will allocate a struct for you and put it in *dst\n @param src   Pointer to the source AVDictionary struct to copy items from.\n @param flags Flags to use when setting entries in *dst\n\n @return 0 on success, negative AVERROR code on failure. If dst was allocated\n           by this function, callers should free the associated memory."]
     pub fn av_dict_copy(
         dst: *mut *mut AVDictionary,
@@ -7997,11 +7997,11 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free all the memory allocated for an AVDictionary struct\n and all keys and values."]
     pub fn av_dict_free(m: *mut *mut AVDictionary);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get dictionary entries as a string.\n\n Create a string containing dictionary's entries.\n Such string may be passed back to av_dict_parse_string().\n @note String is escaped with backslashes ('\\').\n\n @warning Separators cannot be neither '\\\\' nor '\\0'. They also cannot be the same.\n\n @param[in]  m             The dictionary\n @param[out] buffer        Pointer to buffer that will be allocated with string containing entries.\n                           Buffer must be freed by the caller when is no longer needed.\n @param[in]  key_val_sep   Character used to separate key from value\n @param[in]  pairs_sep     Character used to separate two pairs from each other\n\n @return                   >= 0 on success, negative on error"]
     pub fn av_dict_get_string(
         m: *const AVDictionary,
@@ -8535,65 +8535,65 @@ impl ::std::fmt::Debug for AVFrame {
         write ! (f , "AVFrame {{ data: {:?}, linesize: {:?}, extended_data: {:?}, width: {:?}, height: {:?}, nb_samples: {:?}, format: {:?}, pict_type: {:?}, sample_aspect_ratio: {:?}, pts: {:?}, pkt_dts: {:?}, time_base: {:?}, quality: {:?}, opaque: {:?}, repeat_pict: {:?}, sample_rate: {:?}, buf: {:?}, extended_buf: {:?}, nb_extended_buf: {:?}, side_data: {:?}, nb_side_data: {:?}, flags: {:?}, color_range: {:?}, color_primaries: {:?}, color_trc: {:?}, colorspace: {:?}, chroma_location: {:?}, best_effort_timestamp: {:?}, metadata: {:?}, decode_error_flags: {:?}, hw_frames_ctx: {:?}, opaque_ref: {:?}, crop_top: {:?}, crop_bottom: {:?}, crop_left: {:?}, crop_right: {:?}, private_ref: {:?}, ch_layout: {:?}, duration: {:?}, alpha_mode: {:?} }}" , self . data , self . linesize , self . extended_data , self . width , self . height , self . nb_samples , self . format , self . pict_type , self . sample_aspect_ratio , self . pts , self . pkt_dts , self . time_base , self . quality , self . opaque , self . repeat_pict , self . sample_rate , self . buf , self . extended_buf , self . nb_extended_buf , self . side_data , self . nb_side_data , self . flags , self . color_range , self . color_primaries , self . color_trc , self . colorspace , self . chroma_location , self . best_effort_timestamp , self . metadata , self . decode_error_flags , self . hw_frames_ctx , self . opaque_ref , self . crop_top , self . crop_bottom , self . crop_left , self . crop_right , self . private_ref , self . ch_layout , self . duration , self . alpha_mode)
     }
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVFrame and set its fields to default values.  The resulting\n struct must be freed using av_frame_free().\n\n @return An AVFrame filled with default values or NULL on failure.\n\n @note this only allocates the AVFrame itself, not the data buffers. Those\n must be allocated through other means, e.g. with av_frame_get_buffer() or\n manually."]
     pub fn av_frame_alloc() -> *mut AVFrame;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the frame and any dynamically allocated objects in it,\n e.g. extended_data. If the frame is reference counted, it will be\n unreferenced first.\n\n @param frame frame to be freed. The pointer will be set to NULL."]
     pub fn av_frame_free(frame: *mut *mut AVFrame);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set up a new reference to the data described by the source frame.\n\n Copy frame properties from src to dst and create a new reference for each\n AVBufferRef from src.\n\n If src is not reference counted, new buffers are allocated and the data is\n copied.\n\n @warning: dst MUST have been either unreferenced with av_frame_unref(dst),\n           or newly allocated with av_frame_alloc() before calling this\n           function, or undefined behavior will occur.\n\n @return 0 on success, a negative AVERROR on error"]
     pub fn av_frame_ref(dst: *mut AVFrame, src: *const AVFrame) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Ensure the destination frame refers to the same data described by the source\n frame, either by creating a new reference for each AVBufferRef from src if\n they differ from those in dst, by allocating new buffers and copying data if\n src is not reference counted, or by unreferencing it if src is empty.\n\n Frame properties on dst will be replaced by those from src.\n\n @return 0 on success, a negative AVERROR on error. On error, dst is\n         unreferenced."]
     pub fn av_frame_replace(dst: *mut AVFrame, src: *const AVFrame) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create a new frame that references the same data as src.\n\n This is a shortcut for av_frame_alloc()+av_frame_ref().\n\n @return newly created AVFrame on success, NULL on error."]
     pub fn av_frame_clone(src: *const AVFrame) -> *mut AVFrame;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Unreference all the buffers referenced by frame and reset the frame fields."]
     pub fn av_frame_unref(frame: *mut AVFrame);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Move everything contained in src to dst and reset src.\n\n @warning: dst is not unreferenced, but directly overwritten without reading\n           or deallocating its contents. Call av_frame_unref(dst) manually\n           before calling this function to ensure that no memory is leaked."]
     pub fn av_frame_move_ref(dst: *mut AVFrame, src: *mut AVFrame);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate new buffer(s) for audio or video data.\n\n The following fields must be set on frame before calling this function:\n - format (pixel format for video, sample format for audio)\n - width and height for video\n - nb_samples and ch_layout for audio\n\n This function will fill AVFrame.data and AVFrame.buf arrays and, if\n necessary, allocate and fill AVFrame.extended_data and AVFrame.extended_buf.\n For planar formats, one buffer will be allocated for each plane.\n\n @warning: if frame already has been allocated, calling this function will\n           leak memory. In addition, undefined behavior can occur in certain\n           cases.\n\n @param frame frame in which to store the new buffers.\n @param align Required buffer size and data pointer alignment. If equal to 0,\n              alignment will be chosen automatically for the current CPU.\n              It is highly recommended to pass 0 here unless you know what\n              you are doing.\n\n @return 0 on success, a negative AVERROR on error."]
     pub fn av_frame_get_buffer(
         frame: *mut AVFrame,
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if the frame data is writable.\n\n @return A positive value if the frame data is writable (which is true if and\n only if each of the underlying buffers has only one reference, namely the one\n stored in this frame). Return 0 otherwise.\n\n If 1 is returned the answer is valid until av_buffer_ref() is called on any\n of the underlying AVBufferRefs (e.g. through av_frame_ref() or directly).\n\n @see av_frame_make_writable(), av_buffer_is_writable()"]
     pub fn av_frame_is_writable(frame: *mut AVFrame) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Ensure that the frame data is writable, avoiding data copy if possible.\n\n Do nothing if the frame is writable, allocate new buffers and copy the data\n if it is not. Non-refcounted frames behave as non-writable, i.e. a copy\n is always made.\n\n @return 0 on success, a negative AVERROR on error.\n\n @see av_frame_is_writable(), av_buffer_is_writable(),\n av_buffer_make_writable()"]
     pub fn av_frame_make_writable(frame: *mut AVFrame) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy the frame data from src to dst.\n\n This function does not allocate anything, dst must be already initialized and\n allocated with the same parameters as src.\n\n This function only copies the frame data (i.e. the contents of the data /\n extended data arrays), not any other properties.\n\n @return >= 0 on success, a negative AVERROR on error."]
     pub fn av_frame_copy(dst: *mut AVFrame, src: *const AVFrame) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy only \"metadata\" fields from src to dst.\n\n Metadata for the purpose of this function are those fields that do not affect\n the data layout in the buffers.  E.g. pts, sample rate (for audio) or sample\n aspect ratio (for video), but not width/height or channel layout.\n Side data is also copied."]
     pub fn av_frame_copy_props(dst: *mut AVFrame, src: *const AVFrame) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the buffer reference a given data plane is stored in.\n\n @param frame the frame to get the plane's buffer from\n @param plane index of the data plane of interest in frame->extended_data.\n\n @return the buffer reference that contains the plane or NULL if the input\n frame is not valid."]
     pub fn av_frame_get_plane_buffer(
         frame: *const AVFrame,
         plane: ::std::os::raw::c_int,
     ) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a new side data to a frame.\n\n @param frame a frame to which the side data should be added\n @param type type of the added side data\n @param size size of the side data\n\n @return newly added side data on success, NULL on error"]
     pub fn av_frame_new_side_data(
         frame: *mut AVFrame,
@@ -8601,7 +8601,7 @@ extern "C" {
         size: usize,
     ) -> *mut AVFrameSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a new side data to a frame from an existing AVBufferRef\n\n @param frame a frame to which the side data should be added\n @param type  the type of the added side data\n @param buf   an AVBufferRef to add as side data. The ownership of\n              the reference is transferred to the frame.\n\n @return newly added side data on success, NULL on error. On failure\n         the frame is unchanged and the AVBufferRef remains owned by\n         the caller."]
     pub fn av_frame_new_side_data_from_buf(
         frame: *mut AVFrame,
@@ -8609,14 +8609,14 @@ extern "C" {
         buf: *mut AVBufferRef,
     ) -> *mut AVFrameSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return a pointer to the side data of a given type on success, NULL if there\n is no side data with such type in this frame."]
     pub fn av_frame_get_side_data(
         frame: *const AVFrame,
         type_: AVFrameSideDataType,
     ) -> *mut AVFrameSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Remove and free all side data instances of the given type."]
     pub fn av_frame_remove_side_data(frame: *mut AVFrame, type_: AVFrameSideDataType);
 }
@@ -8624,29 +8624,29 @@ extern "C" {
 pub const AV_FRAME_CROP_UNALIGNED: _bindgen_ty_2 = 1;
 #[doc = " Flags for frame cropping."]
 pub type _bindgen_ty_2 = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Crop the given video AVFrame according to its crop_left/crop_top/crop_right/\n crop_bottom fields. If cropping is successful, the function will adjust the\n data pointers and the width/height fields, and set the crop fields to 0.\n\n In all cases, the cropping boundaries will be rounded to the inherent\n alignment of the pixel format. In some cases, such as for opaque hwaccel\n formats, the left/top cropping is ignored. The crop fields are set to 0 even\n if the cropping was rounded or ignored.\n\n @param frame the frame which should be cropped\n @param flags Some combination of AV_FRAME_CROP_* flags, or 0.\n\n @return >= 0 on success, a negative AVERROR on error. If the cropping fields\n were invalid, AVERROR(ERANGE) is returned, and nothing is changed."]
     pub fn av_frame_apply_cropping(
         frame: *mut AVFrame,
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return a string identifying the side data type"]
     pub fn av_frame_side_data_name(type_: AVFrameSideDataType) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return side data descriptor corresponding to a given side data type, NULL\n         when not available."]
     pub fn av_frame_side_data_desc(type_: AVFrameSideDataType) -> *const AVSideDataDescriptor;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free all side data entries and their contents, then zeroes out the\n values which the pointers are pointing to.\n\n @param sd    pointer to array of side data to free. Will be set to NULL\n              upon return.\n @param nb_sd pointer to an integer containing the number of entries in\n              the array. Will be set to 0 upon return."]
     pub fn av_frame_side_data_free(
         sd: *mut *mut *mut AVFrameSideData,
         nb_sd: *mut ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add new side data entry to an array.\n\n @param sd    pointer to array of side data to which to add another entry,\n              or to NULL in order to start a new array.\n @param nb_sd pointer to an integer containing the number of entries in\n              the array.\n @param type  type of the added side data\n @param size  size of the side data\n @param flags Some combination of AV_FRAME_SIDE_DATA_FLAG_* flags, or 0.\n\n @return newly added side data on success, NULL on error.\n @note In case of AV_FRAME_SIDE_DATA_FLAG_UNIQUE being set, entries of\n       matching AVFrameSideDataType will be removed before the addition\n       is attempted.\n @note In case of AV_FRAME_SIDE_DATA_FLAG_REPLACE being set, if an\n       entry of the same type already exists, it will be replaced instead."]
     pub fn av_frame_side_data_new(
         sd: *mut *mut *mut AVFrameSideData,
@@ -8656,7 +8656,7 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> *mut AVFrameSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a new side data entry to an array from an existing AVBufferRef.\n\n @param sd    pointer to array of side data to which to add another entry,\n              or to NULL in order to start a new array.\n @param nb_sd pointer to an integer containing the number of entries in\n              the array.\n @param type  type of the added side data\n @param buf   Pointer to AVBufferRef to add to the array. On success,\n              the function takes ownership of the AVBufferRef and *buf is\n              set to NULL, unless AV_FRAME_SIDE_DATA_FLAG_NEW_REF is set\n              in which case the ownership will remain with the caller.\n @param flags Some combination of AV_FRAME_SIDE_DATA_FLAG_* flags, or 0.\n\n @return newly added side data on success, NULL on error.\n @note In case of AV_FRAME_SIDE_DATA_FLAG_UNIQUE being set, entries of\n       matching AVFrameSideDataType will be removed before the addition\n       is attempted.\n @note In case of AV_FRAME_SIDE_DATA_FLAG_REPLACE being set, if an\n       entry of the same type already exists, it will be replaced instead.\n"]
     pub fn av_frame_side_data_add(
         sd: *mut *mut *mut AVFrameSideData,
@@ -8666,7 +8666,7 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> *mut AVFrameSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a new side data entry to an array based on existing side data, taking\n a reference towards the contained AVBufferRef.\n\n @param sd    pointer to array of side data to which to add another entry,\n              or to NULL in order to start a new array.\n @param nb_sd pointer to an integer containing the number of entries in\n              the array.\n @param src   side data to be cloned, with a new reference utilized\n              for the buffer.\n @param flags Some combination of AV_FRAME_SIDE_DATA_FLAG_* flags, or 0.\n\n @return negative error code on failure, >=0 on success.\n @note In case of AV_FRAME_SIDE_DATA_FLAG_UNIQUE being set, entries of\n       matching AVFrameSideDataType will be removed before the addition\n       is attempted.\n @note In case of AV_FRAME_SIDE_DATA_FLAG_REPLACE being set, if an\n       entry of the same type already exists, it will be replaced instead."]
     pub fn av_frame_side_data_clone(
         sd: *mut *mut *mut AVFrameSideData,
@@ -8675,7 +8675,7 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a side data entry of a specific type from an array.\n\n @param sd    array of side data.\n @param nb_sd integer containing the number of entries in the array.\n @param type  type of side data to be queried\n\n @return a pointer to the side data of a given type on success, NULL if there\n         is no side data with such type in this set."]
     pub fn av_frame_side_data_get_c(
         sd: *const *const AVFrameSideData,
@@ -8683,7 +8683,7 @@ extern "C" {
         type_: AVFrameSideDataType,
     ) -> *const AVFrameSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Remove and free all side data instances of the given type from an array."]
     pub fn av_frame_side_data_remove(
         sd: *mut *mut *mut AVFrameSideData,
@@ -8691,7 +8691,7 @@ extern "C" {
         type_: AVFrameSideDataType,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Remove and free all side data instances that match any of the given\n side data properties. (See enum AVSideDataProps)"]
     pub fn av_frame_side_data_remove_by_props(
         sd: *mut *mut *mut AVFrameSideData,
@@ -8874,27 +8874,27 @@ fn bindgen_test_layout_AVHWFramesContext() {
         "Offset of field: AVHWFramesContext::height"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Look up an AVHWDeviceType by name.\n\n @param name String name of the device type (case-insensitive).\n @return The type from enum AVHWDeviceType, or AV_HWDEVICE_TYPE_NONE if\n         not found."]
     pub fn av_hwdevice_find_type_by_name(name: *const ::std::os::raw::c_char) -> AVHWDeviceType;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the string name of an AVHWDeviceType.\n\n @param type Type from enum AVHWDeviceType.\n @return Pointer to a static string containing the name, or NULL if the type\n         is not valid."]
     pub fn av_hwdevice_get_type_name(type_: AVHWDeviceType) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over supported device types.\n\n @param prev AV_HWDEVICE_TYPE_NONE initially, then the previous type\n             returned by this function in subsequent iterations.\n @return The next usable device type from enum AVHWDeviceType, or\n         AV_HWDEVICE_TYPE_NONE if there are no more."]
     pub fn av_hwdevice_iterate_types(prev: AVHWDeviceType) -> AVHWDeviceType;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVHWDeviceContext for a given hardware type.\n\n @param type the type of the hardware device to allocate.\n @return a reference to the newly created AVHWDeviceContext on success or NULL\n         on failure."]
     pub fn av_hwdevice_ctx_alloc(type_: AVHWDeviceType) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finalize the device context before use. This function must be called after\n the context is filled with all the required information and before it is\n used in any way.\n\n @param ref a reference to the AVHWDeviceContext\n @return 0 on success, a negative AVERROR code on failure"]
     pub fn av_hwdevice_ctx_init(ref_: *mut AVBufferRef) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Open a device of the specified type and create an AVHWDeviceContext for it.\n\n This is a convenience function intended to cover the simple cases. Callers\n who need to fine-tune device creation/management should open the device\n manually and then wrap it in an AVHWDeviceContext using\n av_hwdevice_ctx_alloc()/av_hwdevice_ctx_init().\n\n The returned context is already initialized and ready for use, the caller\n should not call av_hwdevice_ctx_init() on it. The user_opaque/free fields of\n the created AVHWDeviceContext are set by this function and should not be\n touched by the caller.\n\n @param device_ctx On success, a reference to the newly-created device context\n                   will be written here. The reference is owned by the caller\n                   and must be released with av_buffer_unref() when no longer\n                   needed. On failure, NULL will be written to this pointer.\n @param type The type of the device to create.\n @param device A type-specific string identifying the device to open.\n @param opts A dictionary of additional (type-specific) options to use in\n             opening the device. The dictionary remains owned by the caller.\n @param flags currently unused\n\n @return 0 on success, a negative AVERROR code on failure."]
     pub fn av_hwdevice_ctx_create(
         device_ctx: *mut *mut AVBufferRef,
@@ -8904,7 +8904,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create a new device of the specified type from an existing device.\n\n If the source device is a device of the target type or was originally\n derived from such a device (possibly through one or more intermediate\n devices of other types), then this will return a reference to the\n existing device of the same type as is requested.\n\n Otherwise, it will attempt to derive a new device from the given source\n device.  If direct derivation to the new type is not implemented, it will\n attempt the same derivation from each ancestor of the source device in\n turn looking for an implemented derivation method.\n\n @param dst_ctx On success, a reference to the newly-created\n                AVHWDeviceContext.\n @param type    The type of the new device to create.\n @param src_ctx A reference to an existing AVHWDeviceContext which will be\n                used to create the new device.\n @param flags   Currently unused; should be set to zero.\n @return        Zero on success, a negative AVERROR code on failure."]
     pub fn av_hwdevice_ctx_create_derived(
         dst_ctx: *mut *mut AVBufferRef,
@@ -8913,7 +8913,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create a new device of the specified type from an existing device.\n\n This function performs the same action as av_hwdevice_ctx_create_derived,\n however, it is able to set options for the new device to be derived.\n\n @param dst_ctx On success, a reference to the newly-created\n                AVHWDeviceContext.\n @param type    The type of the new device to create.\n @param src_ctx A reference to an existing AVHWDeviceContext which will be\n                used to create the new device.\n @param options Options for the new device to create, same format as in\n                av_hwdevice_ctx_create.\n @param flags   Currently unused; should be set to zero.\n @return        Zero on success, a negative AVERROR code on failure."]
     pub fn av_hwdevice_ctx_create_derived_opts(
         dst_ctx: *mut *mut AVBufferRef,
@@ -8923,15 +8923,15 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVHWFramesContext tied to a given device context.\n\n @param device_ctx a reference to a AVHWDeviceContext. This function will make\n                   a new reference for internal use, the one passed to the\n                   function remains owned by the caller.\n @return a reference to the newly created AVHWFramesContext on success or NULL\n         on failure."]
     pub fn av_hwframe_ctx_alloc(device_ctx: *mut AVBufferRef) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finalize the context before use. This function must be called after the\n context is filled with all the required information and before it is attached\n to any frames.\n\n @param ref a reference to the AVHWFramesContext\n @return 0 on success, a negative AVERROR code on failure"]
     pub fn av_hwframe_ctx_init(ref_: *mut AVBufferRef) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a new frame attached to the given AVHWFramesContext.\n\n @param hwframe_ctx a reference to an AVHWFramesContext\n @param frame an empty (freshly allocated or unreffed) frame to be filled with\n              newly allocated buffers.\n @param flags currently unused, should be set to zero\n @return 0 on success, a negative AVERROR code on failure"]
     pub fn av_hwframe_get_buffer(
         hwframe_ctx: *mut AVBufferRef,
@@ -8939,7 +8939,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy data to or from a hw surface. At least one of dst/src must have an\n AVHWFramesContext attached.\n\n If src has an AVHWFramesContext attached, then the format of dst (if set)\n must use one of the formats returned by av_hwframe_transfer_get_formats(src,\n AV_HWFRAME_TRANSFER_DIRECTION_FROM).\n If dst has an AVHWFramesContext attached, then the format of src must use one\n of the formats returned by av_hwframe_transfer_get_formats(dst,\n AV_HWFRAME_TRANSFER_DIRECTION_TO)\n\n dst may be \"clean\" (i.e. with data/buf pointers unset), in which case the\n data buffers will be allocated by this function using av_frame_get_buffer().\n If dst->format is set, then this format will be used, otherwise (when\n dst->format is AV_PIX_FMT_NONE) the first acceptable format will be chosen.\n\n The two frames must have matching allocated dimensions (i.e. equal to\n AVHWFramesContext.width/height), since not all device types support\n transferring a sub-rectangle of the whole surface. The display dimensions\n (i.e. AVFrame.width/height) may be smaller than the allocated dimensions, but\n also have to be equal for both frames. When the display dimensions are\n smaller than the allocated dimensions, the content of the padding in the\n destination frame is unspecified.\n\n @param dst the destination frame. dst is not touched on failure.\n @param src the source frame.\n @param flags currently unused, should be set to zero\n @return 0 on success, a negative AVERROR error code on failure."]
     pub fn av_hwframe_transfer_data(
         dst: *mut AVFrame,
@@ -8952,7 +8952,7 @@ pub const AV_HWFRAME_TRANSFER_DIRECTION_FROM: AVHWFrameTransferDirection = 0;
 #[doc = " Transfer the data to the queried hw frame."]
 pub const AV_HWFRAME_TRANSFER_DIRECTION_TO: AVHWFrameTransferDirection = 1;
 pub type AVHWFrameTransferDirection = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a list of possible source or target formats usable in\n av_hwframe_transfer_data().\n\n @param hwframe_ctx the frame context to obtain the information for\n @param dir the direction of the transfer\n @param formats the pointer to the output format list will be written here.\n                The list is terminated with AV_PIX_FMT_NONE and must be freed\n                by the caller when no longer needed using av_free().\n                If this function returns successfully, the format list will\n                have at least one item (not counting the terminator).\n                On failure, the contents of this pointer are unspecified.\n @param flags currently unused, should be set to zero\n @return 0 on success, a negative AVERROR code on failure."]
     pub fn av_hwframe_transfer_get_formats(
         hwframe_ctx: *mut AVBufferRef,
@@ -9022,18 +9022,18 @@ fn bindgen_test_layout_AVHWFramesConstraints() {
         "Offset of field: AVHWFramesConstraints::max_height"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a HW-specific configuration structure for a given HW device.\n After use, the user must free all members as required by the specific\n hardware structure being used, then free the structure itself with\n av_free().\n\n @param device_ctx a reference to the associated AVHWDeviceContext.\n @return The newly created HW-specific configuration structure on\n         success or NULL on failure."]
     pub fn av_hwdevice_hwconfig_alloc(device_ctx: *mut AVBufferRef) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the constraints on HW frames given a device and the HW-specific\n configuration to be used with that device.  If no HW-specific\n configuration is provided, returns the maximum possible capabilities\n of the device.\n\n @param ref a reference to the associated AVHWDeviceContext.\n @param hwconfig a filled HW-specific configuration structure, or NULL\n        to return the maximum possible capabilities of the device.\n @return AVHWFramesConstraints structure describing the constraints\n         on the device, or NULL if not available."]
     pub fn av_hwdevice_get_hwframe_constraints(
         ref_: *mut AVBufferRef,
         hwconfig: *const ::std::os::raw::c_void,
     ) -> *mut AVHWFramesConstraints;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free an AVHWFrameConstraints structure.\n\n @param constraints The (filled or unfilled) AVHWFrameConstraints structure."]
     pub fn av_hwframe_constraints_free(constraints: *mut *mut AVHWFramesConstraints);
 }
@@ -9047,7 +9047,7 @@ pub const AV_HWFRAME_MAP_OVERWRITE: _bindgen_ty_3 = 4;
 pub const AV_HWFRAME_MAP_DIRECT: _bindgen_ty_3 = 8;
 #[doc = " Flags to apply to frame mappings."]
 pub type _bindgen_ty_3 = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Map a hardware frame.\n\n This has a number of different possible effects, depending on the format\n and origin of the src and dst frames.  On input, src should be a usable\n frame with valid buffers and dst should be blank (typically as just created\n by av_frame_alloc()).  src should have an associated hwframe context, and\n dst may optionally have a format and associated hwframe context.\n\n If src was created by mapping a frame from the hwframe context of dst,\n then this function undoes the mapping - dst is replaced by a reference to\n the frame that src was originally mapped from.\n\n If both src and dst have an associated hwframe context, then this function\n attempts to map the src frame from its hardware context to that of dst and\n then fill dst with appropriate data to be usable there.  This will only be\n possible if the hwframe contexts and associated devices are compatible -\n given compatible devices, av_hwframe_ctx_create_derived() can be used to\n create a hwframe context for dst in which mapping should be possible.\n\n If src has a hwframe context but dst does not, then the src frame is\n mapped to normal memory and should thereafter be usable as a normal frame.\n If the format is set on dst, then the mapping will attempt to create dst\n with that format and fail if it is not possible.  If format is unset (is\n AV_PIX_FMT_NONE) then dst will be mapped with whatever the most appropriate\n format to use is (probably the sw_format of the src hwframe context).\n\n A return value of AVERROR(ENOSYS) indicates that the mapping is not\n possible with the given arguments and hwframe setup, while other return\n values indicate that it failed somehow.\n\n On failure, the destination frame will be left blank, except for the\n hw_frames_ctx/format fields they may have been set by the caller - those will\n be preserved as they were.\n\n @param dst Destination frame, to contain the mapping.\n @param src Source frame, to be mapped.\n @param flags Some combination of AV_HWFRAME_MAP_* flags.\n @return Zero on success, negative AVERROR code on failure."]
     pub fn av_hwframe_map(
         dst: *mut AVFrame,
@@ -9055,7 +9055,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create and initialise an AVHWFramesContext as a mapping of another existing\n AVHWFramesContext on a different device.\n\n av_hwframe_ctx_init() should not be called after this.\n\n @param derived_frame_ctx  On success, a reference to the newly created\n                           AVHWFramesContext.\n @param format             The AVPixelFormat for the derived context.\n @param derived_device_ctx A reference to the device to create the new\n                           AVHWFramesContext on.\n @param source_frame_ctx   A reference to an existing AVHWFramesContext\n                           which will be mapped to the derived context.\n @param flags  Some combination of AV_HWFRAME_MAP_* flags, defining the\n               mapping parameters to apply to frames which are allocated\n               in the derived device.\n @return       Zero on success, negative AVERROR code on failure."]
     pub fn av_hwframe_ctx_create_derived(
         derived_frame_ctx: *mut *mut AVBufferRef,
@@ -9630,30 +9630,30 @@ pub const AV_CODEC_ID_VNULL: AVCodecID = 135170;
 pub const AV_CODEC_ID_ANULL: AVCodecID = 135171;
 #[doc = " Identify the syntax and semantics of the bitstream.\n The principle is roughly:\n Two decoders with the same ID can decode the same streams.\n Two encoders with the same ID can encode compatible streams.\n There may be slight deviations from the principle due to implementation\n details.\n\n If you add a codec ID to this list, add it so that\n 1. no value of an existing codec ID changes (that would break ABI),\n 2. it is as close as possible to similar codecs\n\n After adding new codec IDs, do not forget to add an entry to the codec\n descriptor list and bump libavcodec minor version."]
 pub type AVCodecID = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the type of the given codec."]
     pub fn avcodec_get_type(codec_id: AVCodecID) -> AVMediaType;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the name of a codec.\n @return  a static string identifying the codec; never NULL"]
     pub fn avcodec_get_name(id: AVCodecID) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return codec bits per sample.\n\n @param[in] codec_id the codec\n @return Number of bits per sample or zero if unknown for the given codec."]
     pub fn av_get_bits_per_sample(codec_id: AVCodecID) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return codec bits per sample.\n Only return non-zero if the bits per sample is exactly correct, not an\n approximation.\n\n @param[in] codec_id the codec\n @return Number of bits per sample or zero if unknown for the given codec."]
     pub fn av_get_exact_bits_per_sample(codec_id: AVCodecID) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a name for the specified profile, if available.\n\n @param codec_id the ID of the codec to which the requested profile belongs\n @param profile the profile value for which a name is requested\n @return A name for the profile if found, NULL otherwise.\n\n @note unlike av_get_profile_name(), which searches a list of profiles\n       supported by a specific decoder or encoder implementation, this\n       function searches the list of profiles from the AVCodecDescriptor"]
     pub fn avcodec_profile_name(
         codec_id: AVCodecID,
         profile: ::std::os::raw::c_int,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the PCM codec associated with a sample format.\n @param be  endianness, 0 for little, 1 for big,\n            -1 (or anything else) for native\n @return  AV_CODEC_ID_PCM_* or AV_CODEC_ID_NONE"]
     pub fn av_get_pcm_codec(fmt: AVSampleFormat, be: ::std::os::raw::c_int) -> AVCodecID;
 }
@@ -9802,35 +9802,35 @@ fn bindgen_test_layout_AVCodec() {
         "Offset of field: AVCodec::ch_layouts"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all registered codecs.\n\n @param opaque a pointer where libavcodec will store the iteration state. Must\n               point to NULL to start the iteration.\n\n @return the next registered codec or NULL when the iteration is\n         finished"]
     pub fn av_codec_iterate(opaque: *mut *mut ::std::os::raw::c_void) -> *const AVCodec;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find a registered decoder with a matching codec ID.\n\n @param id AVCodecID of the requested decoder\n @return A decoder if one was found, NULL otherwise."]
     pub fn avcodec_find_decoder(id: AVCodecID) -> *const AVCodec;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find a registered decoder with the specified name.\n\n @param name name of the requested decoder\n @return A decoder if one was found, NULL otherwise."]
     pub fn avcodec_find_decoder_by_name(name: *const ::std::os::raw::c_char) -> *const AVCodec;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find a registered encoder with a matching codec ID.\n\n @param id AVCodecID of the requested encoder\n @return An encoder if one was found, NULL otherwise."]
     pub fn avcodec_find_encoder(id: AVCodecID) -> *const AVCodec;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find a registered encoder with the specified name.\n\n @param name name of the requested encoder\n @return An encoder if one was found, NULL otherwise."]
     pub fn avcodec_find_encoder_by_name(name: *const ::std::os::raw::c_char) -> *const AVCodec;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return a non-zero number if codec is an encoder, zero otherwise"]
     pub fn av_codec_is_encoder(codec: *const AVCodec) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return a non-zero number if codec is a decoder, zero otherwise"]
     pub fn av_codec_is_decoder(codec: *const AVCodec) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a name for the specified profile, if available.\n\n @param codec the codec that is searched for the given profile\n @param profile the profile value for which a name is requested\n @return A name for the profile if found, NULL otherwise."]
     pub fn av_get_profile_name(
         codec: *const AVCodec,
@@ -9886,7 +9886,7 @@ fn bindgen_test_layout_AVCodecHWConfig() {
         "Offset of field: AVCodecHWConfig::device_type"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Retrieve supported hardware configurations for a codec.\n\n Values of index from zero to some maximum return the indexed configuration\n descriptor; all other values return NULL.  If the codec does not support\n any hardware configurations then it will always return NULL."]
     pub fn avcodec_get_hw_config(
         codec: *const AVCodec,
@@ -10034,7 +10034,7 @@ fn bindgen_test_layout_AVCPBProperties() {
         "Offset of field: AVCPBProperties::vbv_delay"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a CPB properties structure and initialize its fields to default\n values.\n\n @param size if non-NULL, the size of the allocated struct will be written\n             here. This is useful for embedding it in side data.\n\n @return the newly allocated struct or NULL on failure"]
     pub fn av_cpb_properties_alloc(size: *mut usize) -> *mut AVCPBProperties;
 }
@@ -10127,7 +10127,7 @@ fn bindgen_test_layout_AVRTCPSenderReport() {
         "Offset of field: AVRTCPSenderReport::sender_nb_bytes"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encode extradata length to a buffer. Used by xiph codecs.\n\n @param s buffer to write to; must be at least (v/255+1) bytes long\n @param v size of extradata in bytes\n @return number of bytes written to the buffer."]
     pub fn av_xiphlacing(
         s: *mut ::std::os::raw::c_uchar,
@@ -10258,7 +10258,7 @@ fn bindgen_test_layout_AVPacketSideData() {
         "Offset of field: AVPacketSideData::type_"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a new packet side data.\n\n @param sd    pointer to an array of side data to which the side data should\n              be added. *sd may be NULL, in which case the array will be\n              initialized.\n @param nb_sd pointer to an integer containing the number of entries in\n              the array. The integer value will be increased by 1 on success.\n @param type  side data type\n @param size  desired side data size\n @param flags currently unused. Must be zero\n\n @return pointer to freshly allocated side data on success, or NULL otherwise."]
     pub fn av_packet_side_data_new(
         psd: *mut *mut AVPacketSideData,
@@ -10268,7 +10268,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> *mut AVPacketSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Wrap existing data as packet side data.\n\n @param sd    pointer to an array of side data to which the side data should\n              be added. *sd may be NULL, in which case the array will be\n              initialized\n @param nb_sd pointer to an integer containing the number of entries in\n              the array. The integer value will be increased by 1 on success.\n @param type  side data type\n @param data  a data array. It must be allocated with the av_malloc() family\n              of functions. The ownership of the data is transferred to the\n              side data array on success\n @param size  size of the data array\n @param flags currently unused. Must be zero\n\n @return pointer to freshly allocated side data on success, or NULL otherwise\n         On failure, the side data array is unchanged and the data remains\n         owned by the caller."]
     pub fn av_packet_side_data_add(
         sd: *mut *mut AVPacketSideData,
@@ -10279,7 +10279,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> *mut AVPacketSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get side information from a side data array.\n\n @param sd    the array from which the side data should be fetched\n @param nb_sd value containing the number of entries in the array.\n @param type  desired side information type\n\n @return pointer to side data if present or NULL otherwise"]
     pub fn av_packet_side_data_get(
         sd: *const AVPacketSideData,
@@ -10287,7 +10287,7 @@ extern "C" {
         type_: AVPacketSideDataType,
     ) -> *const AVPacketSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Remove side data of the given type from a side data array.\n\n @param sd    the array from which the side data should be removed\n @param nb_sd pointer to an integer containing the number of entries in\n              the array. Will be reduced by the amount of entries removed\n              upon return\n @param type  side information type"]
     pub fn av_packet_side_data_remove(
         sd: *mut AVPacketSideData,
@@ -10295,14 +10295,14 @@ extern "C" {
         type_: AVPacketSideDataType,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convenience function to free all the side data stored in an array, and\n the array itself.\n\n @param sd    pointer to array of side data to free. Will be set to NULL\n              upon return.\n @param nb_sd pointer to an integer containing the number of entries in\n              the array. Will be set to 0 upon return."]
     pub fn av_packet_side_data_free(
         sd: *mut *mut AVPacketSideData,
         nb_sd: *mut ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a new packet side data entry to an array based on existing frame\n side data, if a matching type exists for packet side data.\n\n @param flags              Currently unused. Must be 0.\n @retval >= 0              Success\n @retval AVERROR(EINVAL)   The frame side data type does not have a matching\n                           packet side data type.\n @retval AVERROR(ENOMEM)   Failed to add a side data entry to the array, or\n                           similar."]
     pub fn av_packet_side_data_from_frame(
         sd: *mut *mut AVPacketSideData,
@@ -10311,7 +10311,7 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a new frame side data entry to an array based on existing packet\n side data, if a matching type exists for frame side data.\n\n @param flags              Some combination of AV_FRAME_SIDE_DATA_FLAG_* flags,\n                           or 0.\n @retval >= 0              Success\n @retval AVERROR(EINVAL)   The packet side data type does not have a matching\n                           frame side data type.\n @retval AVERROR(ENOMEM)   Failed to add a side data entry to the array, or\n                           similar."]
     pub fn av_packet_side_data_to_frame(
         sd: *mut *mut *mut AVFrameSideData,
@@ -10320,7 +10320,7 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_packet_side_data_name(type_: AVPacketSideDataType) -> *const ::std::os::raw::c_char;
 }
 #[doc = " This structure stores compressed data. It is typically exported by demuxers\n and then passed as input to decoders, or received as output from encoders and\n then passed to muxers.\n\n For video, it should typically contain one compressed frame. For audio it may\n contain several compressed frames. Encoders are allowed to output empty\n packets, with no compressed data, containing only side data\n (e.g. to update some stream parameters at the end of encoding).\n\n The semantics of data ownership depends on the buf field.\n If it is set, the packet data is dynamically allocated and is\n valid indefinitely until a call to av_packet_unref() reduces the\n reference count to 0.\n\n If the buf field is not set av_packet_ref() would make a copy instead\n of increasing the reference count.\n\n The side data is always allocated with av_malloc(), copied by\n av_packet_ref() and freed by av_packet_unref().\n\n sizeof(AVPacket) being a part of the public ABI is deprecated. once\n av_init_packet() is removed, new packets will only be able to be allocated\n with av_packet_alloc(), and new fields may be added to the end of the struct\n with a minor bump.\n\n @see av_packet_alloc\n @see av_packet_ref\n @see av_packet_unref"]
@@ -10471,38 +10471,38 @@ fn bindgen_test_layout_AVPacketList() {
 pub const AV_SIDE_DATA_PARAM_CHANGE_SAMPLE_RATE: AVSideDataParamChangeFlags = 4;
 pub const AV_SIDE_DATA_PARAM_CHANGE_DIMENSIONS: AVSideDataParamChangeFlags = 8;
 pub type AVSideDataParamChangeFlags = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVPacket and set its fields to default values.  The resulting\n struct must be freed using av_packet_free().\n\n @return An AVPacket filled with default values or NULL on failure.\n\n @note this only allocates the AVPacket itself, not the data buffers. Those\n must be allocated through other means such as av_new_packet.\n\n @see av_new_packet"]
     pub fn av_packet_alloc() -> *mut AVPacket;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create a new packet that references the same data as src.\n\n This is a shortcut for av_packet_alloc()+av_packet_ref().\n\n @return newly created AVPacket on success, NULL on error.\n\n @see av_packet_alloc\n @see av_packet_ref"]
     pub fn av_packet_clone(src: *const AVPacket) -> *mut AVPacket;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the packet, if the packet is reference counted, it will be\n unreferenced first.\n\n @param pkt packet to be freed. The pointer will be set to NULL.\n @note passing NULL is a no-op."]
     pub fn av_packet_free(pkt: *mut *mut AVPacket);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize optional fields of a packet with default values.\n\n Note, this does not touch the data and size members, which have to be\n initialized separately.\n\n @param pkt packet\n\n @see av_packet_alloc\n @see av_packet_unref\n\n @deprecated This function is deprecated. Once it's removed,\nsizeof(AVPacket) will not be a part of the ABI anymore."]
     pub fn av_init_packet(pkt: *mut AVPacket);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate the payload of a packet and initialize its fields with\n default values.\n\n @param pkt packet\n @param size wanted payload size\n @return 0 if OK, AVERROR_xxx otherwise"]
     pub fn av_new_packet(pkt: *mut AVPacket, size: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reduce packet size, correctly zeroing padding\n\n @param pkt packet\n @param size new size"]
     pub fn av_shrink_packet(pkt: *mut AVPacket, size: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Increase packet size, correctly zeroing padding\n\n @param pkt packet\n @param grow_by number of bytes by which to increase the size of the packet"]
     pub fn av_grow_packet(
         pkt: *mut AVPacket,
         grow_by: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a reference-counted packet from av_malloc()ed data.\n\n @param pkt packet to be initialized. This function will set the data, size,\n        and buf fields, all others are left untouched.\n @param data Data allocated by av_malloc() to be used as packet data. If this\n        function returns successfully, the data is owned by the underlying AVBuffer.\n        The caller may not access the data through other means.\n @param size size of data in bytes, without the padding. I.e. the full buffer\n        size is assumed to be size + AV_INPUT_BUFFER_PADDING_SIZE.\n\n @return 0 on success, a negative AVERROR on error"]
     pub fn av_packet_from_data(
         pkt: *mut AVPacket,
@@ -10510,7 +10510,7 @@ extern "C" {
         size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate new information of a packet.\n\n @param pkt packet\n @param type side information type\n @param size side information size\n @return pointer to fresh allocated data or NULL otherwise"]
     pub fn av_packet_new_side_data(
         pkt: *mut AVPacket,
@@ -10518,7 +10518,7 @@ extern "C" {
         size: usize,
     ) -> *mut u8;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Wrap an existing array as a packet side data.\n\n @param pkt packet\n @param type side information type\n @param data the side data array. It must be allocated with the av_malloc()\n             family of functions. The ownership of the data is transferred to\n             pkt.\n @param size side information size\n @return a non-negative number on success, a negative AVERROR code on\n         failure. On failure, the packet is unchanged and the data remains\n         owned by the caller."]
     pub fn av_packet_add_side_data(
         pkt: *mut AVPacket,
@@ -10527,7 +10527,7 @@ extern "C" {
         size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Shrink the already allocated side data buffer\n\n @param pkt packet\n @param type side information type\n @param size new side information size\n @return 0 on success, < 0 on failure"]
     pub fn av_packet_shrink_side_data(
         pkt: *mut AVPacket,
@@ -10535,7 +10535,7 @@ extern "C" {
         size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get side information from packet.\n\n @param pkt packet\n @param type desired side information type\n @param size If supplied, *size will be set to the size of the side data\n             or to zero if the desired side data is not present.\n @return pointer to data if present or NULL otherwise"]
     pub fn av_packet_get_side_data(
         pkt: *const AVPacket,
@@ -10543,11 +10543,11 @@ extern "C" {
         size: *mut usize,
     ) -> *mut u8;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Pack a dictionary for use in side_data.\n\n @param dict The dictionary to pack.\n @param size pointer to store the size of the returned data\n @return pointer to data if successful, NULL otherwise"]
     pub fn av_packet_pack_dictionary(dict: *mut AVDictionary, size: *mut usize) -> *mut u8;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Unpack a dictionary from side_data.\n\n @param data data from side_data\n @param size size of the data\n @param dict the metadata storage dictionary\n @return 0 on success, < 0 on failure"]
     pub fn av_packet_unpack_dictionary(
         data: *const u8,
@@ -10555,35 +10555,35 @@ extern "C" {
         dict: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convenience function to free all the side data stored.\n All the other fields stay untouched.\n\n @param pkt packet"]
     pub fn av_packet_free_side_data(pkt: *mut AVPacket);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Setup a new reference to the data described by a given packet\n\n If src is reference-counted, setup dst as a new reference to the\n buffer in src. Otherwise allocate a new buffer in dst and copy the\n data from src into it.\n\n All the other fields are copied from src.\n\n @see av_packet_unref\n\n @param dst Destination packet. Will be completely overwritten.\n @param src Source packet\n\n @return 0 on success, a negative AVERROR on error. On error, dst\n         will be blank (as if returned by av_packet_alloc())."]
     pub fn av_packet_ref(dst: *mut AVPacket, src: *const AVPacket) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Wipe the packet.\n\n Unreference the buffer referenced by the packet and reset the\n remaining packet fields to their default values.\n\n @param pkt The packet to be unreferenced."]
     pub fn av_packet_unref(pkt: *mut AVPacket);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Move every field in src to dst and reset src.\n\n @see av_packet_unref\n\n @param src Source packet, will be reset\n @param dst Destination packet"]
     pub fn av_packet_move_ref(dst: *mut AVPacket, src: *mut AVPacket);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy only \"properties\" fields from src to dst.\n\n Properties for the purpose of this function are all the fields\n beside those related to the packet data (buf, data, size)\n\n @param dst Destination packet\n @param src Source packet\n\n @return 0 on success AVERROR on failure."]
     pub fn av_packet_copy_props(dst: *mut AVPacket, src: *const AVPacket) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Ensure the data described by a given packet is reference counted.\n\n @note This function does not ensure that the reference will be writable.\n       Use av_packet_make_writable instead for that purpose.\n\n @see av_packet_ref\n @see av_packet_make_writable\n\n @param pkt packet whose data should be made reference counted.\n\n @return 0 on success, a negative AVERROR on error. On failure, the\n         packet is unchanged."]
     pub fn av_packet_make_refcounted(pkt: *mut AVPacket) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create a writable reference for the data described by a given packet,\n avoiding data copy if possible.\n\n @param pkt Packet whose data should be made writable.\n\n @return 0 on success, a negative AVERROR on failure. On failure, the\n         packet is unchanged."]
     pub fn av_packet_make_writable(pkt: *mut AVPacket) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert valid timing fields (timestamps / durations) in a packet from one\n timebase to another. Timestamps with unknown values (AV_NOPTS_VALUE) will be\n ignored.\n\n @param pkt packet on which the conversion will be performed\n @param tb_src source timebase, in which the timing fields in pkt are\n               expressed\n @param tb_dst destination timebase, to which the timing fields will be\n               converted"]
     pub fn av_packet_rescale_ts(pkt: *mut AVPacket, tb_src: AVRational, tb_dst: AVRational);
 }
@@ -10592,7 +10592,7 @@ extern "C" {
 pub struct AVContainerFifo {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVContainerFifo instance for AVPacket.\n\n @param flags currently unused"]
     pub fn av_container_fifo_alloc_avpacket(flags: ::std::os::raw::c_uint) -> *mut AVContainerFifo;
 }
@@ -10663,15 +10663,15 @@ fn bindgen_test_layout_AVCodecDescriptor() {
         "Offset of field: AVCodecDescriptor::profiles"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return descriptor for given codec ID or NULL if no descriptor exists."]
     pub fn avcodec_descriptor_get(id: AVCodecID) -> *const AVCodecDescriptor;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all codec descriptors known to libavcodec.\n\n @param prev previous descriptor. NULL to get the first descriptor.\n\n @return next descriptor or NULL after the last descriptor"]
     pub fn avcodec_descriptor_next(prev: *const AVCodecDescriptor) -> *const AVCodecDescriptor;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return codec descriptor with the given name or NULL if no such descriptor\n         exists."]
     pub fn avcodec_descriptor_get_by_name(
         name: *const ::std::os::raw::c_char,
@@ -10920,22 +10920,22 @@ impl ::std::fmt::Debug for AVCodecParameters {
         write ! (f , "AVCodecParameters {{ codec_type: {:?}, codec_id: {:?}, codec_tag: {:?}, extradata: {:?}, extradata_size: {:?}, coded_side_data: {:?}, nb_coded_side_data: {:?}, format: {:?}, bit_rate: {:?}, bits_per_coded_sample: {:?}, bits_per_raw_sample: {:?}, profile: {:?}, level: {:?}, width: {:?}, height: {:?}, sample_aspect_ratio: {:?}, framerate: {:?}, field_order: {:?}, color_range: {:?}, color_primaries: {:?}, color_trc: {:?}, color_space: {:?}, chroma_location: {:?}, video_delay: {:?}, ch_layout: {:?}, sample_rate: {:?}, block_align: {:?}, frame_size: {:?}, initial_padding: {:?}, trailing_padding: {:?}, seek_preroll: {:?}, alpha_mode: {:?} }}" , self . codec_type , self . codec_id , self . codec_tag , self . extradata , self . extradata_size , self . coded_side_data , self . nb_coded_side_data , self . format , self . bit_rate , self . bits_per_coded_sample , self . bits_per_raw_sample , self . profile , self . level , self . width , self . height , self . sample_aspect_ratio , self . framerate , self . field_order , self . color_range , self . color_primaries , self . color_trc , self . color_space , self . chroma_location , self . video_delay , self . ch_layout , self . sample_rate , self . block_align , self . frame_size , self . initial_padding , self . trailing_padding , self . seek_preroll , self . alpha_mode)
     }
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a new AVCodecParameters and set its fields to default values\n (unknown/invalid/0). The returned struct must be freed with\n avcodec_parameters_free()."]
     pub fn avcodec_parameters_alloc() -> *mut AVCodecParameters;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free an AVCodecParameters instance and everything associated with it and\n write NULL to the supplied pointer."]
     pub fn avcodec_parameters_free(par: *mut *mut AVCodecParameters);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy the contents of src to dst. Any allocated fields in dst are freed and\n replaced with newly allocated duplicates of the corresponding fields in src.\n\n @return >= 0 on success, a negative AVERROR code on failure."]
     pub fn avcodec_parameters_copy(
         dst: *mut AVCodecParameters,
         src: *const AVCodecParameters,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " This function is the same as av_get_audio_frame_duration(), except it works\n with AVCodecParameters instead of an AVCodecContext."]
     pub fn av_get_audio_frame_duration2(
         par: *mut AVCodecParameters,
@@ -12330,49 +12330,49 @@ fn bindgen_test_layout_AVSubtitle() {
         "Offset of field: AVSubtitle::pts"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the LIBAVCODEC_VERSION_INT constant."]
     pub fn avcodec_version() -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavcodec build-time configuration."]
     pub fn avcodec_configuration() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavcodec license."]
     pub fn avcodec_license() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVCodecContext and set its fields to default values. The\n resulting struct should be freed with avcodec_free_context().\n\n @param codec if non-NULL, allocate private data and initialize defaults\n              for the given codec. It is illegal to then call avcodec_open2()\n              with a different codec.\n              If NULL, then the codec-specific defaults won't be initialized,\n              which may result in suboptimal default settings (this is\n              important mainly for encoders, e.g. libx264).\n\n @return An AVCodecContext filled with default values or NULL on failure."]
     pub fn avcodec_alloc_context3(codec: *const AVCodec) -> *mut AVCodecContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the codec context and everything associated with it and write NULL to\n the provided pointer."]
     pub fn avcodec_free_context(avctx: *mut *mut AVCodecContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVClass for AVCodecContext. It can be used in combination with\n AV_OPT_SEARCH_FAKE_OBJ for examining options.\n\n @see av_opt_find()."]
     pub fn avcodec_get_class() -> *const AVClass;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVClass for AVSubtitleRect. It can be used in combination with\n AV_OPT_SEARCH_FAKE_OBJ for examining options.\n\n @see av_opt_find()."]
     pub fn avcodec_get_subtitle_rect_class() -> *const AVClass;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill the parameters struct based on the values from the supplied codec\n context. Any allocated fields in par are freed and replaced with duplicates\n of the corresponding fields in codec.\n\n @return >= 0 on success, a negative AVERROR code on failure"]
     pub fn avcodec_parameters_from_context(
         par: *mut AVCodecParameters,
         codec: *const AVCodecContext,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill the codec context based on the values from the supplied codec\n parameters. Any allocated fields in codec that have a corresponding field in\n par are freed and replaced with duplicates of the corresponding field in par.\n Fields in codec that do not have a counterpart in par are not touched.\n\n @return >= 0 on success, a negative AVERROR code on failure."]
     pub fn avcodec_parameters_to_context(
         codec: *mut AVCodecContext,
         par: *const AVCodecParameters,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize the AVCodecContext to use the given AVCodec. Prior to using this\n function the context has to be allocated with avcodec_alloc_context3().\n\n The functions avcodec_find_decoder_by_name(), avcodec_find_encoder_by_name(),\n avcodec_find_decoder() and avcodec_find_encoder() provide an easy way for\n retrieving a codec.\n\n Depending on the codec, you might need to set options in the codec context\n also for decoding (e.g. width, height, or the pixel or audio sample format in\n the case the information is not available in the bitstream, as when decoding\n raw audio or video).\n\n Options in the codec context can be set either by setting them in the options\n AVDictionary, or by setting the values in the context itself, directly or by\n using the av_opt_set() API before calling this function.\n\n Example:\n @code\n av_dict_set(&opts, \"b\", \"2.5M\", 0);\n codec = avcodec_find_decoder(AV_CODEC_ID_H264);\n if (!codec)\n     exit(1);\n\n context = avcodec_alloc_context3(codec);\n\n if (avcodec_open2(context, codec, opts) < 0)\n     exit(1);\n @endcode\n\n In the case AVCodecParameters are available (e.g. when demuxing a stream\n using libavformat, and accessing the AVStream contained in the demuxer), the\n codec parameters can be copied to the codec context using\n avcodec_parameters_to_context(), as in the following example:\n\n @code\n AVStream *stream = ...;\n context = avcodec_alloc_context3(codec);\n if (avcodec_parameters_to_context(context, stream->codecpar) < 0)\n     exit(1);\n if (avcodec_open2(context, codec, NULL) < 0)\n     exit(1);\n @endcode\n\n @note Always call this function before using decoding routines (such as\n @ref avcodec_receive_frame()).\n\n @param avctx The context to initialize.\n @param codec The codec to open this context for. If a non-NULL codec has been\n              previously passed to avcodec_alloc_context3() or\n              for this context, then this parameter MUST be either NULL or\n              equal to the previously passed codec.\n @param options A dictionary filled with AVCodecContext and codec-private\n                options, which are set on top of the options already set in\n                avctx, can be NULL. On return this object will be filled with\n                options that were not found in the avctx codec context.\n\n @return zero on success, a negative value on error\n @see avcodec_alloc_context3(), avcodec_find_decoder(), avcodec_find_encoder(),\n      av_dict_set(), av_opt_set(), av_opt_find(), avcodec_parameters_to_context()"]
     pub fn avcodec_open2(
         avctx: *mut AVCodecContext,
@@ -12380,11 +12380,11 @@ extern "C" {
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free all allocated data in the given subtitle struct.\n\n @param sub AVSubtitle to free."]
     pub fn avsubtitle_free(sub: *mut AVSubtitle);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " The default callback for AVCodecContext.get_buffer2(). It is made public so\n it can be called by custom get_buffer2() implementations for decoders without\n AV_CODEC_CAP_DR1 set."]
     pub fn avcodec_default_get_buffer2(
         s: *mut AVCodecContext,
@@ -12392,7 +12392,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " The default callback for AVCodecContext.get_encode_buffer(). It is made public so\n it can be called by custom get_encode_buffer() implementations for encoders without\n AV_CODEC_CAP_DR1 set."]
     pub fn avcodec_default_get_encode_buffer(
         s: *mut AVCodecContext,
@@ -12400,7 +12400,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Modify width and height values so that they will result in a memory\n buffer that is acceptable for the codec if you do not use any horizontal\n padding.\n\n May only be used if a codec with AV_CODEC_CAP_DR1 has been opened."]
     pub fn avcodec_align_dimensions(
         s: *mut AVCodecContext,
@@ -12408,7 +12408,7 @@ extern "C" {
         height: *mut ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Modify width and height values so that they will result in a memory\n buffer that is acceptable for the codec if you also ensure that all\n line sizes are a multiple of the respective linesize_align[i].\n\n May only be used if a codec with AV_CODEC_CAP_DR1 has been opened."]
     pub fn avcodec_align_dimensions2(
         s: *mut AVCodecContext,
@@ -12417,7 +12417,7 @@ extern "C" {
         linesize_align: *mut ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Decode a subtitle message.\n Return a negative value on error, otherwise return the number of bytes used.\n If no subtitle could be decompressed, got_sub_ptr is zero.\n Otherwise, the subtitle is stored in *sub.\n Note that AV_CODEC_CAP_DR1 is not available for subtitle codecs. This is for\n simplicity, because the performance difference is expected to be negligible\n and reusing a get_buffer written for video codecs would probably perform badly\n due to a potentially very different allocation pattern.\n\n Some decoders (those marked with AV_CODEC_CAP_DELAY) have a delay between input\n and output. This means that for some packets they will not immediately\n produce decoded output and need to be flushed at the end of decoding to get\n all the decoded data. Flushing is done by calling this function with packets\n with avpkt->data set to NULL and avpkt->size set to 0 until it stops\n returning subtitles. It is safe to flush even those decoders that are not\n marked with AV_CODEC_CAP_DELAY, then no subtitles will be returned.\n\n @note The AVCodecContext MUST have been opened with @ref avcodec_open2()\n before packets may be fed to the decoder.\n\n @param avctx the codec context\n @param[out] sub The preallocated AVSubtitle in which the decoded subtitle will be stored,\n                 must be freed with avsubtitle_free if *got_sub_ptr is set.\n @param[in,out] got_sub_ptr Zero if no subtitle could be decompressed, otherwise, it is nonzero.\n @param[in] avpkt The input AVPacket containing the input buffer."]
     pub fn avcodec_decode_subtitle2(
         avctx: *mut AVCodecContext,
@@ -12426,14 +12426,14 @@ extern "C" {
         avpkt: *const AVPacket,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Supply raw packet data as input to a decoder.\n\n Internally, this call will copy relevant AVCodecContext fields, which can\n influence decoding per-packet, and apply them when the packet is actually\n decoded. (For example AVCodecContext.skip_frame, which might direct the\n decoder to drop the frame contained by the packet sent with this function.)\n\n @warning The input buffer, avpkt->data must be AV_INPUT_BUFFER_PADDING_SIZE\n          larger than the actual read bytes because some optimized bitstream\n          readers read 32 or 64 bits at once and could read over the end.\n\n @note The AVCodecContext MUST have been opened with @ref avcodec_open2()\n       before packets may be fed to the decoder.\n\n @param avctx codec context\n @param[in] avpkt The input AVPacket. Usually, this will be a single video\n                  frame, or several complete audio frames.\n                  Ownership of the packet remains with the caller, and the\n                  decoder will not write to the packet. The decoder may create\n                  a reference to the packet data (or copy it if the packet is\n                  not reference-counted).\n                  Unlike with older APIs, the packet is always fully consumed,\n                  and if it contains multiple frames (e.g. some audio codecs),\n                  will require you to call avcodec_receive_frame() multiple\n                  times afterwards before you can send a new packet.\n                  It can be NULL (or an AVPacket with data set to NULL and\n                  size set to 0); in this case, it is considered a flush\n                  packet, which signals the end of the stream. Sending the\n                  first flush packet will return success. Subsequent ones are\n                  unnecessary and will return AVERROR_EOF. If the decoder\n                  still has frames buffered, it will return them after sending\n                  a flush packet.\n\n @retval 0                 success\n @retval AVERROR(EAGAIN)   input is not accepted in the current state - user\n                           must read output with avcodec_receive_frame() (once\n                           all output is read, the packet should be resent,\n                           and the call will not fail with EAGAIN).\n @retval AVERROR_EOF       the decoder has been flushed, and no new packets can be\n                           sent to it (also returned if more than 1 flush\n                           packet is sent)\n @retval AVERROR(EINVAL)   codec not opened, it is an encoder, or requires flush\n @retval AVERROR(ENOMEM)   failed to add packet to internal queue, or similar\n @retval \"another negative error code\" legitimate decoding errors"]
     pub fn avcodec_send_packet(
         avctx: *mut AVCodecContext,
         avpkt: *const AVPacket,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return decoded output data from a decoder or encoder (when the\n @ref AV_CODEC_FLAG_RECON_FRAME flag is used).\n\n @param avctx codec context\n @param frame This will be set to a reference-counted video or audio\n              frame (depending on the decoder type) allocated by the\n              codec. Note that the function will always call\n              av_frame_unref(frame) before doing anything else.\n @param flags Combination of AV_CODEC_RECEIVE_FRAME_FLAG_* flags.\n\n @retval 0                success, a frame was returned\n @retval AVERROR(EAGAIN)  output is not available in this state - user must\n                          try to send new input\n @retval AVERROR_EOF      the codec has been fully flushed, and there will be\n                          no more output frames\n @retval AVERROR(EINVAL)  codec not opened, or it is an encoder without the\n                          @ref AV_CODEC_FLAG_RECON_FRAME flag enabled\n @retval \"other negative error code\" legitimate decoding errors"]
     pub fn avcodec_receive_frame_flags(
         avctx: *mut AVCodecContext,
@@ -12441,28 +12441,28 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Alias for `avcodec_receive_frame_flags(avctx, frame, 0)`."]
     pub fn avcodec_receive_frame(
         avctx: *mut AVCodecContext,
         frame: *mut AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Supply a raw video or audio frame to the encoder. Use avcodec_receive_packet()\n to retrieve buffered output packets.\n\n @param avctx     codec context\n @param[in] frame AVFrame containing the raw audio or video frame to be encoded.\n                  Ownership of the frame remains with the caller, and the\n                  encoder will not write to the frame. The encoder may create\n                  a reference to the frame data (or copy it if the frame is\n                  not reference-counted).\n                  It can be NULL, in which case it is considered a flush\n                  packet.  This signals the end of the stream. If the encoder\n                  still has packets buffered, it will return them after this\n                  call. Once flushing mode has been entered, additional flush\n                  packets are ignored, and sending frames will return\n                  AVERROR_EOF.\n\n                  For audio:\n                  If AV_CODEC_CAP_VARIABLE_FRAME_SIZE is set, then each frame\n                  can have any number of samples.\n                  If it is not set, frame->nb_samples must be equal to\n                  avctx->frame_size for all frames except the last.\n                  The final frame may be smaller than avctx->frame_size.\n @retval 0                 success\n @retval AVERROR(EAGAIN)   input is not accepted in the current state - user must\n                           read output with avcodec_receive_packet() (once all\n                           output is read, the packet should be resent, and the\n                           call will not fail with EAGAIN).\n @retval AVERROR_EOF       the encoder has been flushed, and no new frames can\n                           be sent to it\n @retval AVERROR(EINVAL)   codec not opened, it is a decoder, or requires flush\n @retval AVERROR(ENOMEM)   failed to add packet to internal queue, or similar\n @retval \"another negative error code\" legitimate encoding errors"]
     pub fn avcodec_send_frame(
         avctx: *mut AVCodecContext,
         frame: *const AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read encoded data from the encoder.\n\n @param avctx codec context\n @param avpkt This will be set to a reference-counted packet allocated by the\n              encoder. Note that the function will always call\n              av_packet_unref(avpkt) before doing anything else.\n @retval 0               success\n @retval AVERROR(EAGAIN) output is not available in the current state - user must\n                         try to send input\n @retval AVERROR_EOF     the encoder has been fully flushed, and there will be no\n                         more output packets\n @retval AVERROR(EINVAL) codec not opened, or it is a decoder\n @retval \"another negative error code\" legitimate encoding errors"]
     pub fn avcodec_receive_packet(
         avctx: *mut AVCodecContext,
         avpkt: *mut AVPacket,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create and return a AVHWFramesContext with values adequate for hardware\n decoding. This is meant to get called from the get_format callback, and is\n a helper for preparing a AVHWFramesContext for AVCodecContext.hw_frames_ctx.\n This API is for decoding with certain hardware acceleration modes/APIs only.\n\n The returned AVHWFramesContext is not initialized. The caller must do this\n with av_hwframe_ctx_init().\n\n Calling this function is not a requirement, but makes it simpler to avoid\n codec or hardware API specific details when manually allocating frames.\n\n Alternatively to this, an API user can set AVCodecContext.hw_device_ctx,\n which sets up AVCodecContext.hw_frames_ctx fully automatically, and makes\n it unnecessary to call this function or having to care about\n AVHWFramesContext initialization at all.\n\n There are a number of requirements for calling this function:\n\n - It must be called from get_format with the same avctx parameter that was\n   passed to get_format. Calling it outside of get_format is not allowed, and\n   can trigger undefined behavior.\n - The function is not always supported (see description of return values).\n   Even if this function returns successfully, hwaccel initialization could\n   fail later. (The degree to which implementations check whether the stream\n   is actually supported varies. Some do this check only after the user's\n   get_format callback returns.)\n - The hw_pix_fmt must be one of the choices suggested by get_format. If the\n   user decides to use a AVHWFramesContext prepared with this API function,\n   the user must return the same hw_pix_fmt from get_format.\n - The device_ref passed to this function must support the given hw_pix_fmt.\n - After calling this API function, it is the user's responsibility to\n   initialize the AVHWFramesContext (returned by the out_frames_ref parameter),\n   and to set AVCodecContext.hw_frames_ctx to it. If done, this must be done\n   before returning from get_format (this is implied by the normal\n   AVCodecContext.hw_frames_ctx API rules).\n - The AVHWFramesContext parameters may change every time time get_format is\n   called. Also, AVCodecContext.hw_frames_ctx is reset before get_format. So\n   you are inherently required to go through this process again on every\n   get_format call.\n - It is perfectly possible to call this function without actually using\n   the resulting AVHWFramesContext. One use-case might be trying to reuse a\n   previously initialized AVHWFramesContext, and calling this API function\n   only to test whether the required frame parameters have changed.\n - Fields that use dynamically allocated values of any kind must not be set\n   by the user unless setting them is explicitly allowed by the documentation.\n   If the user sets AVHWFramesContext.free and AVHWFramesContext.user_opaque,\n   the new free callback must call the potentially set previous free callback.\n   This API call may set any dynamically allocated fields, including the free\n   callback.\n\n The function will set at least the following fields on AVHWFramesContext\n (potentially more, depending on hwaccel API):\n\n - All fields set by av_hwframe_ctx_alloc().\n - Set the format field to hw_pix_fmt.\n - Set the sw_format field to the most suited and most versatile format. (An\n   implication is that this will prefer generic formats over opaque formats\n   with arbitrary restrictions, if possible.)\n - Set the width/height fields to the coded frame size, rounded up to the\n   API-specific minimum alignment.\n - Only _if_ the hwaccel requires a pre-allocated pool: set the initial_pool_size\n   field to the number of maximum reference surfaces possible with the codec,\n   plus 1 surface for the user to work (meaning the user can safely reference\n   at most 1 decoded surface at a time), plus additional buffering introduced\n   by frame threading. If the hwaccel does not require pre-allocation, the\n   field is left to 0, and the decoder will allocate new surfaces on demand\n   during decoding.\n - Possibly AVHWFramesContext.hwctx fields, depending on the underlying\n   hardware API.\n\n Essentially, out_frames_ref returns the same as av_hwframe_ctx_alloc(), but\n with basic frame parameters set.\n\n The function is stateless, and does not change the AVCodecContext or the\n device_ref AVHWDeviceContext.\n\n @param avctx The context which is currently calling get_format, and which\n              implicitly contains all state needed for filling the returned\n              AVHWFramesContext properly.\n @param device_ref A reference to the AVHWDeviceContext describing the device\n                   which will be used by the hardware decoder.\n @param hw_pix_fmt The hwaccel format you are going to return from get_format.\n @param out_frames_ref On success, set to a reference to an _uninitialized_\n                       AVHWFramesContext, created from the given device_ref.\n                       Fields will be set to values required for decoding.\n                       Not changed if an error is returned.\n @return zero on success, a negative value on error. The following error codes\n         have special semantics:\n      AVERROR(ENOENT): the decoder does not support this functionality. Setup\n                       is always manual, or it is a decoder which does not\n                       support setting AVCodecContext.hw_frames_ctx at all,\n                       or it is a software format.\n      AVERROR(EINVAL): it is known that hardware decoding is not supported for\n                       this configuration, or the device_ref is not supported\n                       for the hwaccel referenced by hw_pix_fmt."]
     pub fn avcodec_get_hw_frames_parameters(
         avctx: *mut AVCodecContext,
@@ -12488,7 +12488,7 @@ pub const AV_CODEC_CONFIG_COLOR_SPACE: AVCodecConfig = 6;
 #[doc = "< AVAlphaMode, terminated by AVALPHA_MODE_UNSPECIFIED"]
 pub const AV_CODEC_CONFIG_ALPHA_MODE: AVCodecConfig = 7;
 pub type AVCodecConfig = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Retrieve a list of all supported values for a given configuration type.\n\n @param avctx An optional context to use. Values such as\n              `strict_std_compliance` may affect the result. If NULL,\n              default values are used.\n @param codec The codec to query, or NULL to use avctx->codec.\n @param config The configuration to query.\n @param flags Currently unused; should be set to zero.\n @param out_configs On success, set to a list of configurations, terminated\n                    by a config-specific terminator, or NULL if all\n                    possible values are supported.\n @param out_num_configs On success, set to the number of elements in\nout_configs, excluding the terminator. Optional."]
     pub fn avcodec_get_supported_config(
         avctx: *const AVCodecContext,
@@ -12826,14 +12826,14 @@ fn bindgen_test_layout_AVCodecParser() {
         "Offset of field: AVCodecParser::split"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all registered codec parsers.\n\n @param opaque a pointer where libavcodec will store the iteration state. Must\n               point to NULL to start the iteration.\n\n @return the next registered codec parser or NULL when the iteration is\n         finished"]
     pub fn av_parser_iterate(opaque: *mut *mut ::std::os::raw::c_void) -> *const AVCodecParser;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_parser_init(codec_id: ::std::os::raw::c_int) -> *mut AVCodecParserContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse a packet.\n\n @param s             parser context.\n @param avctx         codec context.\n @param poutbuf       set to pointer to parsed buffer or NULL if not yet finished.\n @param poutbuf_size  set to size of parsed buffer or zero if not yet finished.\n @param buf           input buffer.\n @param buf_size      buffer size in bytes without the padding. I.e. the full buffer\nsize is assumed to be buf_size + AV_INPUT_BUFFER_PADDING_SIZE.\nTo signal EOF, this should be 0 (so that the last frame\ncan be output).\n @param pts           input presentation timestamp.\n @param dts           input decoding timestamp.\n @param pos           input byte position in stream.\n @return the number of bytes of the input bitstream used.\n\n Example:\n @code\n   while(in_len){\n       len = av_parser_parse2(myparser, AVCodecContext, &data, &size,\n                                        in_data, in_len,\n                                        pts, dts, pos);\n       in_data += len;\n       in_len  -= len;\n\n       if(size)\n          decode_frame(data, size);\n   }\n @endcode"]
     pub fn av_parser_parse2(
         s: *mut AVCodecParserContext,
@@ -12847,10 +12847,10 @@ extern "C" {
         pos: i64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_parser_close(s: *mut AVCodecParserContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @addtogroup lavc_encoding\n @{"]
     pub fn avcodec_encode_subtitle(
         avctx: *mut AVCodecContext,
@@ -12859,11 +12859,11 @@ extern "C" {
         sub: *const AVSubtitle,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a value representing the fourCC code associated to the\n pixel format pix_fmt, or 0 if no associated fourCC code can be\n found."]
     pub fn avcodec_pix_fmt_to_codec_tag(pix_fmt: AVPixelFormat) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find the best pixel format to convert to given a certain source pixel\n format.  When converting from one pixel format to another, information loss\n may occur.  For example, when converting from RGB24 to GRAY, the color\n information will be lost. Similarly, other losses occur when converting from\n some formats to other formats. avcodec_find_best_pix_fmt_of_2() searches which of\n the given pixel formats should be used to suffer the least amount of loss.\n The pixel formats from which it chooses one, are determined by the\n pix_fmt_list parameter.\n\n\n @param[in] pix_fmt_list AV_PIX_FMT_NONE terminated array of pixel formats to choose from\n @param[in] src_pix_fmt source pixel format\n @param[in] has_alpha Whether the source pixel format alpha channel is used.\n @param[out] loss_ptr Combination of flags informing you what kind of losses will occur.\n @return The best pixel format to convert to or -1 if none was found."]
     pub fn avcodec_find_best_pix_fmt_of_list(
         pix_fmt_list: *const AVPixelFormat,
@@ -12872,13 +12872,13 @@ extern "C" {
         loss_ptr: *mut ::std::os::raw::c_int,
     ) -> AVPixelFormat;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avcodec_default_get_format(
         s: *mut AVCodecContext,
         fmt: *const AVPixelFormat,
     ) -> AVPixelFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @}"]
     pub fn avcodec_string(
         buf: *mut ::std::os::raw::c_char,
@@ -12887,7 +12887,7 @@ extern "C" {
         encode: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avcodec_default_execute(
         c: *mut AVCodecContext,
         func: ::std::option::Option<
@@ -12902,7 +12902,7 @@ extern "C" {
         size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avcodec_default_execute2(
         c: *mut AVCodecContext,
         func: ::std::option::Option<
@@ -12918,7 +12918,7 @@ extern "C" {
         count: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill AVFrame audio data and linesize pointers.\n\n The buffer buf must be a preallocated buffer with a size big enough\n to contain the specified samples amount. The filled AVFrame data\n pointers will point to this buffer.\n\n AVFrame extended_data channel pointers are allocated if necessary for\n planar audio.\n\n @param frame       the AVFrame\n                    frame->nb_samples must be set prior to calling the\n                    function. This function fills in frame->data,\n                    frame->extended_data, frame->linesize[0].\n @param nb_channels channel count\n @param sample_fmt  sample format\n @param buf         buffer to use for frame data\n @param buf_size    size of buffer\n @param align       plane size sample alignment (0 = default)\n @return            >=0 on success, negative error code on failure\n @todo return the size in bytes required to store the samples in\n case of success, at the next libavutil bump"]
     pub fn avcodec_fill_audio_frame(
         frame: *mut AVFrame,
@@ -12929,18 +12929,18 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reset the internal codec state / flush internal buffers. Should be called\n e.g. when seeking or when switching to a different stream.\n\n @note for decoders, this function just releases any references the decoder\n might keep internally, but the caller's references remain valid.\n\n @note for encoders, this function will only do something if the encoder\n declares support for AV_CODEC_CAP_ENCODER_FLUSH. When called, the encoder\n will drain any remaining packets, and can then be reused for a different\n stream (as opposed to sending a null frame which will leave the encoder\n in a permanent EOF state after draining). This can be desirable if the\n cost of tearing down and replacing the encoder instance is high."]
     pub fn avcodec_flush_buffers(avctx: *mut AVCodecContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return audio frame duration.\n\n @param avctx        codec context\n @param frame_bytes  size of the frame, or 0 if unknown\n @return             frame duration, in samples, if known. 0 if not able to\n                     determine."]
     pub fn av_get_audio_frame_duration(
         avctx: *mut AVCodecContext,
         frame_bytes: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Same behaviour av_fast_malloc but the buffer has additional\n AV_INPUT_BUFFER_PADDING_SIZE at the end which will always be 0.\n\n In addition the whole buffer will initially and after resizes\n be 0-initialized so that no uninitialized data will ever appear."]
     pub fn av_fast_padded_malloc(
         ptr: *mut ::std::os::raw::c_void,
@@ -12948,7 +12948,7 @@ extern "C" {
         min_size: usize,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Same behaviour av_fast_padded_malloc except that buffer will always\n be 0-initialized after call."]
     pub fn av_fast_padded_mallocz(
         ptr: *mut ::std::os::raw::c_void,
@@ -12956,7 +12956,7 @@ extern "C" {
         min_size: usize,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return a positive value if s is open (i.e. avcodec_open2() was called on it),\n 0 otherwise."]
     pub fn avcodec_is_open(s: *mut AVCodecContext) -> ::std::os::raw::c_int;
 }
@@ -13296,11 +13296,11 @@ fn bindgen_test_layout_AVOptionRanges() {
         "Offset of field: AVOptionRanges::nb_components"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the values of all AVOption fields to their default values.\n\n @param s an AVOption-enabled struct (its first member must be a pointer to AVClass)"]
     pub fn av_opt_set_defaults(s: *mut ::std::os::raw::c_void);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the values of all AVOption fields to their default values. Only these\n AVOption fields for which (opt->flags & mask) == flags will have their\n default applied to s.\n\n @param s an AVOption-enabled struct (its first member must be a pointer to AVClass)\n @param mask combination of AV_OPT_FLAG_*\n @param flags combination of AV_OPT_FLAG_*"]
     pub fn av_opt_set_defaults2(
         s: *mut ::std::os::raw::c_void,
@@ -13308,32 +13308,32 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free all allocated objects in obj."]
     pub fn av_opt_free(obj: *mut ::std::os::raw::c_void);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all AVOptions belonging to obj.\n\n @param obj an AVOptions-enabled struct or a double pointer to an\n            AVClass describing it.\n @param prev result of the previous call to av_opt_next() on this object\n             or NULL\n @return next AVOption or NULL"]
     pub fn av_opt_next(
         obj: *const ::std::os::raw::c_void,
         prev: *const AVOption,
     ) -> *const AVOption;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over AVOptions-enabled children of obj.\n\n @param prev result of a previous call to this function or NULL\n @return next AVOptions-enabled child or NULL"]
     pub fn av_opt_child_next(
         obj: *mut ::std::os::raw::c_void,
         prev: *mut ::std::os::raw::c_void,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over potential AVOptions-enabled children of parent.\n\n @param iter a pointer where iteration state is stored.\n @return AVClass corresponding to next potential child or NULL"]
     pub fn av_opt_child_class_iterate(
         parent: *const AVClass,
         iter: *mut *mut ::std::os::raw::c_void,
     ) -> *const AVClass;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Look for an option in an object. Consider only options which\n have all the specified flags set.\n\n @param[in] obj A pointer to a struct whose first element is a\n                pointer to an AVClass.\n                Alternatively a double pointer to an AVClass, if\n                AV_OPT_SEARCH_FAKE_OBJ search flag is set.\n @param[in] name The name of the option to look for.\n @param[in] unit When searching for named constants, name of the unit\n                 it belongs to.\n @param opt_flags Find only options with all the specified flags set (AV_OPT_FLAG).\n @param search_flags A combination of AV_OPT_SEARCH_*.\n\n @return A pointer to the option found, or NULL if no option\n         was found.\n\n @note Options found with AV_OPT_SEARCH_CHILDREN flag may not be settable\n directly with av_opt_set(). Use special calls which take an options\n AVDictionary (e.g. avformat_open_input()) to set options found with this\n flag."]
     pub fn av_opt_find(
         obj: *mut ::std::os::raw::c_void,
@@ -13343,7 +13343,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> *const AVOption;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Look for an option in an object. Consider only options which\n have all the specified flags set.\n\n @param[in] obj A pointer to a struct whose first element is a\n                pointer to an AVClass.\n                Alternatively a double pointer to an AVClass, if\n                AV_OPT_SEARCH_FAKE_OBJ search flag is set.\n @param[in] name The name of the option to look for.\n @param[in] unit When searching for named constants, name of the unit\n                 it belongs to.\n @param opt_flags Find only options with all the specified flags set (AV_OPT_FLAG).\n @param search_flags A combination of AV_OPT_SEARCH_*.\n @param[out] target_obj if non-NULL, an object to which the option belongs will be\n written here. It may be different from obj if AV_OPT_SEARCH_CHILDREN is present\n in search_flags. This parameter is ignored if search_flags contain\n AV_OPT_SEARCH_FAKE_OBJ.\n\n @return A pointer to the option found, or NULL if no option\n         was found."]
     pub fn av_opt_find2(
         obj: *mut ::std::os::raw::c_void,
@@ -13354,7 +13354,7 @@ extern "C" {
         target_obj: *mut *mut ::std::os::raw::c_void,
     ) -> *const AVOption;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Show the obj options.\n\n @param req_flags requested flags for the options to show. Show only the\n options for which it is opt->flags & req_flags.\n @param rej_flags rejected flags for the options to show. Show only the\n options for which it is !(opt->flags & req_flags).\n @param av_log_obj log context to use for showing the options"]
     pub fn av_opt_show2(
         obj: *mut ::std::os::raw::c_void,
@@ -13363,7 +13363,7 @@ extern "C" {
         rej_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Extract a key-value pair from the beginning of a string.\n\n @param ropts        pointer to the options string, will be updated to\n                     point to the rest of the string (one of the pairs_sep\n                     or the final NUL)\n @param key_val_sep  a 0-terminated list of characters used to separate\n                     key from value, for example '='\n @param pairs_sep    a 0-terminated list of characters used to separate\n                     two pairs from each other, for example ':' or ','\n @param flags        flags; see the AV_OPT_FLAG_* values below\n @param rkey         parsed key; must be freed using av_free()\n @param rval         parsed value; must be freed using av_free()\n\n @return  >=0 for success, or a negative value corresponding to an\n          AVERROR code in case of error; in particular:\n          AVERROR(EINVAL) if no key is present\n"]
     pub fn av_opt_get_key_value(
         ropts: *mut *const ::std::os::raw::c_char,
@@ -13377,7 +13377,7 @@ extern "C" {
 #[doc = " Accept to parse a value without a key; the key will then be returned\n as NULL."]
 pub const AV_OPT_FLAG_IMPLICIT_KEY: _bindgen_ty_5 = 1;
 pub type _bindgen_ty_5 = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse the key/value pairs list in opts. For each key/value pair\n found, stores the value in the field in ctx that is named like the\n key. ctx must be an AVClass context, storing is done using\n AVOptions.\n\n @param opts options string to parse, may be NULL\n @param key_val_sep a 0-terminated list of characters used to\n separate key from value\n @param pairs_sep a 0-terminated list of characters used to separate\n two pairs from each other\n @return the number of successfully set key/value pairs, or a negative\n value corresponding to an AVERROR code in case of error:\n AVERROR(EINVAL) if opts cannot be parsed,\n the error code issued by av_opt_set() if a key/value pair\n cannot be set"]
     pub fn av_set_options_string(
         ctx: *mut ::std::os::raw::c_void,
@@ -13386,7 +13386,7 @@ extern "C" {
         pairs_sep: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse the key-value pairs list in opts. For each key=value pair found,\n set the value of the corresponding option in ctx.\n\n @param ctx          the AVClass object to set options on\n @param opts         the options string, key-value pairs separated by a\n                     delimiter\n @param shorthand    a NULL-terminated array of options names for shorthand\n                     notation: if the first field in opts has no key part,\n                     the key is taken from the first element of shorthand;\n                     then again for the second, etc., until either opts is\n                     finished, shorthand is finished or a named option is\n                     found; after that, all options must be named\n @param key_val_sep  a 0-terminated list of characters used to separate\n                     key from value, for example '='\n @param pairs_sep    a 0-terminated list of characters used to separate\n                     two pairs from each other, for example ':' or ','\n @return  the number of successfully set key=value pairs, or a negative\n          value corresponding to an AVERROR code in case of error:\n          AVERROR(EINVAL) if opts cannot be parsed,\n          the error code issued by av_set_string3() if a key/value pair\n          cannot be set\n\n Options names must use only the following characters: a-z A-Z 0-9 - . / _\n Separators must use characters distinct from option names and from each\n other."]
     pub fn av_opt_set_from_string(
         ctx: *mut ::std::os::raw::c_void,
@@ -13396,14 +13396,14 @@ extern "C" {
         pairs_sep: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set all the options from a given dictionary on an object.\n\n @param obj a struct whose first element is a pointer to AVClass\n @param options options to process. This dictionary will be freed and replaced\n                by a new one containing all options not found in obj.\n                Of course this new dictionary needs to be freed by caller\n                with av_dict_free().\n\n @return 0 on success, a negative AVERROR if some option was found in obj,\n         but could not be set.\n\n @see av_dict_copy()"]
     pub fn av_opt_set_dict(
         obj: *mut ::std::os::raw::c_void,
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set all the options from a given dictionary on an object.\n\n @param obj a struct whose first element is a pointer to AVClass\n @param options options to process. This dictionary will be freed and replaced\n                by a new one containing all options not found in obj.\n                Of course this new dictionary needs to be freed by caller\n                with av_dict_free().\n @param search_flags A combination of AV_OPT_SEARCH_*.\n\n @return 0 on success, a negative AVERROR if some option was found in obj,\n         but could not be set.\n\n @see av_dict_copy()"]
     pub fn av_opt_set_dict2(
         obj: *mut ::std::os::raw::c_void,
@@ -13411,14 +13411,14 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy options from src object into dest object.\n\n The underlying AVClass of both src and dest must coincide. The guarantee\n below does not apply if this is not fulfilled.\n\n Options that require memory allocation (e.g. string or binary) are malloc'ed in dest object.\n Original memory allocated for such options is freed unless both src and dest options points to the same memory.\n\n Even on error it is guaranteed that allocated options from src and dest\n no longer alias each other afterwards; in particular calling av_opt_free()\n on both src and dest is safe afterwards if dest has been memdup'ed from src.\n\n @param dest Object to copy from\n @param src  Object to copy into\n @return 0 on success, negative on error"]
     pub fn av_opt_copy(
         dest: *mut ::std::os::raw::c_void,
         src: *const ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup opt_set_funcs Option setting functions\n @{\n Those functions set the field of obj with the given name to value.\n\n @param[in] obj A struct whose first element is a pointer to an AVClass.\n @param[in] name the name of the field to set\n @param[in] val The value to set. In case of av_opt_set() if the field is not\n of a string type, then the given string is parsed.\n SI postfixes and some named scalars are supported.\n If the field is of a numeric type, it has to be a numeric or named\n scalar. Behavior with more than one scalar and +- infix operators\n is undefined.\n If the field is of a flags type, it has to be a sequence of numeric\n scalars or named flags separated by '+' or '-'. Prefixing a flag\n with '+' causes it to be set without affecting the other flags;\n similarly, '-' unsets a flag.\n If the field is of a dictionary type, it has to be a ':' separated list of\n key=value parameters. Values containing ':' special characters must be\n escaped.\n @param search_flags flags passed to av_opt_find2. I.e. if AV_OPT_SEARCH_CHILDREN\n is passed here, then the option may be set on a child of obj.\n\n @return 0 if the value has been set, or an AVERROR code in case of\n error:\n AVERROR_OPTION_NOT_FOUND if no matching option exists\n AVERROR(ERANGE) if the value is out of range\n AVERROR(EINVAL) if the value is not valid"]
     pub fn av_opt_set(
         obj: *mut ::std::os::raw::c_void,
@@ -13427,7 +13427,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_set_int(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13435,7 +13435,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_set_double(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13443,7 +13443,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_set_q(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13451,7 +13451,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_set_bin(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13460,7 +13460,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_set_image_size(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13469,7 +13469,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_set_pixel_fmt(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13477,7 +13477,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_set_sample_fmt(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13485,7 +13485,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_set_video_rate(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13493,7 +13493,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @note Any old chlayout present is discarded and replaced with a copy of the new one. The\n caller still owns layout and is responsible for uninitializing it."]
     pub fn av_opt_set_chlayout(
         obj: *mut ::std::os::raw::c_void,
@@ -13502,7 +13502,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @note Any old dictionary present is discarded and replaced with a copy of the new one. The\n caller still owns val is and responsible for freeing it."]
     pub fn av_opt_set_dict_val(
         obj: *mut ::std::os::raw::c_void,
@@ -13511,7 +13511,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add, replace, or remove elements for an array option. Which of these\n operations is performed depends on the values of val and search_flags.\n\n @param start_elem Index of the first array element to modify; must not be\n                   larger than array size as returned by\n                   av_opt_get_array_size().\n @param nb_elems number of array elements to modify; when val is NULL,\n                 start_elem+nb_elems must not be larger than array size as\n                 returned by av_opt_get_array_size()\n\n @param val_type Option type corresponding to the type of val, ignored when val is\n                 NULL.\n\n                 The effect of this function will will be as if av_opt_setX()\n                 was called for each element, where X is specified by type.\n                 E.g. AV_OPT_TYPE_STRING corresponds to av_opt_set().\n\n                 Typically this should be the same as the scalarized type of\n                 the AVOption being set, but certain conversions are also\n                 possible - the same as those done by the corresponding\n                 av_opt_set*() function. E.g. any option type can be set from\n                 a string, numeric types can be set from int64, double, or\n                 rational, etc.\n\n @param val Array with nb_elems elements or NULL.\n\n            When NULL, nb_elems array elements starting at start_elem are\n            removed from the array. Any array elements remaining at the end\n            are shifted by nb_elems towards the first element in order to keep\n            the array contiguous.\n\n            Otherwise (val is non-NULL), the type of val must match the\n            underlying C type as documented for val_type.\n\n            When AV_OPT_ARRAY_REPLACE is not set in search_flags, the array is\n            enlarged by nb_elems, and the contents of val are inserted at\n            start_elem. Previously existing array elements from start_elem\n            onwards (if present) are shifted by nb_elems away from the first\n            element in order to make space for the new elements.\n\n            When AV_OPT_ARRAY_REPLACE is set in search_flags, the contents\n            of val replace existing array elements from start_elem to\n            start_elem+nb_elems (if present). New array size is\n            max(start_elem + nb_elems, old array size)."]
     pub fn av_opt_set_array(
         obj: *mut ::std::os::raw::c_void,
@@ -13523,7 +13523,7 @@ extern "C" {
         val: *const ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup opt_get_funcs Option getting functions\n @{\n Those functions get a value of the option with the given name from an object.\n\n @param[in] obj a struct whose first element is a pointer to an AVClass.\n @param[in] name name of the option to get.\n @param[in] search_flags flags passed to av_opt_find2. I.e. if AV_OPT_SEARCH_CHILDREN\n is passed here, then the option may be found in a child of obj.\n @param[out] out_val value of the option will be written here\n @return >=0 on success, a negative error code otherwise\n/\n/**\n @note the returned string will be av_malloc()ed and must be av_free()ed by the caller\n\n @note if AV_OPT_ALLOW_NULL is set in search_flags in av_opt_get, and the\n option is of type AV_OPT_TYPE_STRING, AV_OPT_TYPE_BINARY or AV_OPT_TYPE_DICT\n and is set to NULL, *out_val will be set to NULL instead of an allocated\n empty string."]
     pub fn av_opt_get(
         obj: *mut ::std::os::raw::c_void,
@@ -13532,7 +13532,7 @@ extern "C" {
         out_val: *mut *mut u8,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_get_int(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13540,7 +13540,7 @@ extern "C" {
         out_val: *mut i64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_get_double(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13548,7 +13548,7 @@ extern "C" {
         out_val: *mut f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_get_q(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13556,7 +13556,7 @@ extern "C" {
         out_val: *mut AVRational,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_get_image_size(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13565,7 +13565,7 @@ extern "C" {
         h_out: *mut ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_get_pixel_fmt(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13573,7 +13573,7 @@ extern "C" {
         out_fmt: *mut AVPixelFormat,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_get_sample_fmt(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13581,7 +13581,7 @@ extern "C" {
         out_fmt: *mut AVSampleFormat,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_get_video_rate(
         obj: *mut ::std::os::raw::c_void,
         name: *const ::std::os::raw::c_char,
@@ -13589,7 +13589,7 @@ extern "C" {
         out_val: *mut AVRational,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @param[out] layout The returned layout is a copy of the actual value and must\n be freed with av_channel_layout_uninit() by the caller"]
     pub fn av_opt_get_chlayout(
         obj: *mut ::std::os::raw::c_void,
@@ -13598,7 +13598,7 @@ extern "C" {
         layout: *mut AVChannelLayout,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @param[out] out_val The returned dictionary is a copy of the actual value and must\n be freed with av_dict_free() by the caller"]
     pub fn av_opt_get_dict_val(
         obj: *mut ::std::os::raw::c_void,
@@ -13607,7 +13607,7 @@ extern "C" {
         out_val: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " For an array-type option, get the number of elements in the array."]
     pub fn av_opt_get_array_size(
         obj: *mut ::std::os::raw::c_void,
@@ -13616,7 +13616,7 @@ extern "C" {
         out_val: *mut ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " For an array-type option, retrieve the values of one or more array elements.\n\n @param start_elem index of the first array element to retrieve\n @param nb_elems number of array elements to retrieve; start_elem+nb_elems\n                 must not be larger than array size as returned by\n                 av_opt_get_array_size()\n\n @param out_type Option type corresponding to the desired output.\n\n                 The array elements produced by this function will\n                 will be as if av_opt_getX() was called for each element,\n                 where X is specified by out_type. E.g. AV_OPT_TYPE_STRING\n                 corresponds to av_opt_get().\n\n                 Typically this should be the same as the scalarized type of\n                 the AVOption being retrieved, but certain conversions are\n                 also possible - the same as those done by the corresponding\n                 av_opt_get*() function. E.g. any option type can be retrieved\n                 as a string, numeric types can be retrieved as int64, double,\n                 or rational, etc.\n\n @param out_val  Array with nb_elems members into which the output will be\n                 written. The array type must match the underlying C type as\n                 documented for out_type, and be zeroed on entry to this\n                 function.\n\n                 For dynamically allocated types (strings, binary, dicts,\n                 etc.), the result is owned and freed by the caller."]
     pub fn av_opt_get_array(
         obj: *mut ::std::os::raw::c_void,
@@ -13628,7 +13628,7 @@ extern "C" {
         out_val: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup opt_eval_funcs Evaluating option strings\n @{\n This group of functions can be used to evaluate option strings\n and get numbers out of them. They do the same thing as av_opt_set(),\n except the result is written into the caller-supplied pointer.\n\n @param obj a struct whose first element is a pointer to AVClass.\n @param o an option for which the string is to be evaluated.\n @param val string to be evaluated.\n @param *_out value of the string will be written here.\n\n @return 0 on success, a negative number on failure."]
     pub fn av_opt_eval_flags(
         obj: *mut ::std::os::raw::c_void,
@@ -13637,7 +13637,7 @@ extern "C" {
         flags_out: *mut ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_eval_int(
         obj: *mut ::std::os::raw::c_void,
         o: *const AVOption,
@@ -13645,7 +13645,7 @@ extern "C" {
         int_out: *mut ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_eval_uint(
         obj: *mut ::std::os::raw::c_void,
         o: *const AVOption,
@@ -13653,7 +13653,7 @@ extern "C" {
         uint_out: *mut ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_eval_int64(
         obj: *mut ::std::os::raw::c_void,
         o: *const AVOption,
@@ -13661,7 +13661,7 @@ extern "C" {
         int64_out: *mut i64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_eval_float(
         obj: *mut ::std::os::raw::c_void,
         o: *const AVOption,
@@ -13669,7 +13669,7 @@ extern "C" {
         float_out: *mut f32,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_eval_double(
         obj: *mut ::std::os::raw::c_void,
         o: *const AVOption,
@@ -13677,7 +13677,7 @@ extern "C" {
         double_out: *mut f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_opt_eval_q(
         obj: *mut ::std::os::raw::c_void,
         o: *const AVOption,
@@ -13685,7 +13685,7 @@ extern "C" {
         q_out: *mut AVRational,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Gets a pointer to the requested field in a struct.\n This function allows accessing a struct even when its fields are moved or\n renamed since the application making the access has been compiled,\n\n @returns a pointer to the field, it can be cast to the correct type and read\n          or written to.\n\n @deprecated direct access to AVOption-exported fields is not supported"]
     pub fn av_opt_ptr(
         avclass: *const AVClass,
@@ -13693,14 +13693,14 @@ extern "C" {
         name: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if given option is set to its default value.\n\n Options o must belong to the obj. This function must not be called to check child's options state.\n @see av_opt_is_set_to_default_by_name().\n\n @param obj  AVClass object to check option on\n @param o    option to be checked\n @return     >0 when option is set to its default,\n              0 when option is not set its default,\n             <0 on error"]
     pub fn av_opt_is_set_to_default(
         obj: *mut ::std::os::raw::c_void,
         o: *const AVOption,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if given option is set to its default value.\n\n @param obj          AVClass object to check option on\n @param name         option name\n @param search_flags combination of AV_OPT_SEARCH_*\n @return             >0 when option is set to its default,\n                     0 when option is not set its default,\n                     <0 on error"]
     pub fn av_opt_is_set_to_default_by_name(
         obj: *mut ::std::os::raw::c_void,
@@ -13708,7 +13708,7 @@ extern "C" {
         search_flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check whether a particular flag is set in a flags field.\n\n @param field_name the name of the flag field option\n @param flag_name the name of the flag to check\n @return non-zero if the flag is set, zero if the flag isn't set,\n         isn't of the right type, or the flags field doesn't exist."]
     pub fn av_opt_flag_is_set(
         obj: *mut ::std::os::raw::c_void,
@@ -13716,7 +13716,7 @@ extern "C" {
         flag_name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Serialize object's options.\n\n Create a string containing object's serialized options.\n Such string may be passed back to av_opt_set_from_string() in order to restore option values.\n A key/value or pairs separator occurring in the serialized value or\n name string are escaped through the av_escape() function.\n\n @param[in]  obj           AVClass object to serialize\n @param[in]  opt_flags     serialize options with all the specified flags set (AV_OPT_FLAG)\n @param[in]  flags         combination of AV_OPT_SERIALIZE_* flags\n @param[out] buffer        Pointer to buffer that will be allocated with string containing serialized options.\n                           Buffer must be freed by the caller when is no longer needed.\n @param[in]  key_val_sep   character used to separate key from value\n @param[in]  pairs_sep     character used to separate two pairs from each other\n @return                   >= 0 on success, negative on error\n @warning Separators cannot be neither '\\\\' nor '\\0'. They also cannot be the same."]
     pub fn av_opt_serialize(
         obj: *mut ::std::os::raw::c_void,
@@ -13727,11 +13727,11 @@ extern "C" {
         pairs_sep: ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free an AVOptionRanges struct and set it to NULL."]
     pub fn av_opt_freep_ranges(ranges: *mut *mut AVOptionRanges);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a list of allowed ranges for the given option.\n\n The returned list may depend on other fields in obj like for example profile.\n\n @param flags is a bitmask of flags, undefined flags should not be set and should be ignored\n              AV_OPT_SEARCH_FAKE_OBJ indicates that the obj is a double pointer to a AVClass instead of a full instance\n              AV_OPT_MULTI_COMPONENT_RANGE indicates that function may return more than one component, @see AVOptionRanges\n\n The result must be freed with av_opt_freep_ranges.\n\n @return number of components returned on success, a negative error code otherwise"]
     pub fn av_opt_query_ranges(
         arg1: *mut *mut AVOptionRanges,
@@ -13740,7 +13740,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a default list of allowed ranges for the given option.\n\n This list is constructed without using the AVClass.query_ranges() callback\n and can be used as fallback from within the callback.\n\n @param flags is a bitmask of flags, undefined flags should not be set and should be ignored\n              AV_OPT_SEARCH_FAKE_OBJ indicates that the obj is a double pointer to a AVClass instead of a full instance\n              AV_OPT_MULTI_COMPONENT_RANGE indicates that function may return more than one component, @see AVOptionRanges\n\n The result must be freed with av_opt_free_ranges.\n\n @return number of components returned on success, a negative error code otherwise"]
     pub fn av_opt_query_ranges_default(
         arg1: *mut *mut AVOptionRanges,
@@ -13826,14 +13826,14 @@ fn bindgen_test_layout_AVDCT() {
         "Offset of field: AVDCT::get_pixels_unaligned"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates a AVDCT context.\n This needs to be initialized with avcodec_dct_init() after optionally\n configuring it with AVOptions.\n\n To free it use av_free()"]
     pub fn avcodec_dct_alloc() -> *mut AVDCT;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avcodec_dct_init(arg1: *mut AVDCT) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avcodec_dct_get_class() -> *const AVClass;
 }
 #[doc = " The bitstream filter state.\n\n This struct must be allocated with av_bsf_alloc() and freed with\n av_bsf_free().\n\n The fields in the struct will only be changed (by the caller or by the\n filter) as described in their documentation, and are to be considered\n immutable otherwise."]
@@ -13944,45 +13944,45 @@ fn bindgen_test_layout_AVBitStreamFilter() {
         "Offset of field: AVBitStreamFilter::priv_class"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return a bitstream filter with the specified name or NULL if no such\n         bitstream filter exists."]
     pub fn av_bsf_get_by_name(name: *const ::std::os::raw::c_char) -> *const AVBitStreamFilter;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all registered bitstream filters.\n\n @param opaque a pointer where libavcodec will store the iteration state. Must\n               point to NULL to start the iteration.\n\n @return the next registered bitstream filter or NULL when the iteration is\n         finished"]
     pub fn av_bsf_iterate(opaque: *mut *mut ::std::os::raw::c_void) -> *const AVBitStreamFilter;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a context for a given bitstream filter. The caller must fill in the\n context parameters as described in the documentation and then call\n av_bsf_init() before sending any data to the filter.\n\n @param filter the filter for which to allocate an instance.\n @param[out] ctx a pointer into which the pointer to the newly-allocated context\n                 will be written. It must be freed with av_bsf_free() after the\n                 filtering is done.\n\n @return 0 on success, a negative AVERROR code on failure"]
     pub fn av_bsf_alloc(
         filter: *const AVBitStreamFilter,
         ctx: *mut *mut AVBSFContext,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Prepare the filter for use, after all the parameters and options have been\n set.\n\n @param ctx a AVBSFContext previously allocated with av_bsf_alloc()"]
     pub fn av_bsf_init(ctx: *mut AVBSFContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Submit a packet for filtering.\n\n After sending each packet, the filter must be completely drained by calling\n av_bsf_receive_packet() repeatedly until it returns AVERROR(EAGAIN) or\n AVERROR_EOF.\n\n @param ctx an initialized AVBSFContext\n @param pkt the packet to filter. The bitstream filter will take ownership of\n the packet and reset the contents of pkt. pkt is not touched if an error occurs.\n If pkt is empty (i.e. NULL, or pkt->data is NULL and pkt->side_data_elems zero),\n it signals the end of the stream (i.e. no more non-empty packets will be sent;\n sending more empty packets does nothing) and will cause the filter to output\n any packets it may have buffered internally.\n\n @return\n  - 0 on success.\n  - AVERROR(EAGAIN) if packets need to be retrieved from the filter (using\n    av_bsf_receive_packet()) before new input can be consumed.\n  - Another negative AVERROR value if an error occurs."]
     pub fn av_bsf_send_packet(ctx: *mut AVBSFContext, pkt: *mut AVPacket) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Retrieve a filtered packet.\n\n @param ctx an initialized AVBSFContext\n @param[out] pkt this struct will be filled with the contents of the filtered\n                 packet. It is owned by the caller and must be freed using\n                 av_packet_unref() when it is no longer needed.\n                 This parameter should be \"clean\" (i.e. freshly allocated\n                 with av_packet_alloc() or unreffed with av_packet_unref())\n                 when this function is called. If this function returns\n                 successfully, the contents of pkt will be completely\n                 overwritten by the returned data. On failure, pkt is not\n                 touched.\n\n @return\n  - 0 on success.\n  - AVERROR(EAGAIN) if more packets need to be sent to the filter (using\n    av_bsf_send_packet()) to get more output.\n  - AVERROR_EOF if there will be no further output from the filter.\n  - Another negative AVERROR value if an error occurs.\n\n @note one input packet may result in several output packets, so after sending\n a packet with av_bsf_send_packet(), this function needs to be called\n repeatedly until it stops returning 0. It is also possible for a filter to\n output fewer packets than were sent to it, so this function may return\n AVERROR(EAGAIN) immediately after a successful av_bsf_send_packet() call."]
     pub fn av_bsf_receive_packet(
         ctx: *mut AVBSFContext,
         pkt: *mut AVPacket,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reset the internal bitstream filter state. Should be called e.g. when seeking."]
     pub fn av_bsf_flush(ctx: *mut AVBSFContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free a bitstream filter context and everything associated with it; write NULL\n into the supplied pointer."]
     pub fn av_bsf_free(ctx: *mut *mut AVBSFContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVClass for AVBSFContext. It can be used in combination with\n AV_OPT_SEARCH_FAKE_OBJ for examining options.\n\n @see av_opt_find()."]
     pub fn av_bsf_get_class() -> *const AVClass;
 }
@@ -13991,20 +13991,20 @@ extern "C" {
 pub struct AVBSFList {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate empty list of bitstream filters.\n The list must be later freed by av_bsf_list_free()\n or finalized by av_bsf_list_finalize().\n\n @return Pointer to @ref AVBSFList on success, NULL in case of failure"]
     pub fn av_bsf_list_alloc() -> *mut AVBSFList;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free list of bitstream filters.\n\n @param lst Pointer to pointer returned by av_bsf_list_alloc()"]
     pub fn av_bsf_list_free(lst: *mut *mut AVBSFList);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append bitstream filter to the list of bitstream filters.\n\n @param lst List to append to\n @param bsf Filter context to be appended\n\n @return >=0 on success, negative AVERROR in case of failure"]
     pub fn av_bsf_list_append(lst: *mut AVBSFList, bsf: *mut AVBSFContext)
         -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Construct new bitstream filter context given it's name and options\n and append it to the list of bitstream filters.\n\n @param lst      List to append to\n @param bsf_name Name of the bitstream filter\n @param options  Options for the bitstream filter, can be set to NULL\n\n @return >=0 on success, negative AVERROR in case of failure"]
     pub fn av_bsf_list_append2(
         lst: *mut AVBSFList,
@@ -14012,21 +14012,21 @@ extern "C" {
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finalize list of bitstream filters.\n\n This function will transform @ref AVBSFList to single @ref AVBSFContext,\n so the whole chain of bitstream filters can be treated as single filter\n freshly allocated by av_bsf_alloc().\n If the call is successful, @ref AVBSFList structure is freed and lst\n will be set to NULL. In case of failure, caller is responsible for\n freeing the structure by av_bsf_list_free()\n\n @param      lst Filter list structure to be transformed\n @param[out] bsf Pointer to be set to newly created @ref AVBSFContext structure\n                 representing the chain of bitstream filters\n\n @return >=0 on success, negative AVERROR in case of failure"]
     pub fn av_bsf_list_finalize(
         lst: *mut *mut AVBSFList,
         bsf: *mut *mut AVBSFContext,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse string describing list of bitstream filters and create single\n @ref AVBSFContext describing the whole chain of bitstream filters.\n Resulting @ref AVBSFContext can be treated as any other @ref AVBSFContext freshly\n allocated by av_bsf_alloc().\n\n @param      str String describing chain of bitstream filters in format\n                 `bsf1[=opt1=val1:opt2=val2][,bsf2]`\n @param[out] bsf Pointer to be set to newly created @ref AVBSFContext structure\n                 representing the chain of bitstream filters\n\n @return >=0 on success, negative AVERROR in case of failure"]
     pub fn av_bsf_list_parse_str(
         str_: *const ::std::os::raw::c_char,
         bsf: *mut *mut AVBSFContext,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get null/pass-through bitstream filter.\n\n @param[out] bsf Pointer to be set to new instance of pass-through bitstream filter\n\n @return"]
     pub fn av_bsf_get_null_filter(bsf: *mut *mut AVBSFContext) -> ::std::os::raw::c_int;
 }
@@ -14247,7 +14247,7 @@ fn bindgen_test_layout_AVDiracSeqHeader() {
         "Offset of field: AVDiracSeqHeader::bit_depth"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse a Dirac sequence header.\n\n @param dsh this function will allocate and fill an AVDiracSeqHeader struct\n            and write it into this pointer. The caller must free it with\n            av_free().\n @param buf the data buffer\n @param buf_size the size of the data buffer in bytes\n @param log_ctx if non-NULL, this function will log errors here\n @return 0 on success, a negative AVERROR code on failure"]
     pub fn av_dirac_parse_sequence_header(
         dsh: *mut *mut AVDiracSeqHeader,
@@ -14377,7 +14377,7 @@ fn bindgen_test_layout_AVDVProfile() {
         "Offset of field: AVDVProfile::audio_shuffle"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a DV profile for the provided compressed frame.\n\n @param sys the profile used for the previous frame, may be NULL\n @param frame the compressed data buffer\n @param buf_size size of the buffer in bytes\n @return the DV profile for the supplied data or NULL on failure"]
     pub fn av_dv_frame_profile(
         sys: *const AVDVProfile,
@@ -14385,7 +14385,7 @@ extern "C" {
         buf_size: ::std::os::raw::c_uint,
     ) -> *const AVDVProfile;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a DV profile for the provided stream parameters."]
     pub fn av_dv_codec_profile(
         width: ::std::os::raw::c_int,
@@ -14393,7 +14393,7 @@ extern "C" {
         pix_fmt: AVPixelFormat,
     ) -> *const AVDVProfile;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a DV profile for the provided stream parameters.\n The frame rate is used as a best-effort parameter."]
     pub fn av_dv_codec_profile2(
         width: ::std::os::raw::c_int,
@@ -14402,22 +14402,22 @@ extern "C" {
         frame_rate: AVRational,
     ) -> *const AVDVProfile;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_jni_set_java_vm(
         vm: *mut ::std::os::raw::c_void,
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_jni_get_java_vm(log_ctx: *mut ::std::os::raw::c_void) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_jni_set_android_app_ctx(
         app_ctx: *mut ::std::os::raw::c_void,
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_jni_get_android_app_ctx() -> *mut ::std::os::raw::c_void;
 }
 #[doc = " This structure holds a reference to a android/view/Surface object that will\n be used as output by the decoder.\n"]
@@ -14447,11 +14447,11 @@ fn bindgen_test_layout_AVMediaCodecContext() {
         "Offset of field: AVMediaCodecContext::surface"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and initialize a MediaCodec context.\n\n When decoding with MediaCodec is finished, the caller must free the\n MediaCodec context with av_mediacodec_default_free.\n\n @return a pointer to a newly allocated AVMediaCodecContext on success, NULL otherwise"]
     pub fn av_mediacodec_alloc_context() -> *mut AVMediaCodecContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convenience function that sets up the MediaCodec context.\n\n @param avctx codec context\n @param ctx MediaCodec context to initialize\n @param surface reference to an android/view/Surface\n @return 0 on success, < 0 otherwise"]
     pub fn av_mediacodec_default_init(
         avctx: *mut AVCodecContext,
@@ -14459,7 +14459,7 @@ extern "C" {
         surface: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " This function must be called to free the MediaCodec context initialized with\n av_mediacodec_default_init().\n\n @param avctx codec context"]
     pub fn av_mediacodec_default_free(avctx: *mut AVCodecContext);
 }
@@ -14470,14 +14470,14 @@ pub struct MediaCodecBuffer {
 }
 #[doc = " Opaque structure representing a MediaCodec buffer to render."]
 pub type AVMediaCodecBuffer = MediaCodecBuffer;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Release a MediaCodec buffer and render it to the surface that is associated\n with the decoder. This function should only be called once on a given\n buffer, once released the underlying buffer returns to the codec, thus\n subsequent calls to this function will have no effect.\n\n @param buffer the buffer to render\n @param render 1 to release and render the buffer to the surface or 0 to\n discard the buffer\n @return 0 on success, < 0 otherwise"]
     pub fn av_mediacodec_release_buffer(
         buffer: *mut AVMediaCodecBuffer,
         render: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Release a MediaCodec buffer and render it at the given time to the surface\n that is associated with the decoder. The timestamp must be within one second\n of the current `java/lang/System#nanoTime()` (which is implemented using\n `CLOCK_MONOTONIC` on Android). See the Android MediaCodec documentation\n of [`android/media/MediaCodec#releaseOutputBuffer(int,long)`][0] for more details.\n\n @param buffer the buffer to render\n @param time timestamp in nanoseconds of when to render the buffer\n @return 0 on success, < 0 otherwise\n\n [0]: https://developer.android.com/reference/android/media/MediaCodec#releaseOutputBuffer(int,%20long)"]
     pub fn av_mediacodec_render_buffer_at_time(
         buffer: *mut AVMediaCodecBuffer,
@@ -14489,18 +14489,18 @@ extern "C" {
 pub struct AVVorbisParseContext {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and initialize the Vorbis parser using headers in the extradata."]
     pub fn av_vorbis_parse_init(
         extradata: *const u8,
         extradata_size: ::std::os::raw::c_int,
     ) -> *mut AVVorbisParseContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the parser and everything associated with it."]
     pub fn av_vorbis_parse_free(s: *mut *mut AVVorbisParseContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the duration for a Vorbis packet.\n\n If @p flags is @c NULL,\n special frames are considered invalid.\n\n @param s        Vorbis parser context\n @param buf      buffer containing a Vorbis frame\n @param buf_size size of the buffer\n @param flags    flags for special frames"]
     pub fn av_vorbis_parse_frame_flags(
         s: *mut AVVorbisParseContext,
@@ -14509,7 +14509,7 @@ extern "C" {
         flags: *mut ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the duration for a Vorbis packet.\n\n @param s        Vorbis parser context\n @param buf      buffer containing a Vorbis frame\n @param buf_size size of the buffer"]
     pub fn av_vorbis_parse_frame(
         s: *mut AVVorbisParseContext,
@@ -14517,7 +14517,7 @@ extern "C" {
         buf_size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_vorbis_parse_reset(s: *mut AVVorbisParseContext);
 }
 #[doc = " Callback for checking whether to abort blocking functions.\n AVERROR_EXIT is returned in this case by the interrupted\n function. During blocking operations, callback is called with\n opaque as parameter. If the callback returns 1, the\n blocking operation will be aborted.\n\n No members can be added to this struct without a major bump, if\n new elements have been added after this struct in AVFormatContext\n or AVIOContext."]
@@ -14936,20 +14936,20 @@ fn bindgen_test_layout_AVIOContext() {
         "Offset of field: AVIOContext::bytes_written"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the name of the protocol that will handle the passed URL.\n\n NULL is returned if no protocol could be found for the given URL.\n\n @return Name of the protocol or NULL."]
     pub fn avio_find_protocol_name(
         url: *const ::std::os::raw::c_char,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return AVIO_FLAG_* access flags corresponding to the access permissions\n of the resource in url, or a negative value corresponding to an\n AVERROR code in case of failure. The returned access flags are\n masked by the value in flags.\n\n @note This function is intrinsically unsafe, in the sense that the\n checked resource may change its existence or permission status from\n one call to another. Thus you should not trust the returned value,\n unless you are sure that no other processes are accessing the\n checked resource."]
     pub fn avio_check(
         url: *const ::std::os::raw::c_char,
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Open directory for reading.\n\n @param s       directory read context. Pointer to a NULL pointer must be passed.\n @param url     directory to be listed.\n @param options A dictionary filled with protocol-private options. On return\n                this parameter will be destroyed and replaced with a dictionary\n                containing options that were not found. May be NULL.\n @return >=0 on success or negative on error."]
     pub fn avio_open_dir(
         s: *mut *mut AVIODirContext,
@@ -14957,22 +14957,22 @@ extern "C" {
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get next directory entry.\n\n Returned entry must be freed with avio_free_directory_entry(). In particular\n it may outlive AVIODirContext.\n\n @param s         directory read context.\n @param[out] next next entry or NULL when no more entries.\n @return >=0 on success or negative on error. End of list is not considered an\n             error."]
     pub fn avio_read_dir(
         s: *mut AVIODirContext,
         next: *mut *mut AVIODirEntry,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Close directory.\n\n @note Entries created using avio_read_dir() are not deleted and must be\n freeded with avio_free_directory_entry().\n\n @param s         directory read context.\n @return >=0 on success or negative on error."]
     pub fn avio_close_dir(s: *mut *mut AVIODirContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free entry allocated by avio_read_dir().\n\n @param entry entry to be freed."]
     pub fn avio_free_directory_entry(entry: *mut *mut AVIODirEntry);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and initialize an AVIOContext for buffered I/O. It must be later\n freed with avio_context_free().\n\n @param buffer Memory block for input/output operations via AVIOContext.\n        The buffer must be allocated with av_malloc() and friends.\n        It may be freed and replaced with a new buffer by libavformat.\n        AVIOContext.buffer holds the buffer currently in use,\n        which must be later freed with av_free().\n @param buffer_size The buffer size is very important for performance.\n        For protocols with fixed blocksize it should be set to this blocksize.\n        For others a typical size is a cache page, e.g. 4kb.\n @param write_flag Set to 1 if the buffer should be writable, 0 otherwise.\n @param opaque An opaque pointer to user-specific data.\n @param read_packet  A function for refilling the buffer, may be NULL.\n                     For stream protocols, must never return 0 but rather\n                     a proper AVERROR code.\n @param write_packet A function for writing the buffer contents, may be NULL.\n        The function may not change the input buffers content.\n @param seek A function for seeking to specified byte position, may be NULL.\n\n @return Allocated AVIOContext or NULL on failure."]
     pub fn avio_alloc_context(
         buffer: *mut ::std::os::raw::c_uchar,
@@ -15002,86 +15002,86 @@ extern "C" {
         >,
     ) -> *mut AVIOContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the supplied IO context and everything associated with it.\n\n @param s Double pointer to the IO context. This function will write NULL\n into s."]
     pub fn avio_context_free(s: *mut *mut AVIOContext);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_w8(s: *mut AVIOContext, b: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_write(
         s: *mut AVIOContext,
         buf: *const ::std::os::raw::c_uchar,
         size: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_wl64(s: *mut AVIOContext, val: u64);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_wb64(s: *mut AVIOContext, val: u64);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_wl32(s: *mut AVIOContext, val: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_wb32(s: *mut AVIOContext, val: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_wl24(s: *mut AVIOContext, val: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_wb24(s: *mut AVIOContext, val: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_wl16(s: *mut AVIOContext, val: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_wb16(s: *mut AVIOContext, val: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write a NULL-terminated string.\n @return number of bytes written."]
     pub fn avio_put_str(
         s: *mut AVIOContext,
         str_: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert an UTF-8 string to UTF-16LE and write it.\n @param s the AVIOContext\n @param str NULL-terminated UTF-8 string\n\n @return number of bytes written."]
     pub fn avio_put_str16le(
         s: *mut AVIOContext,
         str_: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert an UTF-8 string to UTF-16BE and write it.\n @param s the AVIOContext\n @param str NULL-terminated UTF-8 string\n\n @return number of bytes written."]
     pub fn avio_put_str16be(
         s: *mut AVIOContext,
         str_: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Mark the written bytestream as a specific type.\n\n Zero-length ranges are omitted from the output.\n\n @param s    the AVIOContext\n @param time the stream time the current bytestream pos corresponds to\n             (in AV_TIME_BASE units), or AV_NOPTS_VALUE if unknown or not\n             applicable\n @param type the kind of data written starting at the current pos"]
     pub fn avio_write_marker(s: *mut AVIOContext, time: i64, type_: AVIODataMarkerType);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " fseek() equivalent for AVIOContext.\n @return new position or AVERROR."]
     pub fn avio_seek(s: *mut AVIOContext, offset: i64, whence: ::std::os::raw::c_int) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Skip given number of bytes forward\n @return new position or AVERROR."]
     pub fn avio_skip(s: *mut AVIOContext, offset: i64) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the filesize.\n @return filesize or AVERROR"]
     pub fn avio_size(s: *mut AVIOContext) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Similar to feof() but also returns nonzero on read errors.\n @return non zero if and only if at end of file or a read error happened when reading."]
     pub fn avio_feof(s: *mut AVIOContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Writes a formatted string to the context taking a va_list.\n @return number of bytes written, < 0 on error."]
     pub fn avio_vprintf(
         s: *mut AVIOContext,
@@ -15089,7 +15089,7 @@ extern "C" {
         ap: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Writes a formatted string to the context.\n @return number of bytes written, < 0 on error."]
     pub fn avio_printf(
         s: *mut AVIOContext,
@@ -15097,18 +15097,18 @@ extern "C" {
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write a NULL terminated array of strings to the context.\n Usually you don't need to use this function directly but its macro wrapper,\n avio_print."]
     pub fn avio_print_string_array(
         s: *mut AVIOContext,
         strings: *const *const ::std::os::raw::c_char,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Force flushing of buffered data.\n\n For write streams, force the buffered data to be immediately written to the output,\n without to wait to fill the internal buffer.\n\n For read streams, discard all currently buffered data, and advance the\n reported file position to that of the underlying stream. This does not\n read new data, and does not perform any seeks."]
     pub fn avio_flush(s: *mut AVIOContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read size bytes from AVIOContext into buf.\n @return number of bytes read or AVERROR"]
     pub fn avio_read(
         s: *mut AVIOContext,
@@ -15116,7 +15116,7 @@ extern "C" {
         size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read size bytes from AVIOContext into buf. Unlike avio_read(), this is allowed\n to read fewer bytes than requested. The missing bytes can be read in the next\n call. This always tries to read at least 1 byte.\n Useful to reduce latency in certain cases.\n @return number of bytes read or AVERROR"]
     pub fn avio_read_partial(
         s: *mut AVIOContext,
@@ -15124,35 +15124,35 @@ extern "C" {
         size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @name Functions for reading from AVIOContext\n @{\n\n @note return 0 if EOF, so you cannot use it if EOF handling is\n       necessary"]
     pub fn avio_r8(s: *mut AVIOContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_rl16(s: *mut AVIOContext) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_rl24(s: *mut AVIOContext) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_rl32(s: *mut AVIOContext) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_rl64(s: *mut AVIOContext) -> u64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_rb16(s: *mut AVIOContext) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_rb24(s: *mut AVIOContext) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_rb32(s: *mut AVIOContext) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_rb64(s: *mut AVIOContext) -> u64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read a string from pb into buf. The reading will terminate when either\n a NULL character was encountered, maxlen bytes have been read, or nothing\n more can be read from pb. The result is guaranteed to be NULL-terminated, it\n will be truncated if buf is too small.\n Note that the string is not interpreted or validated in any way, it\n might get truncated in the middle of a sequence for multi-byte encodings.\n\n @return number of bytes read (is always <= maxlen).\n If reading ends on EOF or error, the return value will be one more than\n bytes actually read."]
     pub fn avio_get_str(
         pb: *mut AVIOContext,
@@ -15161,7 +15161,7 @@ extern "C" {
         buflen: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read a UTF-16 string from pb and convert it to UTF-8.\n The reading will terminate when either a null or invalid character was\n encountered or maxlen bytes have been read.\n @return number of bytes read (is always <= maxlen)"]
     pub fn avio_get_str16le(
         pb: *mut AVIOContext,
@@ -15170,7 +15170,7 @@ extern "C" {
         buflen: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avio_get_str16be(
         pb: *mut AVIOContext,
         maxlen: ::std::os::raw::c_int,
@@ -15178,7 +15178,7 @@ extern "C" {
         buflen: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create and initialize a AVIOContext for accessing the\n resource indicated by url.\n @note When the resource indicated by url has been opened in\n read+write mode, the AVIOContext can be used only for writing.\n\n @param s Used to return the pointer to the created AVIOContext.\n In case of failure the pointed to value is set to NULL.\n @param url resource to access\n @param flags flags which control how the resource indicated by url\n is to be opened\n @return >= 0 in case of success, a negative value corresponding to an\n AVERROR code in case of failure"]
     pub fn avio_open(
         s: *mut *mut AVIOContext,
@@ -15186,7 +15186,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create and initialize a AVIOContext for accessing the\n resource indicated by url.\n @note When the resource indicated by url has been opened in\n read+write mode, the AVIOContext can be used only for writing.\n\n @param s Used to return the pointer to the created AVIOContext.\n In case of failure the pointed to value is set to NULL.\n @param url resource to access\n @param flags flags which control how the resource indicated by url\n is to be opened\n @param int_cb an interrupt callback to be used at the protocols level\n @param options  A dictionary filled with protocol-private options. On return\n this parameter will be destroyed and replaced with a dict containing options\n that were not found. May be NULL.\n @return >= 0 in case of success, a negative value corresponding to an\n AVERROR code in case of failure"]
     pub fn avio_open2(
         s: *mut *mut AVIOContext,
@@ -15196,42 +15196,42 @@ extern "C" {
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Close the resource accessed by the AVIOContext s and free it.\n This function can only be used if s was opened by avio_open().\n\n The internal buffer is automatically flushed before closing the\n resource.\n\n @return 0 on success, an AVERROR < 0 on error.\n @see avio_closep"]
     pub fn avio_close(s: *mut AVIOContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Close the resource accessed by the AVIOContext *s, free it\n and set the pointer pointing to it to NULL.\n This function can only be used if s was opened by avio_open().\n\n The internal buffer is automatically flushed before closing the\n resource.\n\n @return 0 on success, an AVERROR < 0 on error.\n @see avio_close"]
     pub fn avio_closep(s: *mut *mut AVIOContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Open a write only memory stream.\n\n @param s new IO context\n @return zero if no error."]
     pub fn avio_open_dyn_buf(s: *mut *mut AVIOContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the written size and a pointer to the buffer.\n The AVIOContext stream is left intact.\n The buffer must NOT be freed.\n No padding is added to the buffer.\n\n @param s IO context\n @param pbuffer pointer to a byte buffer\n @return the length of the byte buffer"]
     pub fn avio_get_dyn_buf(s: *mut AVIOContext, pbuffer: *mut *mut u8) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the written size and a pointer to the buffer. The buffer\n must be freed with av_free().\n Padding of AV_INPUT_BUFFER_PADDING_SIZE is added to the buffer.\n\n @param s IO context\n @param pbuffer pointer to a byte buffer\n @return the length of the byte buffer"]
     pub fn avio_close_dyn_buf(s: *mut AVIOContext, pbuffer: *mut *mut u8) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate through names of available protocols.\n\n @param opaque A private pointer representing current protocol.\n        It must be a pointer to NULL on first iteration and will\n        be updated by successive calls to avio_enum_protocols.\n @param output If set to 1, iterate over output protocols,\n               otherwise over input protocols.\n\n @return A static string containing the name of current protocol or NULL"]
     pub fn avio_enum_protocols(
         opaque: *mut *mut ::std::os::raw::c_void,
         output: ::std::os::raw::c_int,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get AVClass by names of available protocols.\n\n @return A AVClass of input protocol name or NULL"]
     pub fn avio_protocol_get_class(name: *const ::std::os::raw::c_char) -> *const AVClass;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Pause and resume playing - only meaningful if using a network streaming\n protocol (e.g. MMS).\n\n @param h     IO context from which to call the read_pause function pointer\n @param pause 1 for pause, 0 for resume"]
     pub fn avio_pause(h: *mut AVIOContext, pause: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Seek to a given timestamp relative to some component stream.\n Only meaningful if using a network streaming protocol (e.g. MMS.).\n\n @param h IO context from which to call the seek function pointers\n @param stream_index The stream index that the timestamp is relative to.\n        If stream_index is (-1) the timestamp should be in AV_TIME_BASE\n        units from the beginning of the presentation.\n        If a stream_index >= 0 is used and the protocol does not support\n        seeking based on component streams, the call will fail.\n @param timestamp timestamp in AVStream.time_base units\n        or if there is no stream specified then in AV_TIME_BASE units.\n @param flags Optional combination of AVSEEK_FLAG_BACKWARD, AVSEEK_FLAG_BYTE\n        and AVSEEK_FLAG_ANY. The protocol may silently ignore\n        AVSEEK_FLAG_BACKWARD and AVSEEK_FLAG_ANY, but AVSEEK_FLAG_BYTE will\n        fail if used and not supported.\n @return >= 0 on success\n @see AVInputFormat::read_seek"]
     pub fn avio_seek_time(
         h: *mut AVIOContext,
@@ -15240,7 +15240,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read contents of h into print buffer, up to max_size bytes, or up to EOF.\n\n @return 0 for success (max_size bytes read or EOF reached), negative error\n code otherwise"]
     pub fn avio_read_to_bprint(
         h: *mut AVIOContext,
@@ -15248,15 +15248,15 @@ extern "C" {
         max_size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Accept and allocate a client context on a server context.\n @param  s the server context\n @param  c the client context, must be unallocated\n @return   >= 0 on success or a negative value corresponding\n           to an AVERROR on failure"]
     pub fn avio_accept(s: *mut AVIOContext, c: *mut *mut AVIOContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Perform one step of the protocol handshake to accept a new client.\n This function must be called on a client returned by avio_accept() before\n using it as a read/write context.\n It is separate from avio_accept() because it may block.\n A step of the handshake is defined by places where the application may\n decide to change the proceedings.\n For example, on a protocol with a request header and a reply header, each\n one can constitute a step because the application may use the parameters\n from the request to change parameters in the reply; or each individual\n chunk of the request can constitute a step.\n If the handshake is already finished, avio_handshake() does nothing and\n returns 0 immediately.\n\n @param  c the client context to perform the handshake on\n @return   0   on a complete and successful handshake\n           > 0 if the handshake progressed, but is not complete\n           < 0 for an AVERROR code"]
     pub fn avio_handshake(c: *mut AVIOContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and read the payload of a packet and initialize its\n fields with default values.\n\n @param s    associated IO context\n @param pkt packet\n @param size desired payload size\n @return >0 (read size) if OK, AVERROR_xxx otherwise"]
     pub fn av_get_packet(
         s: *mut AVIOContext,
@@ -15264,7 +15264,7 @@ extern "C" {
         size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read data and append it to the current content of the AVPacket.\n If pkt->size is 0 this is identical to av_get_packet.\n Note that this uses av_grow_packet and thus involves a realloc\n which is inefficient. Thus this function should only be used\n when there is no reasonable way to know (an upper bound of)\n the final size.\n\n @param s    associated IO context\n @param pkt packet\n @param size amount of data to read\n @return >0 (read size) if OK, AVERROR_xxx otherwise, previous data\n         will not be lost even if an error occurs."]
     pub fn av_append_packet(
         s: *mut AVIOContext,
@@ -15618,12 +15618,12 @@ impl AVIndexEntry {
         __bindgen_bitfield_unit
     }
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return The AV_DISPOSITION_* flag corresponding to disp or a negative error\n         code if disp does not correspond to a known stream disposition."]
     pub fn av_disposition_from_string(disp: *const ::std::os::raw::c_char)
         -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @param disposition a combination of AV_DISPOSITION_* values\n @return The string description corresponding to the lowest set bit in\n         disposition. NULL when the lowest set bit does not correspond\n         to a known disposition or when disposition is 0."]
     pub fn av_disposition_to_string(
         disposition: ::std::os::raw::c_int,
@@ -16123,7 +16123,7 @@ impl ::std::fmt::Debug for AVStreamGroup {
         write ! (f , "AVStreamGroup {{ av_class: {:?}, priv_data: {:?}, index: {:?}, id: {:?}, type: {:?}, params: {:?}, metadata: {:?}, nb_streams: {:?}, streams: {:?}, disposition: {:?} }}" , self . av_class , self . priv_data , self . index , self . id , self . type_ , self . params , self . metadata , self . nb_streams , self . streams , self . disposition)
     }
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_stream_get_parser(s: *const AVStream) -> *mut AVCodecParserContext;
 }
 #[doc = " New fields can be added to the end with minor version bumps.\n Removal, reordering and changes to existing fields require a major\n version bump.\n sizeof(AVProgram) must not be used outside libav*."]
@@ -16867,61 +16867,61 @@ fn bindgen_test_layout_AVFormatContext() {
         "Offset of field: AVFormatContext::name"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the LIBAVFORMAT_VERSION_INT constant."]
     pub fn avformat_version() -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavformat build-time configuration."]
     pub fn avformat_configuration() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavformat license."]
     pub fn avformat_license() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Do global initialization of network libraries. This is optional,\n and not recommended anymore.\n\n This functions only exists to work around thread-safety issues\n with older GnuTLS or OpenSSL libraries. If libavformat is linked\n to newer versions of those libraries, or if you do not use them,\n calling this function is unnecessary. Otherwise, you need to call\n this function before any other threads using them are started.\n\n This function will be deprecated once support for older GnuTLS and\n OpenSSL libraries is removed, and this function has no purpose\n anymore."]
     pub fn avformat_network_init() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Undo the initialization done by avformat_network_init. Call it only\n once for each time you called avformat_network_init."]
     pub fn avformat_network_deinit() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all registered muxers.\n\n @param opaque a pointer where libavformat will store the iteration state. Must\n               point to NULL to start the iteration.\n\n @return the next registered muxer or NULL when the iteration is\n         finished"]
     pub fn av_muxer_iterate(opaque: *mut *mut ::std::os::raw::c_void) -> *const AVOutputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all registered demuxers.\n\n @param opaque a pointer where libavformat will store the iteration state.\n               Must point to NULL to start the iteration.\n\n @return the next registered demuxer or NULL when the iteration is\n         finished"]
     pub fn av_demuxer_iterate(opaque: *mut *mut ::std::os::raw::c_void) -> *const AVInputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVFormatContext.\n avformat_free_context() can be used to free the context and everything\n allocated by the framework within it."]
     pub fn avformat_alloc_context() -> *mut AVFormatContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free an AVFormatContext and all its streams.\n @param s context to free"]
     pub fn avformat_free_context(s: *mut AVFormatContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVClass for AVFormatContext. It can be used in combination with\n AV_OPT_SEARCH_FAKE_OBJ for examining options.\n\n @see av_opt_find()."]
     pub fn avformat_get_class() -> *const AVClass;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVClass for AVStream. It can be used in combination with\n AV_OPT_SEARCH_FAKE_OBJ for examining options.\n\n @see av_opt_find()."]
     pub fn av_stream_get_class() -> *const AVClass;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVClass for AVStreamGroup. It can be used in combination with\n AV_OPT_SEARCH_FAKE_OBJ for examining options.\n\n @see av_opt_find()."]
     pub fn av_stream_group_get_class() -> *const AVClass;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return a string identifying the stream group type, or NULL if unknown"]
     pub fn avformat_stream_group_name(
         type_: AVStreamGroupParamsType,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a new empty stream group to a media file.\n\n When demuxing, it may be called by the demuxer in read_header(). If the\n flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also\n be called in read_packet().\n\n When muxing, may be called by the user before avformat_write_header().\n\n User is required to call avformat_free_context() to clean up the allocation\n by avformat_stream_group_create().\n\n New streams can be added to the group with avformat_stream_group_add_stream().\n\n @param s media file handle\n\n @return newly created group or NULL on error.\n @see avformat_new_stream, avformat_stream_group_add_stream."]
     pub fn avformat_stream_group_create(
         s: *mut AVFormatContext,
@@ -16929,21 +16929,21 @@ extern "C" {
         options: *mut *mut AVDictionary,
     ) -> *mut AVStreamGroup;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a new stream to a media file.\n\n When demuxing, it is called by the demuxer in read_header(). If the\n flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also\n be called in read_packet().\n\n When muxing, should be called by the user before avformat_write_header().\n\n User is required to call avformat_free_context() to clean up the allocation\n by avformat_new_stream().\n\n @param s media file handle\n @param c unused, does nothing\n\n @return newly created stream or NULL on error."]
     pub fn avformat_new_stream(s: *mut AVFormatContext, c: *const AVCodec) -> *mut AVStream;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add an already allocated stream to a stream group.\n\n When demuxing, it may be called by the demuxer in read_header(). If the\n flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also\n be called in read_packet().\n\n When muxing, may be called by the user before avformat_write_header() after\n having allocated a new group with avformat_stream_group_create() and stream with\n avformat_new_stream().\n\n User is required to call avformat_free_context() to clean up the allocation\n by avformat_stream_group_add_stream().\n\n @param stg stream group belonging to a media file.\n @param st  stream in the media file to add to the group.\n\n @retval 0                 success\n @retval AVERROR(EEXIST)   the stream was already in the group\n @retval \"another negative error code\" legitimate errors\n\n @see avformat_new_stream, avformat_stream_group_create."]
     pub fn avformat_stream_group_add_stream(
         stg: *mut AVStreamGroup,
         st: *mut AVStream,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_new_program(s: *mut AVFormatContext, id: ::std::os::raw::c_int) -> *mut AVProgram;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVFormatContext for an output format.\n avformat_free_context() can be used to free the context and\n everything allocated by the framework within it.\n\n @param ctx           pointee is set to the created format context,\n                      or to NULL in case of failure\n @param oformat       format to use for allocating the context, if NULL\n                      format_name and filename are used instead\n @param format_name   the name of output format to use for allocating the\n                      context, if NULL filename is used instead\n @param filename      the name of the filename to use for allocating the\n                      context, may be NULL\n\n @return  >= 0 in case of success, a negative AVERROR code in case of\n          failure"]
     pub fn avformat_alloc_output_context2(
         ctx: *mut *mut AVFormatContext,
@@ -16952,18 +16952,18 @@ extern "C" {
         filename: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find AVInputFormat based on the short name of the input format."]
     pub fn av_find_input_format(short_name: *const ::std::os::raw::c_char) -> *const AVInputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Guess the file format.\n\n @param pd        data to be probed\n @param is_opened Whether the file is already opened; determines whether\n                  demuxers with or without AVFMT_NOFILE are probed."]
     pub fn av_probe_input_format(
         pd: *const AVProbeData,
         is_opened: ::std::os::raw::c_int,
     ) -> *const AVInputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Guess the file format.\n\n @param pd        data to be probed\n @param is_opened Whether the file is already opened; determines whether\n                  demuxers with or without AVFMT_NOFILE are probed.\n @param score_max A probe score larger that this is required to accept a\n                  detection, the variable is set to the actual detection\n                  score afterwards.\n                  If the score is <= AVPROBE_SCORE_MAX / 4 it is recommended\n                  to retry with a larger probe buffer."]
     pub fn av_probe_input_format2(
         pd: *const AVProbeData,
@@ -16971,7 +16971,7 @@ extern "C" {
         score_max: *mut ::std::os::raw::c_int,
     ) -> *const AVInputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Guess the file format.\n\n @param is_opened Whether the file is already opened; determines whether\n                  demuxers with or without AVFMT_NOFILE are probed.\n @param score_ret The score of the best detection."]
     pub fn av_probe_input_format3(
         pd: *const AVProbeData,
@@ -16979,7 +16979,7 @@ extern "C" {
         score_ret: *mut ::std::os::raw::c_int,
     ) -> *const AVInputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Probe a bytestream to determine the input format. Each time a probe returns\n with a score that is too low, the probe buffer size is increased and another\n attempt is made. When the maximum probe size is reached, the input format\n with the highest score is returned.\n\n @param pb             the bytestream to probe\n @param fmt            the input format is put here\n @param url            the url of the stream\n @param logctx         the log context\n @param offset         the offset within the bytestream to probe from\n @param max_probe_size the maximum probe buffer size (zero for default)\n\n @return the score in case of success, a negative value corresponding to an\n         the maximal score is AVPROBE_SCORE_MAX\n         AVERROR code otherwise"]
     pub fn av_probe_input_buffer2(
         pb: *mut AVIOContext,
@@ -16990,7 +16990,7 @@ extern "C" {
         max_probe_size: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Like av_probe_input_buffer2() but returns 0 on success"]
     pub fn av_probe_input_buffer(
         pb: *mut AVIOContext,
@@ -17001,7 +17001,7 @@ extern "C" {
         max_probe_size: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Open an input stream and read the header. The codecs are not opened.\n The stream must be closed with avformat_close_input().\n\n @param ps       Pointer to user-supplied AVFormatContext (allocated by\n                 avformat_alloc_context). May be a pointer to NULL, in\n                 which case an AVFormatContext is allocated by this\n                 function and written into ps.\n                 Note that a user-supplied AVFormatContext will be freed\n                 on failure and its pointer set to NULL.\n @param url      URL of the stream to open.\n @param fmt      If non-NULL, this parameter forces a specific input format.\n                 Otherwise the format is autodetected.\n @param options  A dictionary filled with AVFormatContext and demuxer-private\n                 options.\n                 On return this parameter will be destroyed and replaced with\n                 a dict containing options that were not found. May be NULL.\n\n @return 0 on success; on failure: frees ps, sets its pointer to NULL,\n         and returns a negative AVERROR.\n\n @note If you want to use custom IO, preallocate the format context and set its pb field."]
     pub fn avformat_open_input(
         ps: *mut *mut AVFormatContext,
@@ -17010,14 +17010,14 @@ extern "C" {
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read packets of a media file to get stream information. This\n is useful for file formats with no headers such as MPEG. This\n function also computes the real framerate in case of MPEG-2 repeat\n frame mode.\n The logical file position is not changed by this function;\n examined packets may be buffered for later processing.\n\n @param ic media file handle\n @param options  If non-NULL, an ic.nb_streams long array of pointers to\n                 dictionaries, where i-th member contains options for\n                 codec corresponding to i-th stream.\n                 On return each dictionary will be filled with options that were not found.\n @return >=0 if OK, AVERROR_xxx on error\n\n @note this function isn't guaranteed to open all the codecs, so\n       options being non-empty at return is a perfectly normal behavior.\n\n @todo Let the user decide somehow what information is needed so that\n       we do not waste time getting stuff the user does not need."]
     pub fn avformat_find_stream_info(
         ic: *mut AVFormatContext,
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find the programs which belong to a given stream.\n\n @param ic    media file handle\n @param last  the last found program, the search will start after this\n              program, or from the beginning if it is NULL\n @param s     stream index\n\n @return the next program which belongs to s, NULL if no program is found or\n         the last program is not among the programs of ic."]
     pub fn av_find_program_from_stream(
         ic: *mut AVFormatContext,
@@ -17025,14 +17025,14 @@ extern "C" {
         s: ::std::os::raw::c_int,
     ) -> *mut AVProgram;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_program_add_stream_index(
         ac: *mut AVFormatContext,
         progid: ::std::os::raw::c_int,
         idx: ::std::os::raw::c_uint,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find the \"best\" stream in the file.\n The best stream is determined according to various heuristics as the most\n likely to be what the user expects.\n If the decoder parameter is non-NULL, av_find_best_stream will find the\n default decoder for the stream's codec; streams for which no decoder can\n be found are ignored.\n\n @param ic                media file handle\n @param type              stream type: video, audio, subtitles, etc.\n @param wanted_stream_nb  user-requested stream number,\n                          or -1 for automatic selection\n @param related_stream    try to find a stream related (eg. in the same\n                          program) to this one, or -1 if none\n @param decoder_ret       if non-NULL, returns the decoder for the\n                          selected stream\n @param flags             flags; none are currently defined\n\n @return  the non-negative stream number in case of success,\n          AVERROR_STREAM_NOT_FOUND if no stream with the requested type\n          could be found,\n          AVERROR_DECODER_NOT_FOUND if streams were found but no decoder\n\n @note  If av_find_best_stream returns successfully and decoder_ret is not\n        NULL, then *decoder_ret is guaranteed to be set to a valid AVCodec."]
     pub fn av_find_best_stream(
         ic: *mut AVFormatContext,
@@ -17043,11 +17043,11 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the next frame of a stream.\n This function returns what is stored in the file, and does not validate\n that what is there are valid frames for the decoder. It will split what is\n stored in the file into frames and return one for each call. It will not\n omit invalid data between valid frames so as to give the decoder the maximum\n information possible for decoding.\n\n On success, the returned packet is reference-counted (pkt->buf is set) and\n valid indefinitely. The packet must be freed with av_packet_unref() when\n it is no longer needed. For video, the packet contains exactly one frame.\n For audio, it contains an integer number of frames if each frame has\n a known fixed size (e.g. PCM or ADPCM data). If the audio frames have\n a variable size (e.g. MPEG audio), then it contains one frame.\n\n pkt->pts, pkt->dts and pkt->duration are always set to correct\n values in AVStream.time_base units (and guessed if the format cannot\n provide them). pkt->pts can be AV_NOPTS_VALUE if the video format\n has B-frames, so it is better to rely on pkt->dts if you do not\n decompress the payload.\n\n @return 0 if OK, < 0 on error or end of file. On error, pkt will be blank\n         (as if it came from av_packet_alloc()).\n\n @note pkt will be initialized, so it may be uninitialized, but it must not\n       contain data that needs to be freed."]
     pub fn av_read_frame(s: *mut AVFormatContext, pkt: *mut AVPacket) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Seek to the keyframe at timestamp.\n 'timestamp' in 'stream_index'.\n\n @param s            media file handle\n @param stream_index If stream_index is (-1), a default stream is selected,\n                     and timestamp is automatically converted from\n                     AV_TIME_BASE units to the stream specific time_base.\n @param timestamp    Timestamp in AVStream.time_base units or, if no stream\n                     is specified, in AV_TIME_BASE units.\n @param flags        flags which select direction and seeking mode\n\n @return >= 0 on success"]
     pub fn av_seek_frame(
         s: *mut AVFormatContext,
@@ -17056,7 +17056,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Seek to timestamp ts.\n Seeking will be done so that the point from which all active streams\n can be presented successfully will be closest to ts and within min/max_ts.\n Active streams are all streams that have AVStream.discard < AVDISCARD_ALL.\n\n If flags contain AVSEEK_FLAG_BYTE, then all timestamps are in bytes and\n are the file position (this may not be supported by all demuxers).\n If flags contain AVSEEK_FLAG_FRAME, then all timestamps are in frames\n in the stream with stream_index (this may not be supported by all demuxers).\n Otherwise all timestamps are in units of the stream selected by stream_index\n or if stream_index is -1, in AV_TIME_BASE units.\n If flags contain AVSEEK_FLAG_ANY, then non-keyframes are treated as\n keyframes (this may not be supported by all demuxers).\n If flags contain AVSEEK_FLAG_BACKWARD, it is ignored.\n\n @param s            media file handle\n @param stream_index index of the stream which is used as time base reference\n @param min_ts       smallest acceptable timestamp\n @param ts           target timestamp\n @param max_ts       largest acceptable timestamp\n @param flags        flags\n @return >=0 on success, error code otherwise\n\n @note This is part of the new seek API which is still under construction."]
     pub fn avformat_seek_file(
         s: *mut AVFormatContext,
@@ -17067,15 +17067,15 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Discard all internally buffered data. This can be useful when dealing with\n discontinuities in the byte stream. Generally works only with formats that\n can resync. This includes headerless formats like MPEG-TS/TS but should also\n work with NUT, Ogg and in a limited way AVI for example.\n\n The set of streams, the detected duration, stream parameters and codecs do\n not change when calling this function. If you want a complete reset, it's\n better to open a new AVFormatContext.\n\n This does not flush the AVIOContext (s->pb). If necessary, call\n avio_flush(s->pb) before calling this function.\n\n @param s media file handle\n @return >=0 on success, error code otherwise"]
     pub fn avformat_flush(s: *mut AVFormatContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Start playing a network-based stream (e.g. RTSP stream) at the\n current position."]
     pub fn av_read_play(s: *mut AVFormatContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Pause a network-based stream (e.g. RTSP stream).\n\n Use av_read_play() to resume it."]
     pub fn av_read_pause(s: *mut AVFormatContext) -> ::std::os::raw::c_int;
 }
@@ -17170,7 +17170,7 @@ fn bindgen_test_layout_AVRTSPResponse() {
         "Offset of field: AVRTSPResponse::body"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send a command to the demuxer\n\n Sends the specified command and (depending on the command)\n optionally a command-specific payload to the demuxer to handle.\n\n @param s     Format context, must be allocated with\n              ::avformat_alloc_context.\n @param id    Identifier of type ::AVFormatCommandID,\n              indicating the command to send.\n @param data  Command-specific data, allocated by the caller\n              and ownership remains with the caller.\n              For details what is expected here, consult the\n              documentation of the respective ::AVFormatCommandID."]
     pub fn avformat_send_command(
         s: *mut AVFormatContext,
@@ -17178,7 +17178,7 @@ extern "C" {
         data: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Receive a command reply from the demuxer\n\n Retrieves a reply for a previously sent command from the muxer.\n\n @param s         Format context, must be allocated with\n                  ::avformat_alloc_context.\n @param id        Identifier of type ::AVFormatCommandID,\n                  indicating the command for which to retrieve\n                  the reply.\n @param data_out  Pointee is set to the command reply, the actual\n                  type depends on the command. This is allocated by\n                  the muxer and must be freed with ::av_free.\n                  For details on the actual data set here, consult the\n                  documentation of the respective ::AVFormatCommandID."]
     pub fn avformat_receive_command_reply(
         s: *mut AVFormatContext,
@@ -17186,36 +17186,36 @@ extern "C" {
         data_out: *mut *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Close an opened input AVFormatContext. Free it and all its contents\n and set *s to NULL."]
     pub fn avformat_close_input(s: *mut *mut AVFormatContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate the stream private data and write the stream header to\n an output media file.\n\n @param s        Media file handle, must be allocated with\n                 avformat_alloc_context().\n                 Its \\ref AVFormatContext.oformat \"oformat\" field must be set\n                 to the desired output format;\n                 Its \\ref AVFormatContext.pb \"pb\" field must be set to an\n                 already opened ::AVIOContext.\n @param options  An ::AVDictionary filled with AVFormatContext and\n                 muxer-private options.\n                 On return this parameter will be destroyed and replaced with\n                 a dict containing options that were not found. May be NULL.\n\n @retval AVSTREAM_INIT_IN_WRITE_HEADER On success, if the codec had not already been\n                                       fully initialized in avformat_init_output().\n @retval AVSTREAM_INIT_IN_INIT_OUTPUT  On success, if the codec had already been fully\n                                       initialized in avformat_init_output().\n @retval AVERROR                       A negative AVERROR on failure.\n\n @see av_opt_find, av_dict_set, avio_open, av_oformat_next, avformat_init_output."]
     pub fn avformat_write_header(
         s: *mut AVFormatContext,
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate the stream private data and initialize the codec, but do not write the header.\n May optionally be used before avformat_write_header() to initialize stream parameters\n before actually writing the header.\n If using this function, do not pass the same options to avformat_write_header().\n\n @param s        Media file handle, must be allocated with\n                 avformat_alloc_context().\n                 Its \\ref AVFormatContext.oformat \"oformat\" field must be set\n                 to the desired output format;\n                 Its \\ref AVFormatContext.pb \"pb\" field must be set to an\n                 already opened ::AVIOContext.\n @param options  An ::AVDictionary filled with AVFormatContext and\n                 muxer-private options.\n                 On return this parameter will be destroyed and replaced with\n                 a dict containing options that were not found. May be NULL.\n\n @retval AVSTREAM_INIT_IN_WRITE_HEADER On success, if the codec requires\n                                       avformat_write_header to fully initialize.\n @retval AVSTREAM_INIT_IN_INIT_OUTPUT  On success, if the codec has been fully\n                                       initialized.\n @retval AVERROR                       Anegative AVERROR on failure.\n\n @see av_opt_find, av_dict_set, avio_open, av_oformat_next, avformat_write_header."]
     pub fn avformat_init_output(
         s: *mut AVFormatContext,
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write a packet to an output media file.\n\n This function passes the packet directly to the muxer, without any buffering\n or reordering. The caller is responsible for correctly interleaving the\n packets if the format requires it. Callers that want libavformat to handle\n the interleaving should call av_interleaved_write_frame() instead of this\n function.\n\n @param s media file handle\n @param pkt The packet containing the data to be written. Note that unlike\n            av_interleaved_write_frame(), this function does not take\n            ownership of the packet passed to it (though some muxers may make\n            an internal reference to the input packet).\n            <br>\n            This parameter can be NULL (at any time, not just at the end), in\n            order to immediately flush data buffered within the muxer, for\n            muxers that buffer up data internally before writing it to the\n            output.\n            <br>\n            Packet's @ref AVPacket.stream_index \"stream_index\" field must be\n            set to the index of the corresponding stream in @ref\n            AVFormatContext.streams \"s->streams\".\n            <br>\n            The timestamps (@ref AVPacket.pts \"pts\", @ref AVPacket.dts \"dts\")\n            must be set to correct values in the stream's timebase (unless the\n            output format is flagged with the AVFMT_NOTIMESTAMPS flag, then\n            they can be set to AV_NOPTS_VALUE).\n            The dts for subsequent packets passed to this function must be strictly\n            increasing when compared in their respective timebases (unless the\n            output format is flagged with the AVFMT_TS_NONSTRICT, then they\n            merely have to be nondecreasing).  @ref AVPacket.duration\n            \"duration\") should also be set if known.\n @return < 0 on error, = 0 if OK, 1 if flushed and there is no more data to flush\n\n @see av_interleaved_write_frame()"]
     pub fn av_write_frame(s: *mut AVFormatContext, pkt: *mut AVPacket) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write a packet to an output media file ensuring correct interleaving.\n\n This function will buffer the packets internally as needed to make sure the\n packets in the output file are properly interleaved, usually ordered by\n increasing dts. Callers doing their own interleaving should call\n av_write_frame() instead of this function.\n\n Using this function instead of av_write_frame() can give muxers advance\n knowledge of future packets, improving e.g. the behaviour of the mp4\n muxer for VFR content in fragmenting mode.\n\n @param s media file handle\n @param pkt The packet containing the data to be written.\n            <br>\n            If the packet is reference-counted, this function will take\n            ownership of this reference and unreference it later when it sees\n            fit. If the packet is not reference-counted, libavformat will\n            make a copy.\n            The returned packet will be blank (as if returned from\n            av_packet_alloc()), even on error.\n            <br>\n            This parameter can be NULL (at any time, not just at the end), to\n            flush the interleaving queues.\n            <br>\n            Packet's @ref AVPacket.stream_index \"stream_index\" field must be\n            set to the index of the corresponding stream in @ref\n            AVFormatContext.streams \"s->streams\".\n            <br>\n            The timestamps (@ref AVPacket.pts \"pts\", @ref AVPacket.dts \"dts\")\n            must be set to correct values in the stream's timebase (unless the\n            output format is flagged with the AVFMT_NOTIMESTAMPS flag, then\n            they can be set to AV_NOPTS_VALUE).\n            The dts for subsequent packets in one stream must be strictly\n            increasing (unless the output format is flagged with the\n            AVFMT_TS_NONSTRICT, then they merely have to be nondecreasing).\n            @ref AVPacket.duration \"duration\" should also be set if known.\n\n @return 0 on success, a negative AVERROR on error.\n\n @see av_write_frame(), AVFormatContext.max_interleave_delta"]
     pub fn av_interleaved_write_frame(
         s: *mut AVFormatContext,
         pkt: *mut AVPacket,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write an uncoded frame to an output media file.\n\n The frame must be correctly interleaved according to the container\n specification; if not, av_interleaved_write_uncoded_frame() must be used.\n\n See av_interleaved_write_uncoded_frame() for details."]
     pub fn av_write_uncoded_frame(
         s: *mut AVFormatContext,
@@ -17223,7 +17223,7 @@ extern "C" {
         frame: *mut AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write an uncoded frame to an output media file.\n\n If the muxer supports it, this function makes it possible to write an AVFrame\n structure directly, without encoding it into a packet.\n It is mostly useful for devices and similar special muxers that use raw\n video or PCM data and will not serialize it into a byte stream.\n\n To test whether it is possible to use it with a given muxer and stream,\n use av_write_uncoded_frame_query().\n\n The caller gives up ownership of the frame and must not access it\n afterwards.\n\n @return  >=0 for success, a negative code on error"]
     pub fn av_interleaved_write_uncoded_frame(
         s: *mut AVFormatContext,
@@ -17231,18 +17231,18 @@ extern "C" {
         frame: *mut AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Test whether a muxer supports uncoded frame.\n\n @return  >=0 if an uncoded frame can be written to that muxer and stream,\n          <0 if not"]
     pub fn av_write_uncoded_frame_query(
         s: *mut AVFormatContext,
         stream_index: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write the stream trailer to an output media file and free the\n file private data.\n\n May only be called after a successful call to avformat_write_header.\n\n @param s media file handle\n @return 0 if OK, AVERROR_xxx on error"]
     pub fn av_write_trailer(s: *mut AVFormatContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the output format in the list of registered output formats\n which best matches the provided parameters, or return NULL if\n there is no match.\n\n @param short_name if non-NULL checks if short_name matches with the\n                   names of the registered formats\n @param filename   if non-NULL checks if filename terminates with the\n                   extensions of the registered formats\n @param mime_type  if non-NULL checks if mime_type matches with the\n                   MIME type of the registered formats"]
     pub fn av_guess_format(
         short_name: *const ::std::os::raw::c_char,
@@ -17250,7 +17250,7 @@ extern "C" {
         mime_type: *const ::std::os::raw::c_char,
     ) -> *const AVOutputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Guess the codec ID based upon muxer and filename."]
     pub fn av_guess_codec(
         fmt: *const AVOutputFormat,
@@ -17260,7 +17260,7 @@ extern "C" {
         type_: AVMediaType,
     ) -> AVCodecID;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get timing information for the data currently output.\n The exact meaning of \"currently output\" depends on the format.\n It is mostly relevant for devices that have an internal buffer and/or\n work in real time.\n @param s          media file handle\n @param stream     stream in the media file\n @param[out] dts   DTS of the last packet output for the stream, in stream\n                   time_base units\n @param[out] wall  absolute time when that packet whas output,\n                   in microsecond\n @retval  0               Success\n @retval  AVERROR(ENOSYS) The format does not support it\n\n @note Some formats or devices may not allow to measure dts and wall\n       atomically."]
     pub fn av_get_output_timestamp(
         s: *mut AVFormatContext,
@@ -17269,11 +17269,11 @@ extern "C" {
         wall: *mut i64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send a nice hexadecimal dump of a buffer to the specified file stream.\n\n @param f The file stream pointer where the dump should be sent to.\n @param buf buffer\n @param size buffer size\n\n @see av_hex_dump_log, av_pkt_dump2, av_pkt_dump_log2"]
     pub fn av_hex_dump(f: *mut FILE, buf: *const u8, size: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send a nice hexadecimal dump of a buffer to the log.\n\n @param avcl A pointer to an arbitrary struct of which the first field is a\n pointer to an AVClass struct.\n @param level The importance level of the message, lower values signifying\n higher importance.\n @param buf buffer\n @param size buffer size\n\n @see av_hex_dump, av_pkt_dump2, av_pkt_dump_log2"]
     pub fn av_hex_dump_log(
         avcl: *mut ::std::os::raw::c_void,
@@ -17282,7 +17282,7 @@ extern "C" {
         size: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send a nice dump of a packet to the specified file stream.\n\n @param f The file stream pointer where the dump should be sent to.\n @param pkt packet to dump\n @param dump_payload True if the payload must be displayed, too.\n @param st AVStream that the packet belongs to"]
     pub fn av_pkt_dump2(
         f: *mut FILE,
@@ -17291,7 +17291,7 @@ extern "C" {
         st: *const AVStream,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send a nice dump of a packet to the log.\n\n @param avcl A pointer to an arbitrary struct of which the first field is a\n pointer to an AVClass struct.\n @param level The importance level of the message, lower values signifying\n higher importance.\n @param pkt packet to dump\n @param dump_payload True if the payload must be displayed, too.\n @param st AVStream that the packet belongs to"]
     pub fn av_pkt_dump_log2(
         avcl: *mut ::std::os::raw::c_void,
@@ -17301,21 +17301,21 @@ extern "C" {
         st: *const AVStream,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVCodecID for the given codec tag tag.\n If no codec id is found returns AV_CODEC_ID_NONE.\n\n @param tags list of supported codec_id-codec_tag pairs, as stored\n in AVInputFormat.codec_tag and AVOutputFormat.codec_tag\n @param tag  codec tag to match to a codec ID"]
     pub fn av_codec_get_id(
         tags: *const *const AVCodecTag,
         tag: ::std::os::raw::c_uint,
     ) -> AVCodecID;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the codec tag for the given codec id id.\n If no codec tag is found returns 0.\n\n @param tags list of supported codec_id-codec_tag pairs, as stored\n in AVInputFormat.codec_tag and AVOutputFormat.codec_tag\n @param id   codec ID to match to a codec tag"]
     pub fn av_codec_get_tag(
         tags: *const *const AVCodecTag,
         id: AVCodecID,
     ) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the codec tag for the given codec id.\n\n @param tags list of supported codec_id - codec_tag pairs, as stored\n in AVInputFormat.codec_tag and AVOutputFormat.codec_tag\n @param id codec id that should be searched for in the list\n @param tag A pointer to the found tag\n @return 0 if id was not found in tags, > 0 if it was found"]
     pub fn av_codec_get_tag2(
         tags: *const *const AVCodecTag,
@@ -17323,10 +17323,10 @@ extern "C" {
         tag: *mut ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_find_default_stream_index(s: *mut AVFormatContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the index for a specific timestamp.\n\n @param st        stream that the timestamp belongs to\n @param timestamp timestamp to retrieve the index for\n @param flags if AVSEEK_FLAG_BACKWARD then the returned index will correspond\n                 to the timestamp which is <= the requested one, if backward\n                 is 0, then it will be >=\n              if AVSEEK_FLAG_ANY seek to any frame, only keyframes otherwise\n @return < 0 if no such timestamp could be found"]
     pub fn av_index_search_timestamp(
         st: *mut AVStream,
@@ -17334,18 +17334,18 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the index entry count for the given AVStream.\n\n @param st stream\n @return the number of index entries in the stream"]
     pub fn avformat_index_get_entries_count(st: *const AVStream) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVIndexEntry corresponding to the given index.\n\n @param st          Stream containing the requested AVIndexEntry.\n @param idx         The desired index.\n @return A pointer to the requested AVIndexEntry if it exists, NULL otherwise.\n\n @note The pointer returned by this function is only guaranteed to be valid\n       until any function that takes the stream or the parent AVFormatContext\n       as input argument is called."]
     pub fn avformat_index_get_entry(
         st: *mut AVStream,
         idx: ::std::os::raw::c_int,
     ) -> *const AVIndexEntry;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVIndexEntry corresponding to the given timestamp.\n\n @param st          Stream containing the requested AVIndexEntry.\n @param wanted_timestamp   Timestamp to retrieve the index entry for.\n @param flags       If AVSEEK_FLAG_BACKWARD then the returned entry will correspond\n                    to the timestamp which is <= the requested one, if backward\n                    is 0, then it will be >=\n                    if AVSEEK_FLAG_ANY seek to any frame, only keyframes otherwise.\n @return A pointer to the requested AVIndexEntry if it exists, NULL otherwise.\n\n @note The pointer returned by this function is only guaranteed to be valid\n       until any function that takes the stream or the parent AVFormatContext\n       as input argument is called."]
     pub fn avformat_index_get_entry_from_timestamp(
         st: *mut AVStream,
@@ -17353,7 +17353,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> *const AVIndexEntry;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add an index entry into a sorted list. Update the entry if the list\n already contains it.\n\n @param timestamp timestamp in the time base of the given stream"]
     pub fn av_add_index_entry(
         st: *mut AVStream,
@@ -17364,7 +17364,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Split a URL string into components.\n\n The pointers to buffers for storing individual components may be null,\n in order to ignore that component. Buffers for components not found are\n set to empty strings. If the port is not found, it is set to a negative\n value.\n\n @param proto the buffer for the protocol\n @param proto_size the size of the proto buffer\n @param authorization the buffer for the authorization\n @param authorization_size the size of the authorization buffer\n @param hostname the buffer for the host name\n @param hostname_size the size of the hostname buffer\n @param port_ptr a pointer to store the port number in\n @param path the buffer for the path\n @param path_size the size of the path buffer\n @param url the URL to split"]
     pub fn av_url_split(
         proto: *mut ::std::os::raw::c_char,
@@ -17379,7 +17379,7 @@ extern "C" {
         url: *const ::std::os::raw::c_char,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Print detailed information about the input or output format, such as\n duration, bitrate, streams, container, programs, metadata, side data,\n codec and time base.\n\n @param ic        the context to analyze\n @param index     index of the stream to dump information about\n @param url       the URL to print, such as source or destination file\n @param is_output Select whether the specified context is an input(0) or output(1)"]
     pub fn av_dump_format(
         ic: *mut AVFormatContext,
@@ -17388,7 +17388,7 @@ extern "C" {
         is_output: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return in 'buf' the path with '%d' replaced by a number.\n\n Also handles the '%0nd' format where 'n' is the total number\n of digits and '%%'.\n\n @param buf destination buffer\n @param buf_size destination buffer size\n @param path numbered sequence string\n @param number frame number\n @param flags AV_FRAME_FILENAME_FLAGS_*\n @return 0 if OK, -1 on format error"]
     pub fn av_get_frame_filename2(
         buf: *mut ::std::os::raw::c_char,
@@ -17398,7 +17398,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_get_frame_filename(
         buf: *mut ::std::os::raw::c_char,
         buf_size: ::std::os::raw::c_int,
@@ -17406,13 +17406,13 @@ extern "C" {
         number: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check whether filename actually is a numbered sequence generator.\n\n @param filename possible numbered sequence string\n @return 1 if a valid numbered sequence string, 0 otherwise"]
     pub fn av_filename_number_test(
         filename: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Generate an SDP for an RTP session.\n\n Note, this overwrites the id values of AVStreams in the muxer contexts\n for getting unique dynamic payload types.\n\n @param ac array of AVFormatContexts describing the RTP streams. If the\n           array is composed by only one context, such context can contain\n           multiple AVStreams (one AVStream per RTP stream). Otherwise,\n           all the contexts in the array (an AVCodecContext per RTP stream)\n           must contain only one AVStream.\n @param n_files number of AVCodecContexts contained in ac\n @param buf buffer where the SDP will be stored (must be allocated by\n            the caller)\n @param size the size of the buffer\n @return 0 if OK, AVERROR_xxx on error"]
     pub fn av_sdp_create(
         ac: *mut *mut AVFormatContext,
@@ -17421,14 +17421,14 @@ extern "C" {
         size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a positive value if the given filename has one of the given\n extensions, 0 otherwise.\n\n @param filename   file name to check against the given extensions\n @param extensions a comma-separated list of filename extensions"]
     pub fn av_match_ext(
         filename: *const ::std::os::raw::c_char,
         extensions: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Test if the given container can store a codec.\n\n @param ofmt           container to check for compatibility\n @param codec_id       codec to potentially store in container\n @param std_compliance standards compliance level, one of FF_COMPLIANCE_*\n\n @return 1 if codec with ID codec_id can be stored in ofmt, 0 if it cannot.\n         A negative number if this information is not available."]
     pub fn avformat_query_codec(
         ofmt: *const AVOutputFormat,
@@ -17436,7 +17436,7 @@ extern "C" {
         std_compliance: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Make a RFC 4281/6381 like string describing a codec for MIME types.\n\n @param par pointer to an AVCodecParameters struct describing the codec\n @param frame_rate an AVRational for the frame rate, for deciding the\n                   right profile for video codecs. Pass an invalid\n                   AVRational (1/0) to indicate that it is unknown.\n @param out the AVBPrint to write the output to\n @return <0 on error"]
     pub fn av_mime_codec_str(
         par: *const AVCodecParameters,
@@ -17444,23 +17444,23 @@ extern "C" {
         out: *mut AVBPrint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup riff_fourcc RIFF FourCCs\n @{\n Get the tables mapping RIFF FourCCs to libavcodec AVCodecIDs. The tables are\n meant to be passed to av_codec_get_id()/av_codec_get_tag() as in the\n following code:\n @code\n uint32_t tag = MKTAG('H', '2', '6', '4');\n const struct AVCodecTag *table[] = { avformat_get_riff_video_tags(), 0 };\n enum AVCodecID id = av_codec_get_id(table, tag);\n @endcode\n/\n/**\n @return the table mapping RIFF FourCCs for video to libavcodec AVCodecID."]
     pub fn avformat_get_riff_video_tags() -> *const AVCodecTag;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the table mapping RIFF FourCCs for audio to AVCodecID."]
     pub fn avformat_get_riff_audio_tags() -> *const AVCodecTag;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the table mapping MOV FourCCs for video to libavcodec AVCodecID."]
     pub fn avformat_get_mov_video_tags() -> *const AVCodecTag;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the table mapping MOV FourCCs for audio to AVCodecID."]
     pub fn avformat_get_mov_audio_tags() -> *const AVCodecTag;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Guess the sample aspect ratio of a frame, based on both the stream and the\n frame aspect ratio.\n\n Since the frame aspect ratio is set by the codec but the stream aspect ratio\n is set by the demuxer, these two may not be equal. This function tries to\n return the value that you should use if you would like to display the frame.\n\n Basic logic is to use the stream aspect ratio if it is set to something sane\n otherwise use the frame aspect ratio. This way a container setting, which is\n usually easy to modify can override the coded value in the frames.\n\n @param format the format context which the stream is part of\n @param stream the stream which the frame is part of\n @param frame the frame with the aspect ratio to be determined\n @return the guessed (valid) sample_aspect_ratio, 0/1 if no idea"]
     pub fn av_guess_sample_aspect_ratio(
         format: *mut AVFormatContext,
@@ -17468,7 +17468,7 @@ extern "C" {
         frame: *mut AVFrame,
     ) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Guess the frame rate, based on both the container and codec information.\n\n @param ctx the format context which the stream is part of\n @param stream the stream which the frame is part of\n @param frame the frame for which the frame rate should be determined, may be NULL\n @return the guessed (valid) frame rate, 0/1 if no idea"]
     pub fn av_guess_frame_rate(
         ctx: *mut AVFormatContext,
@@ -17476,7 +17476,7 @@ extern "C" {
         frame: *mut AVFrame,
     ) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if the stream st contained in s is matched by the stream specifier\n spec.\n\n See the \"stream specifiers\" chapter in the documentation for the syntax\n of spec.\n\n @return  >0 if st is matched by spec;\n          0  if st is not matched by spec;\n          AVERROR code if spec is invalid\n\n @note  A stream specifier can match several streams in the format."]
     pub fn avformat_match_stream_specifier(
         s: *mut AVFormatContext,
@@ -17484,7 +17484,7 @@ extern "C" {
         spec: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avformat_queue_attached_pictures(s: *mut AVFormatContext) -> ::std::os::raw::c_int;
 }
 pub const AVFMT_TBCF_AUTO: AVTimebaseSource = -1;
@@ -17492,7 +17492,7 @@ pub const AVFMT_TBCF_DECODER: AVTimebaseSource = 0;
 pub const AVFMT_TBCF_DEMUXER: AVTimebaseSource = 1;
 pub const AVFMT_TBCF_R_FRAMERATE: AVTimebaseSource = 2;
 pub type AVTimebaseSource = ::std::os::raw::c_int;
-extern "C" {
+unsafe extern "C" {
     #[doc = " @deprecated do not call this function"]
     pub fn avformat_transfer_internal_stream_timing_info(
         ofmt: *const AVOutputFormat,
@@ -17501,39 +17501,39 @@ extern "C" {
         copy_tb: AVTimebaseSource,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @deprecated do not call this function"]
     pub fn av_stream_get_codec_timebase(st: *const AVStream) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the LIBAVDEVICE_VERSION_INT constant."]
     pub fn avdevice_version() -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavdevice build-time configuration."]
     pub fn avdevice_configuration() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavdevice license."]
     pub fn avdevice_license() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize libavdevice and register all the input and output devices."]
     pub fn avdevice_register_all();
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Audio input devices iterator.\n\n If d is NULL, returns the first registered input audio/video device,\n if d is non-NULL, returns the next registered input audio/video device after d\n or NULL if d is the last one."]
     pub fn av_input_audio_device_next(d: *const AVInputFormat) -> *const AVInputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Video input devices iterator.\n\n If d is NULL, returns the first registered input audio/video device,\n if d is non-NULL, returns the next registered input audio/video device after d\n or NULL if d is the last one."]
     pub fn av_input_video_device_next(d: *const AVInputFormat) -> *const AVInputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Audio output devices iterator.\n\n If d is NULL, returns the first registered output audio/video device,\n if d is non-NULL, returns the next registered output audio/video device after d\n or NULL if d is the last one."]
     pub fn av_output_audio_device_next(d: *const AVOutputFormat) -> *const AVOutputFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Video output devices iterator.\n\n If d is NULL, returns the first registered output audio/video device,\n if d is non-NULL, returns the next registered output audio/video device after d\n or NULL if d is the last one."]
     pub fn av_output_video_device_next(d: *const AVOutputFormat) -> *const AVOutputFormat;
 }
@@ -17634,7 +17634,7 @@ pub const AV_DEV_TO_APP_MUTE_STATE_CHANGED: AVDevToAppMessageType = 1129141588;
 pub const AV_DEV_TO_APP_VOLUME_LEVEL_CHANGED: AVDevToAppMessageType = 1129729868;
 #[doc = " Message types used by avdevice_dev_to_app_control_message()."]
 pub type AVDevToAppMessageType = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send control message from application to device.\n\n @param s         device context.\n @param type      message type.\n @param data      message data. Exact type depends on message type.\n @param data_size size of message data.\n @return >= 0 on success, negative on error.\n         AVERROR(ENOSYS) when device doesn't implement handler of the message."]
     pub fn avdevice_app_to_dev_control_message(
         s: *mut AVFormatContext,
@@ -17643,7 +17643,7 @@ extern "C" {
         data_size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send control message from device to application.\n\n @param s         device context.\n @param type      message type.\n @param data      message data. Can be NULL.\n @param data_size size of message data.\n @return >= 0 on success, negative on error.\n         AVERROR(ENOSYS) when application doesn't implement handler of the message."]
     pub fn avdevice_dev_to_app_control_message(
         s: *mut AVFormatContext,
@@ -17741,18 +17741,18 @@ fn bindgen_test_layout_AVDeviceInfoList() {
         "Offset of field: AVDeviceInfoList::default_device"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " List devices.\n\n Returns available device names and their parameters.\n\n @note: Some devices may accept system-dependent device names that cannot be\n        autodetected. The list returned by this function cannot be assumed to\n        be always completed.\n\n @param s                device context.\n @param[out] device_list list of autodetected devices.\n @return count of autodetected devices, negative on error."]
     pub fn avdevice_list_devices(
         s: *mut AVFormatContext,
         device_list: *mut *mut AVDeviceInfoList,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convenient function to free result of avdevice_list_devices().\n\n @param device_list device list to be freed."]
     pub fn avdevice_free_list_devices(device_list: *mut *mut AVDeviceInfoList);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " List devices.\n\n Returns available device names and their parameters.\n These are convenient wrappers for avdevice_list_devices().\n Device context is allocated and deallocated internally.\n\n @param device           device format. May be NULL if device name is set.\n @param device_name      device name. May be NULL if device format is set.\n @param device_options   An AVDictionary filled with device-private options. May be NULL.\n                         The same options must be passed later to avformat_write_header() for output\n                         devices or avformat_open_input() for input devices, or at any other place\n                         that affects device-private options.\n @param[out] device_list list of autodetected devices\n @return count of autodetected devices, negative on error.\n @note device argument takes precedence over device_name when both are set."]
     pub fn avdevice_list_input_sources(
         device: *const AVInputFormat,
@@ -17761,7 +17761,7 @@ extern "C" {
         device_list: *mut *mut AVDeviceInfoList,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn avdevice_list_output_sinks(
         device: *const AVOutputFormat,
         device_name: *const ::std::os::raw::c_char,
@@ -17769,15 +17769,15 @@ extern "C" {
         device_list: *mut *mut AVDeviceInfoList,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the LIBAVFILTER_VERSION_INT constant."]
     pub fn avfilter_version() -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavfilter build-time configuration."]
     pub fn avfilter_configuration() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libavfilter license."]
     pub fn avfilter_license() -> *const ::std::os::raw::c_char;
 }
@@ -17796,21 +17796,21 @@ pub struct AVFilterFormats {
 pub struct AVFilterChannelLayouts {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the name of an AVFilterPad.\n\n @param pads an array of AVFilterPads\n @param pad_idx index of the pad in the array; it is the caller's\n                responsibility to ensure the index is valid\n\n @return name of the pad_idx'th pad in pads"]
     pub fn avfilter_pad_get_name(
         pads: *const AVFilterPad,
         pad_idx: ::std::os::raw::c_int,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the type of an AVFilterPad.\n\n @param pads an array of AVFilterPads\n @param pad_idx index of the pad in the array; it is the caller's\n                responsibility to ensure the index is valid\n\n @return type of the pad_idx'th pad in pads"]
     pub fn avfilter_pad_get_type(
         pads: *const AVFilterPad,
         pad_idx: ::std::os::raw::c_int,
     ) -> AVMediaType;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the hardware frames context of a filter link.\n\n @param link an AVFilterLink\n\n @return a ref-counted copy of the link's hw_frames_ctx field if there is\n         a hardware frames context associated with the link or NULL otherwise.\n         The returned AVBufferRef needs to be released with av_buffer_unref()\n         when it is no longer used."]
     pub fn avfilter_link_get_hw_frames_ctx(link: *mut AVFilterLink) -> *mut AVBufferRef;
 }
@@ -17939,7 +17939,7 @@ fn bindgen_test_layout_AVFilter() {
         "Offset of field: AVFilter::flags"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the number of elements in an AVFilter's inputs or outputs array."]
     pub fn avfilter_filter_pad_count(
         filter: *const AVFilter,
@@ -18269,7 +18269,7 @@ impl ::std::fmt::Debug for AVFilterLink {
         write ! (f , "AVFilterLink {{ src: {:?}, srcpad: {:?}, dst: {:?}, dstpad: {:?}, type: {:?}, format: {:?}, w: {:?}, h: {:?}, sample_aspect_ratio: {:?}, colorspace: {:?}, color_range: {:?}, sample_rate: {:?}, ch_layout: {:?}, time_base: {:?}, side_data: {:?}, nb_side_data: {:?}, alpha_mode: {:?}, incfg: {:?}, outcfg: {:?} }}" , self . src , self . srcpad , self . dst , self . dstpad , self . type_ , self . format , self . w , self . h , self . sample_aspect_ratio , self . colorspace , self . color_range , self . sample_rate , self . ch_layout , self . time_base , self . side_data , self . nb_side_data , self . alpha_mode , self . incfg , self . outcfg)
     }
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Link two filters together.\n\n @param src    the source filter\n @param srcpad index of the output pad on the source filter\n @param dst    the destination filter\n @param dstpad index of the input pad on the destination filter\n @return       zero on success"]
     pub fn avfilter_link(
         src: *mut AVFilterContext,
@@ -18278,7 +18278,7 @@ extern "C" {
         dstpad: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Make the filter instance process a command.\n It is recommended to use avfilter_graph_send_command()."]
     pub fn avfilter_process_command(
         filter: *mut AVFilterContext,
@@ -18289,33 +18289,33 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all registered filters.\n\n @param opaque a pointer where libavfilter will store the iteration state. Must\n               point to NULL to start the iteration.\n\n @return the next registered filter or NULL when the iteration is\n         finished"]
     pub fn av_filter_iterate(opaque: *mut *mut ::std::os::raw::c_void) -> *const AVFilter;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a filter definition matching the given name.\n\n @param name the filter name to find\n @return     the filter definition, if any matching one is registered.\n             NULL if none found."]
     pub fn avfilter_get_by_name(name: *const ::std::os::raw::c_char) -> *const AVFilter;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a filter with the supplied parameters.\n\n @param ctx  uninitialized filter context to initialize\n @param args Options to initialize the filter with. This must be a\n             ':'-separated list of options in the 'key=value' form.\n             May be NULL if the options have been set directly using the\n             AVOptions API or there are no options that need to be set.\n @return 0 on success, a negative AVERROR on failure"]
     pub fn avfilter_init_str(
         ctx: *mut AVFilterContext,
         args: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a filter with the supplied dictionary of options.\n\n @param ctx     uninitialized filter context to initialize\n @param options An AVDictionary filled with options for this filter. On\n                return this parameter will be destroyed and replaced with\n                a dict containing options that were not found. This dictionary\n                must be freed by the caller.\n                May be NULL, then this function is equivalent to\n                avfilter_init_str() with the second parameter set to NULL.\n @return 0 on success, a negative AVERROR on failure\n\n @note This function and avfilter_init_str() do essentially the same thing,\n the difference is in manner in which the options are passed. It is up to the\n calling code to choose whichever is more preferable. The two functions also\n behave differently when some of the provided options are not declared as\n supported by the filter. In such a case, avfilter_init_str() will fail, but\n this function will leave those extra options in the options AVDictionary and\n continue as usual."]
     pub fn avfilter_init_dict(
         ctx: *mut AVFilterContext,
         options: *mut *mut AVDictionary,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free a filter context. This will also remove the filter from its\n filtergraph's list of filters.\n\n @param filter the filter to free"]
     pub fn avfilter_free(filter: *mut AVFilterContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Insert a filter in the middle of an existing link.\n\n @param link the link into which the filter should be inserted\n @param filt the filter to be inserted\n @param filt_srcpad_idx the input pad on the filter to connect\n @param filt_dstpad_idx the output pad on the filter to connect\n @return     zero on success"]
     pub fn avfilter_insert_filter(
         link: *mut AVFilterLink,
@@ -18324,7 +18324,7 @@ extern "C" {
         filt_dstpad_idx: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return AVClass for AVFilterContext.\n\n @see av_opt_find()."]
     pub fn avfilter_get_class() -> *const AVClass;
 }
@@ -18433,11 +18433,11 @@ fn bindgen_test_layout_AVFilterGraph() {
         "Offset of field: AVFilterGraph::max_buffered_frames"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a filter graph.\n\n @return the allocated filter graph on success or NULL."]
     pub fn avfilter_graph_alloc() -> *mut AVFilterGraph;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create a new filter instance in a filter graph.\n\n @param graph graph in which the new filter will be used\n @param filter the filter to create an instance of\n @param name Name to give to the new instance (will be copied to\n             AVFilterContext.name). This may be used by the caller to identify\n             different filters, libavfilter itself assigns no semantics to\n             this parameter. May be NULL.\n\n @return the context of the newly created filter instance (note that it is\n         also retrievable directly through AVFilterGraph.filters or with\n         avfilter_graph_get_filter()) on success or NULL on failure."]
     pub fn avfilter_graph_alloc_filter(
         graph: *mut AVFilterGraph,
@@ -18445,14 +18445,14 @@ extern "C" {
         name: *const ::std::os::raw::c_char,
     ) -> *mut AVFilterContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a filter instance identified by instance name from graph.\n\n @param graph filter graph to search through.\n @param name filter instance name (should be unique in the graph).\n @return the pointer to the found filter instance or NULL if it\n cannot be found."]
     pub fn avfilter_graph_get_filter(
         graph: *mut AVFilterGraph,
         name: *const ::std::os::raw::c_char,
     ) -> *mut AVFilterContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " A convenience wrapper that allocates and initializes a filter in a single\n step. The filter instance is created from the filter filt and inited with the\n parameter args. opaque is currently ignored.\n\n In case of success put in *filt_ctx the pointer to the created\n filter instance, otherwise set *filt_ctx to NULL.\n\n @param name the instance name to give to the created filter instance\n @param graph_ctx the filter graph\n @return a negative AVERROR error code in case of failure, a non\n negative value otherwise\n\n @warning Since the filter is initialized after this function successfully\n          returns, you MUST NOT set any further options on it. If you need to\n          do that, call ::avfilter_graph_alloc_filter(), followed by setting\n          the options, followed by ::avfilter_init_dict() instead of this\n          function."]
     pub fn avfilter_graph_create_filter(
         filt_ctx: *mut *mut AVFilterContext,
@@ -18463,7 +18463,7 @@ extern "C" {
         graph_ctx: *mut AVFilterGraph,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Enable or disable automatic format conversion inside the graph.\n\n Note that format conversion can still happen inside explicitly inserted\n scale and aresample filters.\n\n @param flags  any of the AVFILTER_AUTO_CONVERT_* constants"]
     pub fn avfilter_graph_set_auto_convert(
         graph: *mut AVFilterGraph,
@@ -18475,14 +18475,14 @@ pub const AVFILTER_AUTO_CONVERT_ALL: _bindgen_ty_6 = 0;
 #[doc = "< all automatic conversions disabled"]
 pub const AVFILTER_AUTO_CONVERT_NONE: _bindgen_ty_6 = -1;
 pub type _bindgen_ty_6 = ::std::os::raw::c_int;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check validity and configure all the links and formats in the graph.\n\n @param graphctx the filter graph\n @param log_ctx context used for logging\n @return >= 0 in case of success, a negative AVERROR code otherwise"]
     pub fn avfilter_graph_config(
         graphctx: *mut AVFilterGraph,
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free a graph, destroy its links, and set *graph to NULL.\n If *graph is NULL, do nothing."]
     pub fn avfilter_graph_free(graph: *mut *mut AVFilterGraph);
 }
@@ -18534,15 +18534,15 @@ fn bindgen_test_layout_AVFilterInOut() {
         "Offset of field: AVFilterInOut::next"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a single AVFilterInOut entry.\n Must be freed with avfilter_inout_free().\n @return allocated AVFilterInOut on success, NULL on failure."]
     pub fn avfilter_inout_alloc() -> *mut AVFilterInOut;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the supplied list of AVFilterInOut and set *inout to NULL.\n If *inout is NULL, do nothing."]
     pub fn avfilter_inout_free(inout: *mut *mut AVFilterInOut);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a graph described by a string to a graph.\n\n @note The caller must provide the lists of inputs and outputs,\n which therefore must be known before calling the function.\n\n @note The inputs parameter describes inputs of the already existing\n part of the graph; i.e. from the point of view of the newly created\n part, they are outputs. Similarly the outputs parameter describes\n outputs of the already existing filters, which are provided as\n inputs to the parsed filters.\n\n @param graph   the filter graph where to link the parsed graph context\n @param filters string to be parsed\n @param inputs  linked list to the inputs of the graph\n @param outputs linked list to the outputs of the graph\n @return zero on success, a negative AVERROR code on error"]
     pub fn avfilter_graph_parse(
         graph: *mut AVFilterGraph,
@@ -18552,7 +18552,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a graph described by a string to a graph.\n\n In the graph filters description, if the input label of the first\n filter is not specified, \"in\" is assumed; if the output label of\n the last filter is not specified, \"out\" is assumed.\n\n @param graph   the filter graph where to link the parsed graph context\n @param filters string to be parsed\n @param inputs  pointer to a linked list to the inputs of the graph, may be NULL.\n                If non-NULL, *inputs is updated to contain the list of open inputs\n                after the parsing, should be freed with avfilter_inout_free().\n @param outputs pointer to a linked list to the outputs of the graph, may be NULL.\n                If non-NULL, *outputs is updated to contain the list of open outputs\n                after the parsing, should be freed with avfilter_inout_free().\n @return non negative on success, a negative AVERROR code on error"]
     pub fn avfilter_graph_parse_ptr(
         graph: *mut AVFilterGraph,
@@ -18562,7 +18562,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a graph described by a string to a graph.\n\n @param[in]  graph   the filter graph where to link the parsed graph context\n @param[in]  filters string to be parsed\n @param[out] inputs  a linked list of all free (unlinked) inputs of the\n                     parsed graph will be returned here. It is to be freed\n                     by the caller using avfilter_inout_free().\n @param[out] outputs a linked list of all free (unlinked) outputs of the\n                     parsed graph will be returned here. It is to be freed by the\n                     caller using avfilter_inout_free().\n @return zero on success, a negative AVERROR code on error\n\n @note This function returns the inputs and outputs that are left\n unlinked after parsing the graph and the caller then deals with\n them.\n @note This function makes no reference whatsoever to already\n existing parts of the graph and the inputs parameter will on return\n contain inputs of the newly parsed part of the graph.  Analogously\n the outputs parameter will contain outputs of the newly created\n filters."]
     pub fn avfilter_graph_parse2(
         graph: *mut AVFilterGraph,
@@ -18749,7 +18749,7 @@ fn bindgen_test_layout_AVFilterGraphSegment() {
         "Offset of field: AVFilterGraphSegment::scale_sws_opts"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse a textual filtergraph description into an intermediate form.\n\n This intermediate representation is intended to be modified by the caller as\n described in the documentation of AVFilterGraphSegment and its children, and\n then applied to the graph either manually or with other\n avfilter_graph_segment_*() functions. See the documentation for\n avfilter_graph_segment_apply() for the canonical way to apply\n AVFilterGraphSegment.\n\n @param graph Filter graph the parsed segment is associated with. Will only be\n              used for logging and similar auxiliary purposes. The graph will\n              not be actually modified by this function - the parsing results\n              are instead stored in seg for further processing.\n @param graph_str a string describing the filtergraph segment\n @param flags reserved for future use, caller must set to 0 for now\n @param seg A pointer to the newly-created AVFilterGraphSegment is written\n            here on success. The graph segment is owned by the caller and must\n            be freed with avfilter_graph_segment_free() before graph itself is\n            freed.\n\n @retval \"non-negative number\" success\n @retval \"negative error code\" failure"]
     pub fn avfilter_graph_segment_parse(
         graph: *mut AVFilterGraph,
@@ -18758,28 +18758,28 @@ extern "C" {
         seg: *mut *mut AVFilterGraphSegment,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Create filters specified in a graph segment.\n\n Walk through the creation-pending AVFilterParams in the segment and create\n new filter instances for them.\n Creation-pending params are those where AVFilterParams.filter_name is\n non-NULL (and hence AVFilterParams.filter is NULL). All other AVFilterParams\n instances are ignored.\n\n For any filter created by this function, the corresponding\n AVFilterParams.filter is set to the newly-created filter context,\n AVFilterParams.filter_name and AVFilterParams.instance_name are freed and set\n to NULL.\n\n @param seg the filtergraph segment to process\n @param flags reserved for future use, caller must set to 0 for now\n\n @retval \"non-negative number\" Success, all creation-pending filters were\n                               successfully created\n @retval AVERROR_FILTER_NOT_FOUND some filter's name did not correspond to a\n                                  known filter\n @retval \"another negative error code\" other failures\n\n @note Calling this function multiple times is safe, as it is idempotent."]
     pub fn avfilter_graph_segment_create_filters(
         seg: *mut AVFilterGraphSegment,
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Apply parsed options to filter instances in a graph segment.\n\n Walk through all filter instances in the graph segment that have option\n dictionaries associated with them and apply those options with\n av_opt_set_dict2(..., AV_OPT_SEARCH_CHILDREN). AVFilterParams.opts is\n replaced by the dictionary output by av_opt_set_dict2(), which should be\n empty (NULL) if all options were successfully applied.\n\n If any options could not be found, this function will continue processing all\n other filters and finally return AVERROR_OPTION_NOT_FOUND (unless another\n error happens). The calling program may then deal with unapplied options as\n it wishes.\n\n Any creation-pending filters (see avfilter_graph_segment_create_filters())\n present in the segment will cause this function to fail. AVFilterParams with\n no associated filter context are simply skipped.\n\n @param seg the filtergraph segment to process\n @param flags reserved for future use, caller must set to 0 for now\n\n @retval \"non-negative number\" Success, all options were successfully applied.\n @retval AVERROR_OPTION_NOT_FOUND some options were not found in a filter\n @retval \"another negative error code\" other failures\n\n @note Calling this function multiple times is safe, as it is idempotent."]
     pub fn avfilter_graph_segment_apply_opts(
         seg: *mut AVFilterGraphSegment,
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize all filter instances in a graph segment.\n\n Walk through all filter instances in the graph segment and call\n avfilter_init_dict(..., NULL) on those that have not been initialized yet.\n\n Any creation-pending filters (see avfilter_graph_segment_create_filters())\n present in the segment will cause this function to fail. AVFilterParams with\n no associated filter context or whose filter context is already initialized,\n are simply skipped.\n\n @param seg the filtergraph segment to process\n @param flags reserved for future use, caller must set to 0 for now\n\n @retval \"non-negative number\" Success, all filter instances were successfully\n                               initialized\n @retval \"negative error code\" failure\n\n @note Calling this function multiple times is safe, as it is idempotent."]
     pub fn avfilter_graph_segment_init(
         seg: *mut AVFilterGraphSegment,
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Link filters in a graph segment.\n\n Walk through all filter instances in the graph segment and try to link all\n unlinked input and output pads. Any creation-pending filters (see\n avfilter_graph_segment_create_filters()) present in the segment will cause\n this function to fail. Disabled filters and already linked pads are skipped.\n\n Every filter output pad that has a corresponding AVFilterPadParams with a\n non-NULL label is\n - linked to the input with the matching label, if one exists;\n - exported in the outputs linked list otherwise, with the label preserved.\n Unlabeled outputs are\n - linked to the first unlinked unlabeled input in the next non-disabled\n   filter in the chain, if one exists\n - exported in the outputs linked list otherwise, with NULL label\n\n Similarly, unlinked input pads are exported in the inputs linked list.\n\n @param seg the filtergraph segment to process\n @param flags reserved for future use, caller must set to 0 for now\n @param[out] inputs  a linked list of all free (unlinked) inputs of the\n                     filters in this graph segment will be returned here. It\n                     is to be freed by the caller using avfilter_inout_free().\n @param[out] outputs a linked list of all free (unlinked) outputs of the\n                     filters in this graph segment will be returned here. It\n                     is to be freed by the caller using avfilter_inout_free().\n\n @retval \"non-negative number\" success\n @retval \"negative error code\" failure\n\n @note Calling this function multiple times is safe, as it is idempotent."]
     pub fn avfilter_graph_segment_link(
         seg: *mut AVFilterGraphSegment,
@@ -18788,7 +18788,7 @@ extern "C" {
         outputs: *mut *mut AVFilterInOut,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Apply all filter/link descriptions from a graph segment to the associated filtergraph.\n\n This functions is currently equivalent to calling the following in sequence:\n - avfilter_graph_segment_create_filters();\n - avfilter_graph_segment_apply_opts();\n - avfilter_graph_segment_init();\n - avfilter_graph_segment_link();\n failing if any of them fails. This list may be extended in the future.\n\n Since the above functions are idempotent, the caller may call some of them\n manually, then do some custom processing on the filtergraph, then call this\n function to do the rest.\n\n @param seg the filtergraph segment to process\n @param flags reserved for future use, caller must set to 0 for now\n @param[out] inputs passed to avfilter_graph_segment_link()\n @param[out] outputs passed to avfilter_graph_segment_link()\n\n @retval \"non-negative number\" success\n @retval \"negative error code\" failure\n\n @note Calling this function multiple times is safe, as it is idempotent."]
     pub fn avfilter_graph_segment_apply(
         seg: *mut AVFilterGraphSegment,
@@ -18797,11 +18797,11 @@ extern "C" {
         outputs: *mut *mut AVFilterInOut,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the provided AVFilterGraphSegment and everything associated with it.\n\n @param seg double pointer to the AVFilterGraphSegment to be freed. NULL will\n be written to this pointer on exit from this function.\n\n @note\n The filter contexts (AVFilterParams.filter) are owned by AVFilterGraph rather\n than AVFilterGraphSegment, so they are not freed."]
     pub fn avfilter_graph_segment_free(seg: *mut *mut AVFilterGraphSegment);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send a command to one or more filter instances.\n\n @param graph  the filter graph\n @param target the filter(s) to which the command should be sent\n               \"all\" sends to all filters\n               otherwise it can be a filter or filter instance name\n               which will send the command to all matching filters.\n @param cmd    the command to send, for handling simplicity all commands must be alphanumeric only\n @param arg    the argument for the command\n @param res    a buffer with size res_size where the filter(s) can return a response.\n\n @returns >=0 on success otherwise an error code.\n              AVERROR(ENOSYS) on unsupported commands"]
     pub fn avfilter_graph_send_command(
         graph: *mut AVFilterGraph,
@@ -18813,7 +18813,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Queue a command for one or more filter instances.\n\n @param graph  the filter graph\n @param target the filter(s) to which the command should be sent\n               \"all\" sends to all filters\n               otherwise it can be a filter or filter instance name\n               which will send the command to all matching filters.\n @param cmd    the command to sent, for handling simplicity all commands must be alphanumeric only\n @param arg    the argument for the command\n @param ts     time at which the command should be sent to the filter\n\n @note As this executes commands after this function returns, no return code\n       from the filter is provided, also AVFILTER_CMD_FLAG_ONE is not supported."]
     pub fn avfilter_graph_queue_command(
         graph: *mut AVFilterGraph,
@@ -18824,18 +18824,18 @@ extern "C" {
         ts: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Dump a graph into a human-readable string representation.\n\n @param graph    the graph to dump\n @param options  formatting options; currently ignored\n @return  a string, or NULL in case of memory allocation failure;\n          the string must be freed using av_free"]
     pub fn avfilter_graph_dump(
         graph: *mut AVFilterGraph,
         options: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Request a frame on the oldest sink link.\n\n If the request returns AVERROR_EOF, try the next.\n\n Note that this function is not meant to be the sole scheduling mechanism\n of a filtergraph, only a convenience function to help drain a filtergraph\n in a balanced way under normal circumstances.\n\n Also note that AVERROR_EOF does not mean that frames did not arrive on\n some of the sinks during the process.\n When there are multiple sink links, in case the requested link\n returns an EOF, this may cause a filter to flush pending frames\n which are sent to another sink link, although unrequested.\n\n @return  the return value of ff_request_frame(),\n          or AVERROR_EOF if all links returned AVERROR_EOF"]
     pub fn avfilter_graph_request_oldest(graph: *mut AVFilterGraph) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a frame with filtered data from sink and put it in frame.\n\n @param ctx    pointer to a buffersink or abuffersink filter context.\n @param frame  pointer to an allocated frame that will be filled with data.\n               The data must be freed using av_frame_unref() / av_frame_free()\n @param flags  a combination of AV_BUFFERSINK_FLAG_* flags\n\n @return  >= 0 in for success, a negative AVERROR code for failure."]
     pub fn av_buffersink_get_frame_flags(
         ctx: *mut AVFilterContext,
@@ -18843,73 +18843,73 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the frame size for an audio buffer sink.\n\n All calls to av_buffersink_get_buffer_ref will return a buffer with\n exactly the specified number of samples, or AVERROR(EAGAIN) if there is\n not enough. The last buffer at EOF will be padded with 0."]
     pub fn av_buffersink_set_frame_size(
         ctx: *mut AVFilterContext,
         frame_size: ::std::os::raw::c_uint,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup lavfi_buffersink_accessors Buffer sink accessors\n Get the properties of the stream\n @{"]
     pub fn av_buffersink_get_type(ctx: *const AVFilterContext) -> AVMediaType;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_time_base(ctx: *const AVFilterContext) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_format(ctx: *const AVFilterContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_frame_rate(ctx: *const AVFilterContext) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_w(ctx: *const AVFilterContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_h(ctx: *const AVFilterContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_sample_aspect_ratio(ctx: *const AVFilterContext) -> AVRational;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_colorspace(ctx: *const AVFilterContext) -> AVColorSpace;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_color_range(ctx: *const AVFilterContext) -> AVColorRange;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_alpha_mode(ctx: *const AVFilterContext) -> AVAlphaMode;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_channels(ctx: *const AVFilterContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_ch_layout(
         ctx: *const AVFilterContext,
         ch_layout: *mut AVChannelLayout,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_sample_rate(ctx: *const AVFilterContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_hw_frames_ctx(ctx: *const AVFilterContext) -> *mut AVBufferRef;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_buffersink_get_side_data(
         ctx: *const AVFilterContext,
         nb_side_data: *mut ::std::os::raw::c_int,
     ) -> *const *const AVFrameSideData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a frame with filtered data from sink and put it in frame.\n\n @param ctx pointer to a context of a buffersink or abuffersink AVFilter.\n @param frame pointer to an allocated frame that will be filled with data.\n              The data must be freed using av_frame_unref() / av_frame_free()\n\n @return\n         - >= 0 if a frame was successfully returned.\n         - AVERROR(EAGAIN) if no frames are available at this point; more\n           input frames must be added to the filtergraph to get more output.\n         - AVERROR_EOF if there will be no more output frames on this sink.\n         - A different negative AVERROR code in other failure cases."]
     pub fn av_buffersink_get_frame(
         ctx: *mut AVFilterContext,
         frame: *mut AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Same as av_buffersink_get_frame(), but with the ability to specify the number\n of samples read. This function is less efficient than\n av_buffersink_get_frame(), because it copies the data around.\n\n @param ctx pointer to a context of the abuffersink AVFilter.\n @param frame pointer to an allocated frame that will be filled with data.\n              The data must be freed using av_frame_unref() / av_frame_free()\n              frame will contain exactly nb_samples audio samples, except at\n              the end of stream, when it can contain less than nb_samples.\n\n @return The return codes have the same meaning as for\n         av_buffersink_get_frame().\n\n @warning do not mix this function with av_buffersink_get_frame(). Use only one or\n the other with a single sink, not both."]
     pub fn av_buffersink_get_samples(
         ctx: *mut AVFilterContext,
@@ -18925,7 +18925,7 @@ pub const AV_BUFFERSRC_FLAG_PUSH: _bindgen_ty_7 = 4;
 pub const AV_BUFFERSRC_FLAG_KEEP_REF: _bindgen_ty_7 = 8;
 #[doc = " @defgroup lavfi_buffersrc Buffer source API\n @ingroup lavfi\n @{"]
 pub type _bindgen_ty_7 = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the number of failed requests.\n\n A failed request is when the request_frame method is called while no\n frame is present in the buffer.\n The number is reset when a frame is added."]
     pub fn av_buffersrc_get_nb_failed_requests(
         buffer_src: *mut AVFilterContext,
@@ -19052,32 +19052,32 @@ impl ::std::fmt::Debug for AVBufferSrcParameters {
         write ! (f , "AVBufferSrcParameters {{ format: {:?}, time_base: {:?}, width: {:?}, height: {:?}, sample_aspect_ratio: {:?}, frame_rate: {:?}, hw_frames_ctx: {:?}, sample_rate: {:?}, ch_layout: {:?}, color_space: {:?}, color_range: {:?}, side_data: {:?}, nb_side_data: {:?}, alpha_mode: {:?} }}" , self . format , self . time_base , self . width , self . height , self . sample_aspect_ratio , self . frame_rate , self . hw_frames_ctx , self . sample_rate , self . ch_layout , self . color_space , self . color_range , self . side_data , self . nb_side_data , self . alpha_mode)
     }
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a new AVBufferSrcParameters instance. It should be freed by the\n caller with av_free()."]
     pub fn av_buffersrc_parameters_alloc() -> *mut AVBufferSrcParameters;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize the buffersrc or abuffersrc filter with the provided parameters.\n This function may be called multiple times, the later calls override the\n previous ones. Some of the parameters may also be set through AVOptions, then\n whatever method is used last takes precedence.\n\n @param ctx an instance of the buffersrc or abuffersrc filter\n @param param the stream parameters. The frames later passed to this filter\n              must conform to those parameters. All the allocated fields in\n              param remain owned by the caller, libavfilter will make internal\n              copies or references when necessary.\n @return 0 on success, a negative AVERROR code on failure."]
     pub fn av_buffersrc_parameters_set(
         ctx: *mut AVFilterContext,
         param: *mut AVBufferSrcParameters,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a frame to the buffer source.\n\n @param ctx   an instance of the buffersrc filter\n @param frame frame to be added. If the frame is reference counted, this\n function will make a new reference to it. Otherwise the frame data will be\n copied.\n\n @return 0 on success, a negative AVERROR on error\n\n This function is equivalent to av_buffersrc_add_frame_flags() with the\n AV_BUFFERSRC_FLAG_KEEP_REF flag."]
     pub fn av_buffersrc_write_frame(
         ctx: *mut AVFilterContext,
         frame: *const AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a frame to the buffer source.\n\n @param ctx   an instance of the buffersrc filter\n @param frame frame to be added. If the frame is reference counted, this\n function will take ownership of the reference(s) and reset the frame.\n Otherwise the frame data will be copied. If this function returns an error,\n the input frame is not touched.\n\n @return 0 on success, a negative AVERROR on error.\n\n @note the difference between this function and av_buffersrc_write_frame() is\n that av_buffersrc_write_frame() creates a new reference to the input frame,\n while this function takes ownership of the reference passed to it.\n\n This function is equivalent to av_buffersrc_add_frame_flags() without the\n AV_BUFFERSRC_FLAG_KEEP_REF flag."]
     pub fn av_buffersrc_add_frame(
         ctx: *mut AVFilterContext,
         frame: *mut AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add a frame to the buffer source.\n\n By default, if the frame is reference-counted, this function will take\n ownership of the reference(s) and reset the frame. This can be controlled\n using the flags.\n\n If this function returns an error, the input frame is not touched.\n\n @param buffer_src  pointer to a buffer source context\n @param frame       a frame, or NULL to mark EOF\n @param flags       a combination of AV_BUFFERSRC_FLAG_*\n @return            >= 0 in case of success, a negative AVERROR code\n                    in case of failure"]
     pub fn av_buffersrc_add_frame_flags(
         buffer_src: *mut AVFilterContext,
@@ -19085,7 +19085,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Close the buffer source after EOF.\n\n This is similar to passing NULL to av_buffersrc_add_frame_flags()\n except it takes the timestamp of the EOF, i.e. the timestamp of the end\n of the last frame."]
     pub fn av_buffersrc_close(
         ctx: *mut AVFilterContext,
@@ -19093,17 +19093,17 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Returns 0 or a negative AVERROR code. Currently, this will only ever\n return AVERROR(EOF), to indicate that the buffer source has been closed,\n either as a result of av_buffersrc_close(), or because the downstream\n filter is no longer accepting new data."]
     pub fn av_buffersrc_get_status(ctx: *mut AVFilterContext) -> ::std::os::raw::c_int;
 }
 #[doc = " @defgroup lavu_adler32 Adler-32\n @ingroup lavu_hash\n Adler-32 hash function implementation.\n\n @{"]
 pub type AVAdler = u32;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Calculate the Adler32 checksum of a buffer.\n\n Passing the return value to a subsequent av_adler32_update() call\n allows the checksum of multiple buffers to be calculated as though\n they were concatenated.\n\n @param adler initial checksum value\n @param buf   pointer to input buffer\n @param len   size of input buffer\n @return      updated checksum"]
     pub fn av_adler32_update(adler: AVAdler, buf: *const u8, len: usize) -> AVAdler;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup lavu_aes AES\n @ingroup lavu_crypto\n @{"]
     pub static av_aes_size: ::std::os::raw::c_int;
 }
@@ -19112,11 +19112,11 @@ extern "C" {
 pub struct AVAES {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVAES context."]
     pub fn av_aes_alloc() -> *mut AVAES;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVAES context.\n\n @param a The AVAES context\n @param key Pointer to the key\n @param key_bits 128, 192 or 256\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_aes_init(
         a: *mut AVAES,
@@ -19125,7 +19125,7 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context.\n\n @param a The AVAES context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 16 byte blocks\n @param iv initialization vector for CBC mode, if NULL then ECB will be used\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_aes_crypt(
         a: *mut AVAES,
@@ -19141,19 +19141,19 @@ extern "C" {
 pub struct AVAESCTR {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVAESCTR context."]
     pub fn av_aes_ctr_alloc() -> *mut AVAESCTR;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVAESCTR context.\n\n @param a The AVAESCTR context to initialize\n @param key encryption key, must have a length of AES_CTR_KEY_SIZE"]
     pub fn av_aes_ctr_init(a: *mut AVAESCTR, key: *const u8) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Release an AVAESCTR context.\n\n @param a The AVAESCTR context"]
     pub fn av_aes_ctr_free(a: *mut AVAESCTR);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Process a buffer using a previously initialized context.\n\n @param a The AVAESCTR context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param size the size of src and dst"]
     pub fn av_aes_ctr_crypt(
         a: *mut AVAESCTR,
@@ -19162,23 +19162,23 @@ extern "C" {
         size: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the current iv"]
     pub fn av_aes_ctr_get_iv(a: *mut AVAESCTR) -> *const u8;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Generate a random iv"]
     pub fn av_aes_ctr_set_random_iv(a: *mut AVAESCTR);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Forcefully change the 8-byte iv"]
     pub fn av_aes_ctr_set_iv(a: *mut AVAESCTR, iv: *const u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Forcefully change the \"full\" 16-byte iv, including the counter"]
     pub fn av_aes_ctr_set_full_iv(a: *mut AVAESCTR, iv: *const u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Increment the top 64 bit of the iv (performed after each frame)"]
     pub fn av_aes_ctr_increment_iv(a: *mut AVAESCTR);
 }
@@ -19224,13 +19224,13 @@ fn bindgen_test_layout_AVAmbientViewingEnvironment() {
         "Offset of field: AVAmbientViewingEnvironment::ambient_light_y"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVAmbientViewingEnvironment structure.\n\n @return the newly allocated struct or NULL on failure"]
     pub fn av_ambient_viewing_environment_alloc(
         size: *mut usize,
     ) -> *mut AVAmbientViewingEnvironment;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and add an AVAmbientViewingEnvironment structure to an existing\n AVFrame as side data.\n\n @return the newly allocated struct, or NULL on failure"]
     pub fn av_ambient_viewing_environment_create_side_data(
         frame: *mut AVFrame,
@@ -19241,11 +19241,11 @@ extern "C" {
 pub struct AVAudioFifo {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free an AVAudioFifo.\n\n @param af  AVAudioFifo to free"]
     pub fn av_audio_fifo_free(af: *mut AVAudioFifo);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVAudioFifo.\n\n @param sample_fmt  sample format\n @param channels    number of channels\n @param nb_samples  initial allocation size, in samples\n @return            newly allocated AVAudioFifo, or NULL on error"]
     pub fn av_audio_fifo_alloc(
         sample_fmt: AVSampleFormat,
@@ -19253,14 +19253,14 @@ extern "C" {
         nb_samples: ::std::os::raw::c_int,
     ) -> *mut AVAudioFifo;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reallocate an AVAudioFifo.\n\n @param af          AVAudioFifo to reallocate\n @param nb_samples  new allocation size, in samples\n @return            0 if OK, or negative AVERROR code on failure"]
     pub fn av_audio_fifo_realloc(
         af: *mut AVAudioFifo,
         nb_samples: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write data to an AVAudioFifo.\n\n The AVAudioFifo will be reallocated automatically if the available space\n is less than nb_samples.\n\n @see enum AVSampleFormat\n The documentation for AVSampleFormat describes the data layout.\n\n @param af          AVAudioFifo to write to\n @param data        audio data plane pointers\n @param nb_samples  number of samples to write\n @return            number of samples actually written, or negative AVERROR\n                    code on failure. If successful, the number of samples\n                    actually written will always be nb_samples."]
     pub fn av_audio_fifo_write(
         af: *mut AVAudioFifo,
@@ -19268,7 +19268,7 @@ extern "C" {
         nb_samples: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Peek data from an AVAudioFifo.\n\n @see enum AVSampleFormat\n The documentation for AVSampleFormat describes the data layout.\n\n @param af          AVAudioFifo to read from\n @param data        audio data plane pointers\n @param nb_samples  number of samples to peek\n @return            number of samples actually peek, or negative AVERROR code\n                    on failure. The number of samples actually peek will not\n                    be greater than nb_samples, and will only be less than\n                    nb_samples if av_audio_fifo_size is less than nb_samples."]
     pub fn av_audio_fifo_peek(
         af: *const AVAudioFifo,
@@ -19276,7 +19276,7 @@ extern "C" {
         nb_samples: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Peek data from an AVAudioFifo.\n\n @see enum AVSampleFormat\n The documentation for AVSampleFormat describes the data layout.\n\n @param af          AVAudioFifo to read from\n @param data        audio data plane pointers\n @param nb_samples  number of samples to peek\n @param offset      offset from current read position\n @return            number of samples actually peek, or negative AVERROR code\n                    on failure. The number of samples actually peek will not\n                    be greater than nb_samples, and will only be less than\n                    nb_samples if av_audio_fifo_size is less than nb_samples."]
     pub fn av_audio_fifo_peek_at(
         af: *const AVAudioFifo,
@@ -19285,7 +19285,7 @@ extern "C" {
         offset: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read data from an AVAudioFifo.\n\n @see enum AVSampleFormat\n The documentation for AVSampleFormat describes the data layout.\n\n @param af          AVAudioFifo to read from\n @param data        audio data plane pointers\n @param nb_samples  number of samples to read\n @return            number of samples actually read, or negative AVERROR code\n                    on failure. The number of samples actually read will not\n                    be greater than nb_samples, and will only be less than\n                    nb_samples if av_audio_fifo_size is less than nb_samples."]
     pub fn av_audio_fifo_read(
         af: *mut AVAudioFifo,
@@ -19293,30 +19293,30 @@ extern "C" {
         nb_samples: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Drain data from an AVAudioFifo.\n\n Removes the data without reading it.\n\n @param af          AVAudioFifo to drain\n @param nb_samples  number of samples to drain\n @return            0 if OK, or negative AVERROR code on failure"]
     pub fn av_audio_fifo_drain(
         af: *mut AVAudioFifo,
         nb_samples: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reset the AVAudioFifo buffer.\n\n This empties all data in the buffer.\n\n @param af  AVAudioFifo to reset"]
     pub fn av_audio_fifo_reset(af: *mut AVAudioFifo);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the current number of samples in the AVAudioFifo available for reading.\n\n @param af  the AVAudioFifo to query\n @return    number of samples available for reading"]
     pub fn av_audio_fifo_size(af: *mut AVAudioFifo) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the current number of samples in the AVAudioFifo available for writing.\n\n @param af  the AVAudioFifo to query\n @return    number of samples available for writing"]
     pub fn av_audio_fifo_space(af: *mut AVAudioFifo) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Assert that floating point operations can be executed.\n\n This will av_assert0() that the cpu is not in MMX state on X86\n @deprecated without replacement"]
     pub fn av_assert0_fpu();
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return non-zero if pfx is a prefix of str. If it is, *ptr is set to\n the address of the first character in str after the prefix.\n\n @param str input string\n @param pfx prefix to test\n @param ptr updated if the prefix is matched inside str\n @return non-zero if the prefix matches, zero otherwise"]
     pub fn av_strstart(
         str_: *const ::std::os::raw::c_char,
@@ -19324,7 +19324,7 @@ extern "C" {
         ptr: *mut *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return non-zero if pfx is a prefix of str independent of case. If\n it is, *ptr is set to the address of the first character in str\n after the prefix.\n\n @param str input string\n @param pfx prefix to test\n @param ptr updated if the prefix is matched inside str\n @return non-zero if the prefix matches, zero otherwise"]
     pub fn av_stristart(
         str_: *const ::std::os::raw::c_char,
@@ -19332,14 +19332,14 @@ extern "C" {
         ptr: *mut *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Locate the first case-independent occurrence in the string haystack\n of the string needle.  A zero-length string needle is considered to\n match at the start of haystack.\n\n This function is a case-insensitive version of the standard strstr().\n\n @param haystack string to search in\n @param needle   string to search for\n @return         pointer to the located match within haystack\n                 or a null pointer if no match"]
     pub fn av_stristr(
         haystack: *const ::std::os::raw::c_char,
         needle: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Locate the first occurrence of the string needle in the string haystack\n where not more than hay_length characters are searched. A zero-length\n string needle is considered to match at the start of haystack.\n\n This function is a length-limited version of the standard strstr().\n\n @param haystack   string to search in\n @param needle     string to search for\n @param hay_length length of string to search in\n @return           pointer to the located match within haystack\n                   or a null pointer if no match"]
     pub fn av_strnstr(
         haystack: *const ::std::os::raw::c_char,
@@ -19347,7 +19347,7 @@ extern "C" {
         hay_length: usize,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy the string src to dst, but no more than size - 1 bytes, and\n null-terminate dst.\n\n This function is the same as BSD strlcpy().\n\n @param dst destination buffer\n @param src source string\n @param size size of destination buffer\n @return the length of src\n\n @warning since the return value is the length of src, src absolutely\n _must_ be a properly 0-terminated string, otherwise this will read beyond\n the end of the buffer and possibly crash."]
     pub fn av_strlcpy(
         dst: *mut ::std::os::raw::c_char,
@@ -19355,7 +19355,7 @@ extern "C" {
         size: usize,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append the string src to the string dst, but to a total length of\n no more than size - 1 bytes, and null-terminate dst.\n\n This function is similar to BSD strlcat(), but differs when\n size <= strlen(dst).\n\n @param dst destination buffer\n @param src source string\n @param size size of destination buffer\n @return the total length of src and dst\n\n @warning since the return value use the length of src and dst, these\n absolutely _must_ be a properly 0-terminated strings, otherwise this\n will read beyond the end of the buffer and possibly crash."]
     pub fn av_strlcat(
         dst: *mut ::std::os::raw::c_char,
@@ -19363,7 +19363,7 @@ extern "C" {
         size: usize,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append output to a string, according to a format. Never write out of\n the destination buffer, and always put a terminating 0 within\n the buffer.\n @param dst destination buffer (string to which the output is\n  appended)\n @param size total size of the destination buffer\n @param fmt printf-compatible format string, specifying how the\n  following parameters are used\n @return the length of the string that would have been generated\n  if enough space had been available"]
     pub fn av_strlcatf(
         dst: *mut ::std::os::raw::c_char,
@@ -19372,18 +19372,18 @@ extern "C" {
         ...
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Print arguments following specified format into a large enough auto\n allocated buffer. It is similar to GNU asprintf().\n @param fmt printf-compatible format string, specifying how the\n            following parameters are used.\n @return the allocated string\n @note You have to free the string yourself with av_free()."]
     pub fn av_asprintf(fmt: *const ::std::os::raw::c_char, ...) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Unescape the given string until a non escaped terminating char,\n and return the token corresponding to the unescaped string.\n\n The normal \\ and ' escaping is supported. Leading and trailing\n whitespaces are removed, unless they are escaped with '\\' or are\n enclosed between ''.\n\n @param buf the buffer to parse, buf will be updated to point to the\n terminating char\n @param term a 0-terminated list of terminating chars\n @return the malloced unescaped string, which must be av_freed by\n the user, NULL in case of allocation failure"]
     pub fn av_get_token(
         buf: *mut *const ::std::os::raw::c_char,
         term: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Split the string into several tokens which can be accessed by\n successive calls to av_strtok().\n\n A token is defined as a sequence of characters not belonging to the\n set specified in delim.\n\n On the first call to av_strtok(), s should point to the string to\n parse, and the value of saveptr is ignored. In subsequent calls, s\n should be NULL, and saveptr should be unchanged since the previous\n call.\n\n This function is similar to strtok_r() defined in POSIX.1.\n\n @param s the string to parse, may be NULL\n @param delim 0-terminated list of token delimiters, must be non-NULL\n @param saveptr user-provided pointer which points to stored\n information necessary for av_strtok() to continue scanning the same\n string. saveptr is updated to point to the next character after the\n first delimiter found, or to NULL if the string was terminated\n @return the found token, or NULL when no token is found"]
     pub fn av_strtok(
         s: *mut ::std::os::raw::c_char,
@@ -19391,14 +19391,14 @@ extern "C" {
         saveptr: *mut *mut ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Locale-independent case-insensitive compare.\n @note This means only ASCII-range characters are case-insensitive"]
     pub fn av_strcasecmp(
         a: *const ::std::os::raw::c_char,
         b: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Locale-independent case-insensitive compare.\n @note This means only ASCII-range characters are case-insensitive"]
     pub fn av_strncasecmp(
         a: *const ::std::os::raw::c_char,
@@ -19406,7 +19406,7 @@ extern "C" {
         n: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Locale-independent strings replace.\n @note This means only ASCII-range characters are replaced."]
     pub fn av_strireplace(
         str_: *const ::std::os::raw::c_char,
@@ -19414,22 +19414,22 @@ extern "C" {
         to: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Thread safe basename.\n @param path the string to parse, on DOS both \\ and / are considered separators.\n @return pointer to the basename substring.\n If path does not contain a slash, the function returns a copy of path.\n If path is a NULL pointer or points to an empty string, a pointer\n to a string \".\" is returned."]
     pub fn av_basename(path: *const ::std::os::raw::c_char) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Thread safe dirname.\n @param path the string to parse, on DOS both \\ and / are considered separators.\n @return A pointer to a string that's the parent directory of path.\n If path is a NULL pointer or points to an empty string, a pointer\n to a string \".\" is returned.\n @note the function may modify the contents of the path, so copies should be passed."]
     pub fn av_dirname(path: *mut ::std::os::raw::c_char) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Match instances of a name in a comma-separated list of names.\n List entries are checked from the start to the end of the names list,\n the first match ends further processing. If an entry prefixed with '-'\n matches, then 0 is returned. The \"ALL\" list entry is considered to\n match all names.\n\n @param name  Name to look for.\n @param names List of names.\n @return 1 on match, 0 otherwise."]
     pub fn av_match_name(
         name: *const ::std::os::raw::c_char,
         names: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append path component to the existing path.\n Path separator '/' is placed between when needed.\n Resulting string have to be freed with av_free().\n @param path      base path\n @param component component to be appended\n @return new path or NULL on error."]
     pub fn av_append_path_component(
         path: *const ::std::os::raw::c_char,
@@ -19445,7 +19445,7 @@ pub const AV_ESCAPE_MODE_QUOTE: AVEscapeMode = 2;
 #[doc = "< Use XML non-markup character data escaping."]
 pub const AV_ESCAPE_MODE_XML: AVEscapeMode = 3;
 pub type AVEscapeMode = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Escape string in src, and put the escaped string in an allocated\n string in *dst, which must be freed with av_free().\n\n @param dst           pointer where an allocated string is put\n @param src           string to escape, must be non-NULL\n @param special_chars string containing the special characters which\n                      need to be escaped, can be NULL\n @param mode          escape mode to employ, see AV_ESCAPE_MODE_* macros.\n                      Any unknown value for mode will be considered equivalent to\n                      AV_ESCAPE_MODE_BACKSLASH, but this behaviour can change without\n                      notice.\n @param flags         flags which control how to escape, see AV_ESCAPE_FLAG_ macros\n @return the length of the allocated string, or a negative error code in case of error\n @see av_bprint_escape()"]
     pub fn av_escape(
         dst: *mut *mut ::std::os::raw::c_char,
@@ -19455,7 +19455,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read and decode a single UTF-8 code point (character) from the\n buffer in *buf, and update *buf to point to the next byte to\n decode.\n\n In case of an invalid byte sequence, the pointer will be updated to\n the next byte after the invalid sequence and the function will\n return an error code.\n\n Depending on the specified flags, the function will also fail in\n case the decoded code point does not belong to a valid range.\n\n @note For speed-relevant code a carefully implemented use of\n GET_UTF8() may be preferred.\n\n @param codep   pointer used to return the parsed code in case of success.\n                The value in *codep is set even in case the range check fails.\n @param bufp    pointer to the address the first byte of the sequence\n                to decode, updated by the function to point to the\n                byte next after the decoded sequence\n @param buf_end pointer to the end of the buffer, points to the next\n                byte past the last in the buffer. This is used to\n                avoid buffer overreads (in case of an unfinished\n                UTF-8 sequence towards the end of the buffer).\n @param flags   a collection of AV_UTF8_FLAG_* flags\n @return >= 0 in case a sequence was successfully read, a negative\n value in case of invalid sequence"]
     pub fn av_utf8_decode(
         codep: *mut i32,
@@ -19464,7 +19464,7 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if a name is in a list.\n @returns 0 if not found, or the 1 based index where it has been found in the\n            list."]
     pub fn av_match_list(
         name: *const ::std::os::raw::c_char,
@@ -19472,7 +19472,7 @@ extern "C" {
         separator: ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " See libc sscanf manual for more information.\n Locale-independent sscanf implementation."]
     pub fn av_sscanf(
         string: *const ::std::os::raw::c_char,
@@ -19480,7 +19480,7 @@ extern "C" {
         ...
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Decode a base64-encoded string.\n\n @param out      buffer for decoded data\n @param in       null-terminated input string\n @param out_size size in bytes of the out buffer, must be at\n                 least 3/4 of the length of in, that is AV_BASE64_DECODE_SIZE(strlen(in))\n @return         number of bytes written, or a negative value in case of\n                 invalid input"]
     pub fn av_base64_decode(
         out: *mut u8,
@@ -19488,7 +19488,7 @@ extern "C" {
         out_size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encode data to base64 and null-terminate.\n\n @param out      buffer for encoded data\n @param out_size size in bytes of the out buffer (including the\n                 null terminator), must be at least AV_BASE64_SIZE(in_size)\n @param in       input buffer containing the data to encode\n @param in_size  size in bytes of the in buffer\n @return         out or NULL in case of error"]
     pub fn av_base64_encode(
         out: *mut ::std::os::raw::c_char,
@@ -19528,15 +19528,15 @@ fn bindgen_test_layout_AVBlowfish() {
         "Offset of field: AVBlowfish::s"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVBlowfish context."]
     pub fn av_blowfish_alloc() -> *mut AVBlowfish;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVBlowfish context.\n\n @param ctx an AVBlowfish context\n @param key a key\n @param key_len length of the key"]
     pub fn av_blowfish_init(ctx: *mut AVBlowfish, key: *const u8, key_len: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context.\n\n @param ctx an AVBlowfish context\n @param xl left four bytes halves of input to be encrypted\n @param xr right four bytes halves of input to be encrypted\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_blowfish_crypt_ecb(
         ctx: *mut AVBlowfish,
@@ -19545,7 +19545,7 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context.\n\n @param ctx an AVBlowfish context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 8 byte blocks\n @param iv initialization vector for CBC mode, if NULL ECB will be used\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_blowfish_crypt(
         ctx: *mut AVBlowfish,
@@ -19671,7 +19671,7 @@ fn bindgen_test_layout_AVBPrint() {
         "Offset of field: AVBPrint::reserved_padding"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Init a print buffer.\n\n @param buf        buffer to init\n @param size_init  initial size (including the final 0)\n @param size_max   maximum size;\n                   - `0` means do not write anything, just count the length\n                   - `1` is replaced by the maximum value for automatic storage\n                       any large value means that the internal buffer will be\n                       reallocated as needed up to that limit\n                   - `-1` is converted to `UINT_MAX`, the largest limit possible.\n                   Check also `AV_BPRINT_SIZE_*` macros."]
     pub fn av_bprint_init(
         buf: *mut AVBPrint,
@@ -19679,7 +19679,7 @@ extern "C" {
         size_max: ::std::os::raw::c_uint,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Init a print buffer using a pre-existing buffer.\n\n The buffer will not be reallocated.\n In case size equals zero, the AVBPrint will be initialized to use\n the internal buffer as if using AV_BPRINT_SIZE_COUNT_ONLY with\n av_bprint_init().\n\n @param buf     buffer structure to init\n @param buffer  byte buffer to use for the string data\n @param size    size of buffer"]
     pub fn av_bprint_init_for_buffer(
         buf: *mut AVBPrint,
@@ -19687,11 +19687,11 @@ extern "C" {
         size: ::std::os::raw::c_uint,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append a formatted string to a print buffer."]
     pub fn av_bprintf(buf: *mut AVBPrint, fmt: *const ::std::os::raw::c_char, ...);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append a formatted string to a print buffer."]
     pub fn av_vbprintf(
         buf: *mut AVBPrint,
@@ -19699,7 +19699,7 @@ extern "C" {
         vl_arg: *mut __va_list_tag,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append char c n times to a print buffer."]
     pub fn av_bprint_chars(
         buf: *mut AVBPrint,
@@ -19707,7 +19707,7 @@ extern "C" {
         n: ::std::os::raw::c_uint,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append data to a print buffer.\n\n @param buf  bprint buffer to use\n @param data pointer to data\n @param size size of data"]
     pub fn av_bprint_append_data(
         buf: *mut AVBPrint,
@@ -19715,7 +19715,7 @@ extern "C" {
         size: ::std::os::raw::c_uint,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Append a formatted date and time to a print buffer.\n\n @param buf  bprint buffer to use\n @param fmt  date and time format string, see strftime()\n @param tm   broken-down time structure to translate\n\n @note due to poor design of the standard strftime function, it may\n produce poor results if the format string expands to a very long text and\n the bprint buffer is near the limit stated by the size_max option."]
     pub fn av_bprint_strftime(
         buf: *mut AVBPrint,
@@ -19723,7 +19723,7 @@ extern "C" {
         tm: *const tm,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate bytes in the buffer for external use.\n\n @param[in]  buf          buffer structure\n @param[in]  size         required size\n @param[out] mem          pointer to the memory area\n @param[out] actual_size  size of the memory area after allocation;\n                          can be larger or smaller than size"]
     pub fn av_bprint_get_buffer(
         buf: *mut AVBPrint,
@@ -19732,18 +19732,18 @@ extern "C" {
         actual_size: *mut ::std::os::raw::c_uint,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Reset the string to \"\" but keep internal allocated data."]
     pub fn av_bprint_clear(buf: *mut AVBPrint);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finalize a print buffer.\n\n The print buffer can no longer be used afterwards,\n but the len and size fields are still valid.\n\n @arg[out] ret_str  if not NULL, used to return a permanent copy of the\n                    buffer contents, or NULL if memory allocation fails;\n                    if NULL, the buffer is discarded and freed\n @return  0 for success or error code (probably AVERROR(ENOMEM))"]
     pub fn av_bprint_finalize(
         buf: *mut AVBPrint,
         ret_str: *mut *mut ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Escape the content in src and append it to dstbuf.\n\n @param dstbuf        already inited destination bprint buffer\n @param src           string containing the text to escape\n @param special_chars string containing the special characters which\n                      need to be escaped, can be NULL\n @param mode          escape mode to employ, see AV_ESCAPE_MODE_* macros.\n                      Any unknown value for mode will be considered equivalent to\n                      AV_ESCAPE_MODE_BACKSLASH, but this behaviour can change without\n                      notice.\n @param flags         flags which control how to escape, see AV_ESCAPE_FLAG_* macros"]
     pub fn av_bprint_escape(
         dstbuf: *mut AVBPrint,
@@ -19753,7 +19753,7 @@ extern "C" {
         flags: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @file\n @brief Public header for libavutil CAMELLIA algorithm\n @defgroup lavu_camellia CAMELLIA\n @ingroup lavu_crypto\n @{"]
     pub static av_camellia_size: ::std::os::raw::c_int;
 }
@@ -19762,11 +19762,11 @@ extern "C" {
 pub struct AVCAMELLIA {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVCAMELLIA context\n To free the struct: av_free(ptr)"]
     pub fn av_camellia_alloc() -> *mut AVCAMELLIA;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVCAMELLIA context.\n\n @param ctx an AVCAMELLIA context\n @param key a key of 16, 24, 32 bytes used for encryption/decryption\n @param key_bits number of keybits: possible are 128, 192, 256"]
     pub fn av_camellia_init(
         ctx: *mut AVCAMELLIA,
@@ -19774,7 +19774,7 @@ extern "C" {
         key_bits: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context\n\n @param ctx an AVCAMELLIA context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 16 byte blocks\n @param iv initialization vector for CBC mode, NULL for ECB mode\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_camellia_crypt(
         ctx: *mut AVCAMELLIA,
@@ -19785,7 +19785,7 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @file\n @brief Public header for libavutil CAST5 algorithm\n @defgroup lavu_cast5 CAST5\n @ingroup lavu_crypto\n @{"]
     pub static av_cast5_size: ::std::os::raw::c_int;
 }
@@ -19794,11 +19794,11 @@ extern "C" {
 pub struct AVCAST5 {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVCAST5 context\n To free the struct: av_free(ptr)"]
     pub fn av_cast5_alloc() -> *mut AVCAST5;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVCAST5 context.\n\n @param ctx an AVCAST5 context\n @param key a key of 5,6,...16 bytes used for encryption/decryption\n @param key_bits number of keybits: possible are 40,48,...,128\n @return 0 on success, less than 0 on failure"]
     pub fn av_cast5_init(
         ctx: *mut AVCAST5,
@@ -19806,7 +19806,7 @@ extern "C" {
         key_bits: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context, ECB mode only\n\n @param ctx an AVCAST5 context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 8 byte blocks\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_cast5_crypt(
         ctx: *mut AVCAST5,
@@ -19816,7 +19816,7 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context\n\n @param ctx an AVCAST5 context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 8 byte blocks\n @param iv initialization vector for CBC mode, NULL for ECB mode\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_cast5_crypt2(
         ctx: *mut AVCAST5,
@@ -19827,30 +19827,30 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the flags which specify extensions supported by the CPU.\n The returned value is affected by av_force_cpu_flags() if that was used\n before. So av_get_cpu_flags() can easily be used in an application to\n detect the enabled cpu flags."]
     pub fn av_get_cpu_flags() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Disables cpu detection and forces the specified flags.\n -1 is a special case that disables forcing of specific flags."]
     pub fn av_force_cpu_flags(flags: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse CPU caps from a string and update the given AV_CPU_* flags based on that.\n\n @return negative on error."]
     pub fn av_parse_cpu_caps(
         flags: *mut ::std::os::raw::c_uint,
         s: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the number of logical CPU cores present."]
     pub fn av_cpu_count() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Overrides cpu count detection and forces the specified count.\n Count < 1 disables forcing of specific count."]
     pub fn av_cpu_force_count(count: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the maximum data alignment that may be required by FFmpeg.\n\n Note that this is affected by the build configuration and the CPU flags mask,\n so e.g. if the CPU supports AVX, but libavutil has been built with\n --disable-avx or the AV_CPU_FLAG_AVX flag has been disabled through\n  av_set_cpu_flags_mask(), then this function will behave as if AVX is not\n  present."]
     pub fn av_cpu_max_align() -> usize;
 }
@@ -19866,7 +19866,7 @@ pub const AV_CRC_24_IEEE: AVCRCId = 6;
 pub const AV_CRC_8_EBU: AVCRCId = 7;
 pub const AV_CRC_MAX: AVCRCId = 8;
 pub type AVCRCId = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a CRC table.\n @param ctx must be an array of size sizeof(AVCRC)*257 or sizeof(AVCRC)*1024\n @param le If 1, the lowest bit represents the coefficient for the highest\n           exponent of the corresponding polynomial (both for poly and\n           actual CRC).\n           If 0, you must swap the CRC parameter and the result of av_crc\n           if you need the standard representation (can be simplified in\n           most cases to e.g. bswap16):\n           av_bswap32(crc << (32-bits))\n @param bits number of bits for the CRC\n @param poly generator polynomial without the x**bits coefficient, in the\n             representation as specified by le\n @param ctx_size size of ctx in bytes\n @return <0 on failure"]
     pub fn av_crc_init(
         ctx: *mut AVCRC,
@@ -19876,11 +19876,11 @@ extern "C" {
         ctx_size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get an initialized standard CRC table.\n @param crc_id ID of a standard CRC\n @return a pointer to the CRC table or NULL on failure"]
     pub fn av_crc_get_table(crc_id: AVCRCId) -> *const AVCRC;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Calculate the CRC of a block.\n @param ctx initialized AVCRC array (see av_crc_init())\n @param crc CRC of previous blocks if any or initial value for CRC\n @param buffer buffer whose CRC to calculate\n @param length length of the buffer\n @return CRC updated with the data from the given block\n\n @see av_crc_init() \"le\" parameter"]
     pub fn av_crc(ctx: *const AVCRC, crc: u32, buffer: *const u8, length: usize) -> u32;
 }
@@ -20025,42 +20025,42 @@ fn bindgen_test_layout_AVColorPrimariesDesc() {
 }
 #[doc = " Function pointer representing a double -> double transfer function that\n performs either an OETF transfer function, or alternatively an inverse EOTF\n function (in particular, for SMPTE ST 2084 / PQ). This function inputs\n linear light, and outputs gamma encoded light.\n\n See ITU-T H.273 for more information."]
 pub type av_csp_trc_function = ::std::option::Option<unsafe extern "C" fn(arg1: f64) -> f64>;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Retrieves the Luma coefficients necessary to construct a conversion matrix\n from an enum constant describing the colorspace.\n @param csp An enum constant indicating YUV or similar colorspace.\n @return The Luma coefficients associated with that colorspace, or NULL\n     if the constant is unknown to libavutil."]
     pub fn av_csp_luma_coeffs_from_avcsp(csp: AVColorSpace) -> *const AVLumaCoefficients;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Retrieves a complete gamut description from an enum constant describing the\n color primaries.\n @param prm An enum constant indicating primaries\n @return A description of the colorspace gamut associated with that enum\n     constant, or NULL if the constant is unknown to libavutil."]
     pub fn av_csp_primaries_desc_from_id(prm: AVColorPrimaries) -> *const AVColorPrimariesDesc;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Detects which enum AVColorPrimaries constant corresponds to the given complete\n gamut description.\n @see enum AVColorPrimaries\n @param prm A description of the colorspace gamut\n @return The enum constant associated with this gamut, or\n     AVCOL_PRI_UNSPECIFIED if no clear match can be identified."]
     pub fn av_csp_primaries_id_from_desc(prm: *const AVColorPrimariesDesc) -> AVColorPrimaries;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Determine a suitable 'gamma' value to match the supplied\n AVColorTransferCharacteristic.\n\n See Apple Technical Note TN2257 (https://developer.apple.com/library/mac/technotes/tn2257/_index.html)\n\n This function returns the gamma exponent for the OETF. For example, sRGB is approximated\n by gamma 2.2, not by gamma 0.45455.\n\n @return Will return an approximation to the simple gamma function matching\n         the supplied Transfer Characteristic, Will return 0.0 for any\n         we cannot reasonably match against."]
     pub fn av_csp_approximate_trc_gamma(trc: AVColorTransferCharacteristic) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Determine a suitable EOTF 'gamma' value to match the supplied\n AVColorTransferCharacteristic.\n\n This function returns the gamma value (exponent) for a simple pure power\n function approximation of the supplied AVColorTransferCharacteristic, or 0.\n if no reasonable approximation exists.\n\n EOTF(v) = (L_w - L_b) * v^gamma + L_b\n\n @return Will return an approximation to the simple gamma function matching\n         the supplied Transfer Characteristic EOTF, Will return 0.0 for any\n         we cannot reasonably match against."]
     pub fn av_csp_approximate_eotf_gamma(trc: AVColorTransferCharacteristic) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Determine the function needed to apply the given\n AVColorTransferCharacteristic to linear input.\n\n The function returned should expect a nominal domain and range of [0.0-1.0]\n values outside of this range maybe valid depending on the chosen\n characteristic function.\n\n @return Will return pointer to the function matching the\n         supplied Transfer Characteristic. If unspecified will\n         return NULL:"]
     pub fn av_csp_trc_func_from_id(trc: AVColorTransferCharacteristic) -> av_csp_trc_function;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Returns the mathematical inverse of the corresponding TRC function."]
     pub fn av_csp_trc_func_inv_from_id(trc: AVColorTransferCharacteristic) -> av_csp_trc_function;
 }
 #[doc = " Function pointer representing an ITU EOTF transfer for a given reference\n display configuration.\n\n @param Lw The white point luminance of the display, in nits (cd/m^2).\n @param Lb The black point luminance of the display, in nits (cd/m^2)."]
 pub type av_csp_eotf_function =
     ::std::option::Option<unsafe extern "C" fn(Lw: f64, Lb: f64, c: *mut f64)>;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Returns the ITU EOTF corresponding to a given TRC. This converts from the\n signal level [0,1] to the raw output display luminance in nits (cd/m^2).\n This is done per channel in RGB space, except for AVCOL_TRC_SMPTE428, which\n assumes CIE XYZ in- and output.\n\n @return A pointer to the function implementing the given TRC, or NULL if no\n         such function is defined.\n\n @note In general, the resulting function is defined (wherever possible) for\n       out-of-range values, even though these values do not have a physical\n       meaning on the given display. Users should clamp inputs (or outputs)\n       if this behavior is not desired.\n\n       This is also the case for functions like PQ, which are defined over an\n       absolute signal range independent of the target display capabilities."]
     pub fn av_csp_itu_eotf(trc: AVColorTransferCharacteristic) -> av_csp_eotf_function;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Returns the mathematical inverse of the corresponding EOTF."]
     pub fn av_csp_itu_eotf_inv(trc: AVColorTransferCharacteristic) -> av_csp_eotf_function;
 }
@@ -20092,11 +20092,11 @@ fn bindgen_test_layout_AVDES() {
         "Offset of field: AVDES::triple_des"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVDES context."]
     pub fn av_des_alloc() -> *mut AVDES;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @brief Initializes an AVDES context.\n\n @param d pointer to a AVDES structure to initialize\n @param key pointer to the key to use\n @param key_bits must be 64 or 192\n @param decrypt 0 for encryption/CBC-MAC, 1 for decryption\n @return zero on success, negative value otherwise"]
     pub fn av_des_init(
         d: *mut AVDES,
@@ -20105,7 +20105,7 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @brief Encrypts / decrypts using the DES algorithm.\n\n @param d pointer to the AVDES structure\n @param dst destination array, can be equal to src, must be 8-byte aligned\n @param src source array, can be equal to dst, must be 8-byte aligned, may be NULL\n @param count number of 8 byte blocks\n @param iv initialization vector for CBC mode, if NULL then ECB will be used,\n           must be 8-byte aligned\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_des_crypt(
         d: *mut AVDES,
@@ -20116,7 +20116,7 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @brief Calculates CBC-MAC using the DES algorithm.\n\n @param d pointer to the AVDES structure\n @param dst destination array, can be equal to src, must be 8-byte aligned\n @param src source array, can be equal to dst, must be 8-byte aligned, may be NULL\n @param count number of 8 byte blocks"]
     pub fn av_des_mac(d: *mut AVDES, dst: *mut u8, src: *const u8, count: ::std::os::raw::c_int);
 }
@@ -20243,29 +20243,29 @@ fn bindgen_test_layout_AVDetectionBBoxHeader() {
         "Offset of field: AVDetectionBBoxHeader::bbox_size"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates memory for AVDetectionBBoxHeader, plus an array of {@code nb_bboxes}\n AVDetectionBBox, and initializes the variables.\n Can be freed with a normal av_free() call.\n\n @param nb_bboxes number of AVDetectionBBox structures to allocate\n @param out_size if non-NULL, the size in bytes of the resulting data array is\n written here."]
     pub fn av_detection_bbox_alloc(
         nb_bboxes: u32,
         out_size: *mut usize,
     ) -> *mut AVDetectionBBoxHeader;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates memory for AVDetectionBBoxHeader, plus an array of {@code nb_bboxes}\n AVDetectionBBox, in the given AVFrame {@code frame} as AVFrameSideData of type\n AV_FRAME_DATA_DETECTION_BBOXES and initializes the variables."]
     pub fn av_detection_bbox_create_side_data(
         frame: *mut AVFrame,
         nb_bboxes: u32,
     ) -> *mut AVDetectionBBoxHeader;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Extract the rotation component of the transformation matrix.\n\n @param matrix the transformation matrix\n @return the angle (in degrees) by which the transformation rotates the frame\n         counterclockwise. The angle will be in range [-180.0, 180.0],\n         or NaN if the matrix is singular.\n\n @note floating point numbers are inherently inexact, so callers are\n       recommended to round the return value to nearest integer before use."]
     pub fn av_display_rotation_get(matrix: *const i32) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a transformation matrix describing a pure clockwise\n rotation by the specified angle (in degrees).\n\n @param[out] matrix a transformation matrix (will be fully overwritten\n                    by this function)\n @param angle rotation angle in degrees."]
     pub fn av_display_rotation_set(matrix: *mut i32, angle: f64);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Flip the input matrix horizontally and/or vertically.\n\n @param[in,out] matrix a transformation matrix\n @param hflip whether the matrix should be flipped horizontally\n @param vflip whether the matrix should be flipped vertically"]
     pub fn av_display_matrix_flip(
         matrix: *mut i32,
@@ -20354,7 +20354,7 @@ pub const AV_DOVI_COMPRESSION_LIMITED: AVDOVICompression = 1;
 pub const AV_DOVI_COMPRESSION_RESERVED: AVDOVICompression = 2;
 pub const AV_DOVI_COMPRESSION_EXTENDED: AVDOVICompression = 3;
 pub type AVDOVICompression = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a AVDOVIDecoderConfigurationRecord structure and initialize its\n fields to default values.\n\n @return the newly allocated struct or NULL on failure"]
     pub fn av_dovi_alloc(size: *mut usize) -> *mut AVDOVIDecoderConfigurationRecord;
 }
@@ -21544,11 +21544,11 @@ fn bindgen_test_layout_AVDOVIMetadata() {
         "Offset of field: AVDOVIMetadata::num_ext_blocks"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find an extension block with a given level, or NULL. In the case of\n multiple extension blocks, only the first is returned."]
     pub fn av_dovi_find_level(data: *const AVDOVIMetadata, level: u8) -> *mut AVDOVIDmData;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVDOVIMetadata structure and initialize its\n fields to default values.\n\n @param size If this parameter is non-NULL, the size in bytes of the\n             allocated struct will be written here on success\n\n @return the newly allocated struct or NULL on failure"]
     pub fn av_dovi_metadata_alloc(size: *mut usize) -> *mut AVDOVIMetadata;
 }
@@ -21626,7 +21626,7 @@ fn bindgen_test_layout_AVDownmixInfo() {
         "Offset of field: AVDownmixInfo::lfe_mix_level"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a frame's AV_FRAME_DATA_DOWNMIX_INFO side data for editing.\n\n If the side data is absent, it is created and added to the frame.\n\n @param frame the frame for which the side data is to be obtained or created\n\n @return the AVDownmixInfo structure to be edited by the caller, or NULL if\n         the structure cannot be allocated."]
     pub fn av_downmix_info_update_side_data(frame: *mut AVFrame) -> *mut AVDownmixInfo;
 }
@@ -21818,7 +21818,7 @@ fn bindgen_test_layout_AVEncryptionInitInfo() {
         "Offset of field: AVEncryptionInitInfo::next"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates an AVEncryptionInfo structure and sub-pointers to hold the given\n number of subsamples.  This will allocate pointers for the key ID, IV,\n and subsample entries, set the size members, and zero-initialize the rest.\n\n @param subsample_count The number of subsamples.\n @param key_id_size The number of bytes in the key ID, should be 16.\n @param iv_size The number of bytes in the IV, should be 16.\n\n @return The new AVEncryptionInfo structure, or NULL on error."]
     pub fn av_encryption_info_alloc(
         subsample_count: u32,
@@ -21826,29 +21826,29 @@ extern "C" {
         iv_size: u32,
     ) -> *mut AVEncryptionInfo;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates an AVEncryptionInfo structure with a copy of the given data.\n @return The new AVEncryptionInfo structure, or NULL on error."]
     pub fn av_encryption_info_clone(info: *const AVEncryptionInfo) -> *mut AVEncryptionInfo;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Frees the given encryption info object.  This MUST NOT be used to free the\n side-data data pointer, that should use normal side-data methods."]
     pub fn av_encryption_info_free(info: *mut AVEncryptionInfo);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Creates a copy of the AVEncryptionInfo that is contained in the given side\n data.  The resulting object should be passed to av_encryption_info_free()\n when done.\n\n @return The new AVEncryptionInfo structure, or NULL on error."]
     pub fn av_encryption_info_get_side_data(
         side_data: *const u8,
         side_data_size: usize,
     ) -> *mut AVEncryptionInfo;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates and initializes side data that holds a copy of the given encryption\n info.  The resulting pointer should be either freed using av_free or given\n to av_packet_add_side_data().\n\n @return The new side-data pointer, or NULL."]
     pub fn av_encryption_info_add_side_data(
         info: *const AVEncryptionInfo,
         side_data_size: *mut usize,
     ) -> *mut u8;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates an AVEncryptionInitInfo structure and sub-pointers to hold the\n given sizes.  This will allocate pointers and set all the fields.\n\n @return The new AVEncryptionInitInfo structure, or NULL on error."]
     pub fn av_encryption_init_info_alloc(
         system_id_size: u32,
@@ -21857,18 +21857,18 @@ extern "C" {
         data_size: u32,
     ) -> *mut AVEncryptionInitInfo;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Frees the given encryption init info object.  This MUST NOT be used to free\n the side-data data pointer, that should use normal side-data methods."]
     pub fn av_encryption_init_info_free(info: *mut AVEncryptionInitInfo);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Creates a copy of the AVEncryptionInitInfo that is contained in the given\n side data.  The resulting object should be passed to\n av_encryption_init_info_free() when done.\n\n @return The new AVEncryptionInitInfo structure, or NULL on error."]
     pub fn av_encryption_init_info_get_side_data(
         side_data: *const u8,
         side_data_size: usize,
     ) -> *mut AVEncryptionInitInfo;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates and initializes side data that holds a copy of the given encryption\n init info.  The resulting pointer should be either freed using av_free or\n given to av_packet_add_side_data().\n\n @return The new side-data pointer, or NULL."]
     pub fn av_encryption_init_info_add_side_data(
         info: *const AVEncryptionInitInfo,
@@ -21880,7 +21880,7 @@ extern "C" {
 pub struct AVExpr {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse and evaluate an expression.\n Note, this is significantly slower than av_expr_eval().\n\n @param res a pointer to a double where is put the result value of\n the expression, or NAN in case of error\n @param s expression as a zero terminated string, for example \"1+2^3+5*5+sin(2/3)\"\n @param const_names NULL terminated array of zero terminated strings of constant identifiers, for example {\"PI\", \"E\", 0}\n @param const_values a zero terminated array of values for the identifiers from const_names\n @param func1_names NULL terminated array of zero terminated strings of funcs1 identifiers\n @param funcs1 NULL terminated array of function pointers for functions which take 1 argument\n @param func2_names NULL terminated array of zero terminated strings of funcs2 identifiers\n @param funcs2 NULL terminated array of function pointers for functions which take 2 arguments\n @param opaque a pointer which will be passed to all functions from funcs1 and funcs2\n @param log_offset log level offset, can be used to silence error messages\n @param log_ctx parent logging context\n @return >= 0 in case of success, a negative value corresponding to an\n AVERROR code otherwise"]
     pub fn av_expr_parse_and_eval(
         res: *mut f64,
@@ -21900,7 +21900,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse an expression.\n\n @param expr a pointer where is put an AVExpr containing the parsed\n value in case of successful parsing, or NULL otherwise.\n The pointed to AVExpr must be freed with av_expr_free() by the user\n when it is not needed anymore.\n @param s expression as a zero terminated string, for example \"1+2^3+5*5+sin(2/3)\"\n @param const_names NULL terminated array of zero terminated strings of constant identifiers, for example {\"PI\", \"E\", 0}\n @param func1_names NULL terminated array of zero terminated strings of funcs1 identifiers\n @param funcs1 NULL terminated array of function pointers for functions which take 1 argument\n @param func2_names NULL terminated array of zero terminated strings of funcs2 identifiers\n @param funcs2 NULL terminated array of function pointers for functions which take 2 arguments\n @param log_offset log level offset, can be used to silence error messages\n @param log_ctx parent logging context\n @return >= 0 in case of success, a negative value corresponding to an\n AVERROR code otherwise"]
     pub fn av_expr_parse(
         expr: *mut *mut AVExpr,
@@ -21918,7 +21918,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Evaluate a previously parsed expression.\n\n @param e the AVExpr to evaluate\n @param const_values a zero terminated array of values for the identifiers from av_expr_parse() const_names\n @param opaque a pointer which will be passed to all functions from funcs1 and funcs2\n @return the value of the expression"]
     pub fn av_expr_eval(
         e: *mut AVExpr,
@@ -21926,7 +21926,7 @@ extern "C" {
         opaque: *mut ::std::os::raw::c_void,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Track the presence of variables and their number of occurrences in a parsed expression\n\n @param e the AVExpr to track variables in\n @param counter a zero-initialized array where the count of each variable will be stored\n @param size size of array\n @return 0 on success, a negative value indicates that no expression or array was passed\n or size was zero"]
     pub fn av_expr_count_vars(
         e: *mut AVExpr,
@@ -21934,7 +21934,7 @@ extern "C" {
         size: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Track the presence of user provided functions and their number of occurrences\n in a parsed expression.\n\n @param e the AVExpr to track user provided functions in\n @param counter a zero-initialized array where the count of each function will be stored\n                if you passed 5 functions with 2 arguments to av_expr_parse()\n                then for arg=2 this will use up to 5 entries.\n @param size size of array\n @param arg number of arguments the counted functions have\n @return 0 on success, a negative value indicates that no expression or array was passed\n or size was zero"]
     pub fn av_expr_count_func(
         e: *mut AVExpr,
@@ -21943,11 +21943,11 @@ extern "C" {
         arg: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free a parsed expression previously created with av_expr_parse()."]
     pub fn av_expr_free(e: *mut AVExpr);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse the string in numstr and return its value as a double. If\n the string is empty, contains only whitespaces, or does not contain\n an initial substring that has the expected syntax for a\n floating-point number, no conversion is performed. In this case,\n returns a value of zero and the value returned in tail is the value\n of numstr.\n\n @param numstr a string representing a number, may contain one of\n the International System number postfixes, for example 'K', 'M',\n 'G'. If 'i' is appended after the postfix, powers of 2 are used\n instead of powers of 10. The 'B' postfix multiplies the value by\n 8, and can be appended after another postfix or used alone. This\n allows using for example 'KB', 'MiB', 'G' and 'B' as postfix.\n @param tail if non-NULL puts here the pointer to the char next\n after the last parsed character"]
     pub fn av_strtod(
         numstr: *const ::std::os::raw::c_char,
@@ -22042,18 +22042,18 @@ fn bindgen_test_layout_AVTaskCallbacks() {
         "Offset of field: AVTaskCallbacks::run"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Alloc executor\n @param callbacks callback structure for executor\n @param thread_count worker thread number, 0 for run on caller's thread directly\n @return return the executor"]
     pub fn av_executor_alloc(
         callbacks: *const AVTaskCallbacks,
         thread_count: ::std::os::raw::c_int,
     ) -> *mut AVExecutor;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free executor\n @param e  pointer to executor"]
     pub fn av_executor_free(e: *mut *mut AVExecutor);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Add task to executor\n @param e pointer to executor\n @param t pointer to task. If NULL, it will wakeup one work thread"]
     pub fn av_executor_execute(e: *mut AVExecutor, t: *mut AVTask);
 }
@@ -22070,7 +22070,7 @@ pub type AVFifoCB = ::std::option::Option<
         nb_elems: *mut usize,
     ) -> ::std::os::raw::c_int,
 >;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and initialize an AVFifo with a given element size.\n\n @param elems     initial number of elements that can be stored in the FIFO\n @param elem_size Size in bytes of a single element. Further operations on\n                  the returned FIFO will implicitly use this element size.\n @param flags a combination of AV_FIFO_FLAG_*\n\n @return newly-allocated AVFifo on success, a negative error code on failure"]
     pub fn av_fifo_alloc2(
         elems: usize,
@@ -22078,27 +22078,27 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> *mut AVFifo;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return Element size for FIFO operations. This element size is set at\n         FIFO allocation and remains constant during its lifetime"]
     pub fn av_fifo_elem_size(f: *const AVFifo) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the maximum size (in elements) to which the FIFO can be resized\n automatically. Has no effect unless AV_FIFO_FLAG_AUTO_GROW is used."]
     pub fn av_fifo_auto_grow_limit(f: *mut AVFifo, max_elems: usize);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return number of elements available for reading from the given FIFO."]
     pub fn av_fifo_can_read(f: *const AVFifo) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return Number of elements that can be written into the given FIFO without\n         growing it.\n\n         In other words, this number of elements or less is guaranteed to fit\n         into the FIFO. More data may be written when the\n         AV_FIFO_FLAG_AUTO_GROW flag was specified at FIFO creation, but this\n         may involve memory allocation, which can fail."]
     pub fn av_fifo_can_write(f: *const AVFifo) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Enlarge an AVFifo.\n\n On success, the FIFO will be large enough to hold exactly\n inc + av_fifo_can_read() + av_fifo_can_write()\n elements. In case of failure, the old FIFO is kept unchanged.\n\n @param f AVFifo to resize\n @param inc number of elements to allocate for, in addition to the current\n            allocated size\n @return a non-negative number on success, a negative error code on failure"]
     pub fn av_fifo_grow2(f: *mut AVFifo, inc: usize) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write data into a FIFO.\n\n In case nb_elems > av_fifo_can_write(f) and the AV_FIFO_FLAG_AUTO_GROW flag\n was not specified at FIFO creation, nothing is written and an error\n is returned.\n\n Calling function is guaranteed to succeed if nb_elems <= av_fifo_can_write(f).\n\n @param f the FIFO buffer\n @param buf Data to be written. nb_elems * av_fifo_elem_size(f) bytes will be\n            read from buf on success.\n @param nb_elems number of elements to write into FIFO\n\n @return a non-negative number on success, a negative error code on failure"]
     pub fn av_fifo_write(
         f: *mut AVFifo,
@@ -22106,7 +22106,7 @@ extern "C" {
         nb_elems: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write data from a user-provided callback into a FIFO.\n\n @param f the FIFO buffer\n @param read_cb Callback supplying the data to the FIFO. May be called\n                multiple times.\n @param opaque opaque user data to be provided to read_cb\n @param nb_elems Should point to the maximum number of elements that can be\n                 written. Will be updated to contain the number of elements\n                 actually written.\n\n @return non-negative number on success, a negative error code on failure"]
     pub fn av_fifo_write_from_cb(
         f: *mut AVFifo,
@@ -22115,7 +22115,7 @@ extern "C" {
         nb_elems: *mut usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read data from a FIFO.\n\n In case nb_elems > av_fifo_can_read(f), nothing is read and an error\n is returned.\n\n @param f the FIFO buffer\n @param buf Buffer to store the data. nb_elems * av_fifo_elem_size(f) bytes\n            will be written into buf on success.\n @param nb_elems number of elements to read from FIFO\n\n @return a non-negative number on success, a negative error code on failure"]
     pub fn av_fifo_read(
         f: *mut AVFifo,
@@ -22123,7 +22123,7 @@ extern "C" {
         nb_elems: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Feed data from a FIFO into a user-provided callback.\n\n @param f the FIFO buffer\n @param write_cb Callback the data will be supplied to. May be called\n                 multiple times.\n @param opaque opaque user data to be provided to write_cb\n @param nb_elems Should point to the maximum number of elements that can be\n                 read. Will be updated to contain the total number of elements\n                 actually sent to the callback.\n\n @return non-negative number on success, a negative error code on failure"]
     pub fn av_fifo_read_to_cb(
         f: *mut AVFifo,
@@ -22132,7 +22132,7 @@ extern "C" {
         nb_elems: *mut usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read data from a FIFO without modifying FIFO state.\n\n Returns an error if an attempt is made to peek to nonexistent elements\n (i.e. if offset + nb_elems is larger than av_fifo_can_read(f)).\n\n @param f the FIFO buffer\n @param buf Buffer to store the data. nb_elems * av_fifo_elem_size(f) bytes\n            will be written into buf.\n @param nb_elems number of elements to read from FIFO\n @param offset number of initial elements to skip.\n\n @return a non-negative number on success, a negative error code on failure"]
     pub fn av_fifo_peek(
         f: *const AVFifo,
@@ -22141,7 +22141,7 @@ extern "C" {
         offset: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Feed data from a FIFO into a user-provided callback.\n\n @param f the FIFO buffer\n @param write_cb Callback the data will be supplied to. May be called\n                 multiple times.\n @param opaque opaque user data to be provided to write_cb\n @param nb_elems Should point to the maximum number of elements that can be\n                 read. Will be updated to contain the total number of elements\n                 actually sent to the callback.\n @param offset number of initial elements to skip; offset + *nb_elems must not\n               be larger than av_fifo_can_read(f).\n\n @return a non-negative number on success, a negative error code on failure"]
     pub fn av_fifo_peek_to_cb(
         f: *const AVFifo,
@@ -22151,18 +22151,18 @@ extern "C" {
         offset: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Discard the specified amount of data from an AVFifo.\n @param size number of elements to discard, MUST NOT be larger than\n             av_fifo_can_read(f)"]
     pub fn av_fifo_drain2(f: *mut AVFifo, size: usize);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_fifo_reset2(f: *mut AVFifo);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free an AVFifo and reset pointer to NULL.\n @param f Pointer to an AVFifo to free. *f == NULL is allowed."]
     pub fn av_fifo_freep2(f: *mut *mut AVFifo);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read the file with name filename, and put its content in a newly\n allocated buffer or map it with mmap() when available.\n In case of success set *bufptr to the read or mmapped buffer, and\n *size to the size in bytes of the buffer in *bufptr.\n Unlike mmap this function succeeds with zero sized files, in this\n case *bufptr will be set to NULL and *size will be set to 0.\n The returned buffer must be released with av_file_unmap().\n\n @param filename path to the file\n @param[out] bufptr pointee is set to the mapped or allocated buffer\n @param[out] size pointee is set to the size in bytes of the buffer\n @param log_offset loglevel offset used for logging\n @param log_ctx context used for logging\n @return a non negative number in case of success, a negative value\n corresponding to an AVERROR error code in case of failure"]
     pub fn av_file_map(
         filename: *const ::std::os::raw::c_char,
@@ -22172,7 +22172,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Unmap or free the buffer bufptr created by av_file_map().\n\n @param bufptr the buffer previously created with av_file_map()\n @param size size in bytes of bufptr, must be the same as returned\n by av_file_map()"]
     pub fn av_file_unmap(bufptr: *mut u8, size: usize);
 }
@@ -22548,15 +22548,15 @@ impl ::std::fmt::Debug for AVFilmGrainParams {
         write ! (f , "AVFilmGrainParams {{ type: {:?}, seed: {:?}, width: {:?}, height: {:?}, subsampling_x: {:?}, subsampling_y: {:?}, color_range: {:?}, color_primaries: {:?}, color_trc: {:?}, color_space: {:?}, bit_depth_luma: {:?}, bit_depth_chroma: {:?}, codec: {:?} }}" , self . type_ , self . seed , self . width , self . height , self . subsampling_x , self . subsampling_y , self . color_range , self . color_primaries , self . color_trc , self . color_space , self . bit_depth_luma , self . bit_depth_chroma , self . codec)
     }
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVFilmGrainParams structure and set its fields to\n default values. The resulting struct can be freed using av_freep().\n If size is not NULL it will be set to the number of bytes allocated.\n\n @return An AVFilmGrainParams filled with default values or NULL\n         on failure."]
     pub fn av_film_grain_params_alloc(size: *mut usize) -> *mut AVFilmGrainParams;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a complete AVFilmGrainParams and add it to the frame.\n\n @param frame The frame which side data is added to.\n\n @return The AVFilmGrainParams structure to be filled by caller."]
     pub fn av_film_grain_params_create_side_data(frame: *mut AVFrame) -> *mut AVFilmGrainParams;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Select the most appropriate film grain parameters set for the frame,\n taking into account the frame's format, resolution and video signal\n characteristics.\n\n @note, for H.274, this may select a film grain parameter set with\n greater chroma resolution than the frame. Users should take care to\n correctly adjust the chroma grain frequency to the frame."]
     pub fn av_film_grain_params_select(frame: *const AVFrame) -> *const AVFilmGrainParams;
 }
@@ -22566,50 +22566,50 @@ extern "C" {
 pub struct AVHashContext {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a hash context for the algorithm specified by name.\n\n @return  >= 0 for success, a negative error code for failure\n\n @note The context is not initialized after a call to this function; you must\n call av_hash_init() to do so."]
     pub fn av_hash_alloc(
         ctx: *mut *mut AVHashContext,
         name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the names of available hash algorithms.\n\n This function can be used to enumerate the algorithms.\n\n @param[in] i  Index of the hash algorithm, starting from 0\n @return       Pointer to a static string or `NULL` if `i` is out of range"]
     pub fn av_hash_names(i: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the name of the algorithm corresponding to the given hash context."]
     pub fn av_hash_get_name(ctx: *const AVHashContext) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the size of the resulting hash value in bytes.\n\n The maximum value this function will currently return is available as macro\n #AV_HASH_MAX_SIZE.\n\n @param[in]     ctx Hash context\n @return            Size of the hash value in bytes"]
     pub fn av_hash_get_size(ctx: *const AVHashContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize or reset a hash context.\n\n @param[in,out] ctx Hash context"]
     pub fn av_hash_init(ctx: *mut AVHashContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Update a hash context with additional data.\n\n @param[in,out] ctx Hash context\n @param[in]     src Data to be added to the hash context\n @param[in]     len Size of the additional data"]
     pub fn av_hash_update(ctx: *mut AVHashContext, src: *const u8, len: usize);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finalize a hash context and compute the actual hash value.\n\n The minimum size of `dst` buffer is given by av_hash_get_size() or\n #AV_HASH_MAX_SIZE. The use of the latter macro is discouraged.\n\n It is not safe to update or finalize a hash context again, if it has already\n been finalized.\n\n @param[in,out] ctx Hash context\n @param[out]    dst Where the final hash value will be stored\n\n @see av_hash_final_bin() provides an alternative API"]
     pub fn av_hash_final(ctx: *mut AVHashContext, dst: *mut u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finalize a hash context and store the actual hash value in a buffer.\n\n It is not safe to update or finalize a hash context again, if it has already\n been finalized.\n\n If `size` is smaller than the hash size (given by av_hash_get_size()), the\n hash is truncated; if size is larger, the buffer is padded with 0.\n\n @param[in,out] ctx  Hash context\n @param[out]    dst  Where the final hash value will be stored\n @param[in]     size Number of bytes to write to `dst`"]
     pub fn av_hash_final_bin(ctx: *mut AVHashContext, dst: *mut u8, size: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finalize a hash context and store the hexadecimal representation of the\n actual hash value as a string.\n\n It is not safe to update or finalize a hash context again, if it has already\n been finalized.\n\n The string is always 0-terminated.\n\n If `size` is smaller than `2 * hash_size + 1`, where `hash_size` is the\n value returned by av_hash_get_size(), the string will be truncated.\n\n @param[in,out] ctx  Hash context\n @param[out]    dst  Where the string will be stored\n @param[in]     size Maximum number of bytes to write to `dst`"]
     pub fn av_hash_final_hex(ctx: *mut AVHashContext, dst: *mut u8, size: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finalize a hash context and store the Base64 representation of the\n actual hash value as a string.\n\n It is not safe to update or finalize a hash context again, if it has already\n been finalized.\n\n The string is always 0-terminated.\n\n If `size` is smaller than AV_BASE64_SIZE(hash_size), where `hash_size` is\n the value returned by av_hash_get_size(), the string will be truncated.\n\n @param[in,out] ctx  Hash context\n @param[out]    dst  Where the final hash value will be stored\n @param[in]     size Maximum number of bytes to write to `dst`"]
     pub fn av_hash_final_b64(ctx: *mut AVHashContext, dst: *mut u8, size: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free hash context and set hash context pointer to `NULL`.\n\n @param[in,out] ctx  Pointer to hash context"]
     pub fn av_hash_freep(ctx: *mut *mut AVHashContext);
 }
@@ -22983,15 +22983,15 @@ fn bindgen_test_layout_AVDynamicHDRPlus() {
         "Offset of field: AVDynamicHDRPlus::mastering_display_actual_peak_luminance"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVDynamicHDRPlus structure and set its fields to\n default values. The resulting struct can be freed using av_freep().\n\n @return An AVDynamicHDRPlus filled with default values or NULL\n         on failure."]
     pub fn av_dynamic_hdr_plus_alloc(size: *mut usize) -> *mut AVDynamicHDRPlus;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a complete AVDynamicHDRPlus and add it to the frame.\n @param frame The frame which side data is added to.\n\n @return The AVDynamicHDRPlus structure to be filled by caller or NULL\n         on failure."]
     pub fn av_dynamic_hdr_plus_create_side_data(frame: *mut AVFrame) -> *mut AVDynamicHDRPlus;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse the user data registered ITU-T T.35 to AVbuffer (AVDynamicHDRPlus).\n The T.35 buffer must begin with the application mode, skipping the\n country code, terminal provider codes, and application identifier.\n @param s A pointer containing the decoded AVDynamicHDRPlus structure.\n @param data The byte array containing the raw ITU-T T.35 data.\n @param size Size of the data array in bytes.\n\n @return >= 0 on success. Otherwise, returns the appropriate AVERROR."]
     pub fn av_dynamic_hdr_plus_from_t35(
         s: *mut AVDynamicHDRPlus,
@@ -22999,7 +22999,7 @@ extern "C" {
         size: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Serialize dynamic HDR10+ metadata to a user data registered ITU-T T.35 buffer,\n excluding the first 48 bytes of the header, and beginning with the application mode.\n @param s A pointer containing the decoded AVDynamicHDRPlus structure.\n @param[in,out] data A pointer to pointer to a byte buffer to be filled with the\n                     serialized metadata.\n                     If *data is NULL, a buffer be will be allocated and a pointer to\n                     it stored in its place. The caller assumes ownership of the buffer.\n                     May be NULL, in which case the function will only store the\n                     required buffer size in *size.\n @param[in,out] size A pointer to a size to be set to the returned buffer's size.\n                     If *data is not NULL, *size must contain the size of the input\n                     buffer. May be NULL only if *data is NULL.\n\n @return >= 0 on success. Otherwise, returns the appropriate AVERROR."]
     pub fn av_dynamic_hdr_plus_to_t35(
         s: *const AVDynamicHDRPlus,
@@ -23327,11 +23327,11 @@ fn bindgen_test_layout_AVDynamicHDRVivid() {
         "Offset of field: AVDynamicHDRVivid::params"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVDynamicHDRVivid structure and set its fields to\n default values. The resulting struct can be freed using av_freep().\n\n @return An AVDynamicHDRVivid filled with default values or NULL\n         on failure."]
     pub fn av_dynamic_hdr_vivid_alloc(size: *mut usize) -> *mut AVDynamicHDRVivid;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a complete AVDynamicHDRVivid and add it to the frame.\n @param frame The frame which side data is added to.\n\n @return The AVDynamicHDRVivid structure to be filled by caller or NULL\n         on failure."]
     pub fn av_dynamic_hdr_vivid_create_side_data(frame: *mut AVFrame) -> *mut AVDynamicHDRVivid;
 }
@@ -23348,23 +23348,23 @@ pub type AVHMACType = ::std::os::raw::c_uint;
 pub struct AVHMAC {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVHMAC context.\n @param type The hash function used for the HMAC."]
     pub fn av_hmac_alloc(type_: AVHMACType) -> *mut AVHMAC;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free an AVHMAC context.\n @param ctx The context to free, may be NULL"]
     pub fn av_hmac_free(ctx: *mut AVHMAC);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVHMAC context with an authentication key.\n @param ctx    The HMAC context\n @param key    The authentication key\n @param keylen The length of the key, in bytes"]
     pub fn av_hmac_init(ctx: *mut AVHMAC, key: *const u8, keylen: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Hash data with the HMAC.\n @param ctx  The HMAC context\n @param data The data to hash\n @param len  The length of the data, in bytes"]
     pub fn av_hmac_update(ctx: *mut AVHMAC, data: *const u8, len: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finish hashing and output the HMAC digest.\n @param ctx    The HMAC context\n @param out    The output buffer to write the digest into\n @param outlen The length of the out buffer, in bytes\n @return       The number of bytes written to out, or a negative error code."]
     pub fn av_hmac_final(
         ctx: *mut AVHMAC,
@@ -23372,7 +23372,7 @@ extern "C" {
         outlen: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Hash an array of data with a key.\n @param ctx    The HMAC context\n @param data   The data to hash\n @param len    The length of the data, in bytes\n @param key    The authentication key\n @param keylen The length of the key, in bytes\n @param out    The output buffer to write the digest into\n @param outlen The length of the out buffer, in bytes\n @return       The number of bytes written to out, or a negative error code."]
     pub fn av_hmac_calc(
         ctx: *mut AVHMAC,
@@ -23507,29 +23507,29 @@ fn bindgen_test_layout_AVPixFmtDescriptor() {
         "Offset of field: AVPixFmtDescriptor::alias"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the number of bits per pixel used by the pixel format\n described by pixdesc. Note that this is not the same as the number\n of bits per sample.\n\n The returned number of bits refers to the number of bits actually\n used for storing the pixel information, that is padding bits are\n not counted."]
     pub fn av_get_bits_per_pixel(pixdesc: *const AVPixFmtDescriptor) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the number of bits per pixel for the pixel format\n described by pixdesc, including any padding or unused bits."]
     pub fn av_get_padded_bits_per_pixel(
         pixdesc: *const AVPixFmtDescriptor,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return a pixel format descriptor for provided pixel format or NULL if\n this pixel format is unknown."]
     pub fn av_pix_fmt_desc_get(pix_fmt: AVPixelFormat) -> *const AVPixFmtDescriptor;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Iterate over all pixel format descriptors known to libavutil.\n\n @param prev previous descriptor. NULL to get the first descriptor.\n\n @return next descriptor or NULL after the last descriptor"]
     pub fn av_pix_fmt_desc_next(prev: *const AVPixFmtDescriptor) -> *const AVPixFmtDescriptor;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return an AVPixelFormat id described by desc, or AV_PIX_FMT_NONE if desc\n is not a valid pointer to a pixel format descriptor."]
     pub fn av_pix_fmt_desc_get_id(desc: *const AVPixFmtDescriptor) -> AVPixelFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Utility function to access log2_chroma_w log2_chroma_h from\n the pixel format AVPixFmtDescriptor.\n\n @param[in]  pix_fmt the pixel format\n @param[out] h_shift store log2_chroma_w (horizontal/width shift)\n @param[out] v_shift store log2_chroma_h (vertical/height shift)\n\n @return 0 on success, AVERROR(ENOSYS) on invalid or unknown pixel format"]
     pub fn av_pix_fmt_get_chroma_sub_sample(
         pix_fmt: AVPixelFormat,
@@ -23537,59 +23537,59 @@ extern "C" {
         v_shift: *mut ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return number of planes in pix_fmt, a negative AVERROR if pix_fmt is not a\n valid pixel format."]
     pub fn av_pix_fmt_count_planes(pix_fmt: AVPixelFormat) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the name for provided color range or NULL if unknown."]
     pub fn av_color_range_name(range: AVColorRange) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the AVColorRange value for name or an AVError if not found."]
     pub fn av_color_range_from_name(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the name for provided color primaries or NULL if unknown."]
     pub fn av_color_primaries_name(primaries: AVColorPrimaries) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the AVColorPrimaries value for name or an AVError if not found."]
     pub fn av_color_primaries_from_name(
         name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the name for provided color transfer or NULL if unknown."]
     pub fn av_color_transfer_name(
         transfer: AVColorTransferCharacteristic,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the AVColorTransferCharacteristic value for name or an AVError if not found."]
     pub fn av_color_transfer_from_name(
         name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the name for provided color space or NULL if unknown."]
     pub fn av_color_space_name(space: AVColorSpace) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the AVColorSpace value for name or an AVError if not found."]
     pub fn av_color_space_from_name(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the name for provided chroma location or NULL if unknown."]
     pub fn av_chroma_location_name(location: AVChromaLocation) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the AVChromaLocation value for name or an AVError if not found."]
     pub fn av_chroma_location_from_name(
         name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Converts AVChromaLocation to swscale x/y chroma position.\n\n The positions represent the chroma (0,0) position in a coordinates system\n with luma (0,0) representing the origin and luma(1,1) representing 256,256\n\n @param xpos  horizontal chroma sample position\n @param ypos  vertical   chroma sample position"]
     pub fn av_chroma_location_enum_to_pos(
         xpos: *mut ::std::os::raw::c_int,
@@ -23597,30 +23597,30 @@ extern "C" {
         pos: AVChromaLocation,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Converts swscale x/y chroma position to AVChromaLocation.\n\n The positions represent the chroma (0,0) position in a coordinates system\n with luma (0,0) representing the origin and luma(1,1) representing 256,256\n\n @param xpos  horizontal chroma sample position\n @param ypos  vertical   chroma sample position"]
     pub fn av_chroma_location_pos_to_enum(
         xpos: ::std::os::raw::c_int,
         ypos: ::std::os::raw::c_int,
     ) -> AVChromaLocation;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the name for provided alpha mode or NULL if unknown."]
     pub fn av_alpha_mode_name(mode: AVAlphaMode) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return the AVAlphaMode value for name or an AVError if not found."]
     pub fn av_alpha_mode_from_name(name: *const ::std::os::raw::c_char) -> AVAlphaMode;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the pixel format corresponding to name.\n\n If there is no pixel format with name name, then looks for a\n pixel format with the name corresponding to the native endian\n format of name.\n For example in a little-endian system, first looks for \"gray16\",\n then for \"gray16le\".\n\n Finally if no pixel format has been found, returns AV_PIX_FMT_NONE."]
     pub fn av_get_pix_fmt(name: *const ::std::os::raw::c_char) -> AVPixelFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the short name for a pixel format, NULL in case pix_fmt is\n unknown.\n\n @see av_get_pix_fmt(), av_get_pix_fmt_string()"]
     pub fn av_get_pix_fmt_name(pix_fmt: AVPixelFormat) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Print in buf the string corresponding to the pixel format with\n number pix_fmt, or a header if pix_fmt is negative.\n\n @param buf the buffer where to write the string\n @param buf_size the size of buf\n @param pix_fmt the number of the pixel format to print the\n corresponding info string, or a negative value to print the\n corresponding header."]
     pub fn av_get_pix_fmt_string(
         buf: *mut ::std::os::raw::c_char,
@@ -23628,7 +23628,7 @@ extern "C" {
         pix_fmt: AVPixelFormat,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Read a line from an image, and write the values of the\n pixel format component c to dst.\n\n @param data the array containing the pointers to the planes of the image\n @param linesize the array containing the linesizes of the image\n @param desc the pixel format descriptor for the image\n @param x the horizontal coordinate of the first pixel to read\n @param y the vertical coordinate of the first pixel to read\n @param w the width of the line to read, that is the number of\n values to write to dst\n @param read_pal_component if not zero and the format is a paletted\n format writes the values corresponding to the palette\n component c in data[1] to dst, rather than the palette indexes in\n data[0]. The behavior is undefined if the format is not paletted.\n @param dst_element_size size of elements in dst array (2 or 4 byte)"]
     pub fn av_read_image_line2(
         dst: *mut ::std::os::raw::c_void,
@@ -23643,7 +23643,7 @@ extern "C" {
         dst_element_size: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_read_image_line(
         dst: *mut u16,
         data: *mut *const u8,
@@ -23656,7 +23656,7 @@ extern "C" {
         read_pal_component: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Write the values from src to the pixel format component c of an\n image line.\n\n @param src array containing the values to write\n @param data the array containing the pointers to the planes of the\n image to write into. It is supposed to be zeroed.\n @param linesize the array containing the linesizes of the image\n @param desc the pixel format descriptor for the image\n @param x the horizontal coordinate of the first pixel to write\n @param y the vertical coordinate of the first pixel to write\n @param w the width of the line to write, that is the number of\n values to write to the image line\n @param src_element_size size of elements in src array (2 or 4 byte)"]
     pub fn av_write_image_line2(
         src: *const ::std::os::raw::c_void,
@@ -23670,7 +23670,7 @@ extern "C" {
         src_element_size: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_write_image_line(
         src: *const u16,
         data: *mut *mut u8,
@@ -23682,11 +23682,11 @@ extern "C" {
         w: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Utility function to swap the endianness of a pixel format.\n\n @param[in]  pix_fmt the pixel format\n\n @return pixel format with swapped endianness if it exists,\n otherwise AV_PIX_FMT_NONE"]
     pub fn av_pix_fmt_swap_endianness(pix_fmt: AVPixelFormat) -> AVPixelFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Compute what kind of losses will occur when converting from one specific\n pixel format to another.\n When converting from one pixel format to another, information loss may occur.\n For example, when converting from RGB24 to GRAY, the color information will\n be lost. Similarly, other losses occur when converting from some formats to\n other formats. These losses can involve loss of chroma, but also loss of\n resolution, loss of color depth, loss due to the color space conversion, loss\n of the alpha bits or loss due to color quantization.\n av_get_fix_fmt_loss() informs you about the various types of losses\n which will occur when converting from one pixel format to another.\n\n @param[in] dst_pix_fmt destination pixel format\n @param[in] src_pix_fmt source pixel format\n @param[in] has_alpha Whether the source pixel format alpha channel is used.\n @return Combination of flags informing you what kind of losses will occur\n (maximum loss for an invalid dst_pix_fmt)."]
     pub fn av_get_pix_fmt_loss(
         dst_pix_fmt: AVPixelFormat,
@@ -23694,7 +23694,7 @@ extern "C" {
         has_alpha: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Compute what kind of losses will occur when converting from one specific\n pixel format to another.\n When converting from one pixel format to another, information loss may occur.\n For example, when converting from RGB24 to GRAY, the color information will\n be lost. Similarly, other losses occur when converting from some formats to\n other formats. These losses can involve loss of chroma, but also loss of\n resolution, loss of color depth, loss due to the color space conversion, loss\n of the alpha bits or loss due to color quantization.\n av_get_fix_fmt_loss() informs you about the various types of losses\n which will occur when converting from one pixel format to another.\n\n @param[in] dst_pix_fmt destination pixel format\n @param[in] src_pix_fmt source pixel format\n @param[in] has_alpha Whether the source pixel format alpha channel is used.\n @return Combination of flags informing you what kind of losses will occur\n (maximum loss for an invalid dst_pix_fmt)."]
     pub fn av_find_best_pix_fmt_of_2(
         dst_pix_fmt1: AVPixelFormat,
@@ -23704,7 +23704,7 @@ extern "C" {
         loss_ptr: *mut ::std::os::raw::c_int,
     ) -> AVPixelFormat;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Compute the max pixel step for each plane of an image with a\n format described by pixdesc.\n\n The pixel step is the distance in bytes between the first byte of\n the group of bytes which describe a pixel component and the first\n byte of the successive group in the same plane for the same\n component.\n\n @param max_pixsteps an array which is filled with the max pixel step\n for each plane. Since a plane may contain different pixel\n components, the computed max_pixsteps[plane] is relative to the\n component in the plane with the max pixel step.\n @param max_pixstep_comps an array which is filled with the component\n for each plane which has the max pixel step. May be NULL.\n @param pixdesc the AVPixFmtDescriptor for the image, describing its format"]
     pub fn av_image_fill_max_pixsteps(
         max_pixsteps: *mut ::std::os::raw::c_int,
@@ -23712,7 +23712,7 @@ extern "C" {
         pixdesc: *const AVPixFmtDescriptor,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Compute the size of an image line with format pix_fmt and width\n width for the plane plane.\n\n @return the computed size in bytes"]
     pub fn av_image_get_linesize(
         pix_fmt: AVPixelFormat,
@@ -23720,7 +23720,7 @@ extern "C" {
         plane: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill plane linesizes for an image with pixel format pix_fmt and\n width width.\n\n @param linesizes array to be filled with the linesize for each plane\n @param pix_fmt the AVPixelFormat of the image\n @param width width of the image in pixels\n @return >= 0 in case of success, a negative error code otherwise"]
     pub fn av_image_fill_linesizes(
         linesizes: *mut ::std::os::raw::c_int,
@@ -23728,7 +23728,7 @@ extern "C" {
         width: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill plane sizes for an image with pixel format pix_fmt and height height.\n\n @param size the array to be filled with the size of each image plane\n @param pix_fmt the AVPixelFormat of the image\n @param height height of the image in pixels\n @param linesizes the array containing the linesize for each\n        plane, should be filled by av_image_fill_linesizes()\n @return >= 0 in case of success, a negative error code otherwise\n\n @note The linesize parameters have the type ptrdiff_t here, while they are\n       int for av_image_fill_linesizes()."]
     pub fn av_image_fill_plane_sizes(
         size: *mut usize,
@@ -23737,7 +23737,7 @@ extern "C" {
         linesizes: *const isize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill plane data pointers for an image with pixel format pix_fmt and\n height height.\n\n @param data pointers array to be filled with the pointer for each image plane\n @param pix_fmt the AVPixelFormat of the image\n @param height height of the image in pixels\n @param ptr the pointer to a buffer which will contain the image\n @param linesizes the array containing the linesize for each\n plane, should be filled by av_image_fill_linesizes()\n @return the size in bytes required for the image buffer, a negative\n error code in case of failure"]
     pub fn av_image_fill_pointers(
         data: *mut *mut u8,
@@ -23747,7 +23747,7 @@ extern "C" {
         linesizes: *const ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an image with size w and h and pixel format pix_fmt, and\n fill pointers and linesizes accordingly.\n The allocated image buffer has to be freed by using\n av_freep(&pointers[0]).\n\n @param pointers array to be filled with the pointer for each image plane\n @param linesizes the array filled with the linesize for each plane\n @param w width of the image in pixels\n @param h height of the image in pixels\n @param pix_fmt the AVPixelFormat of the image\n @param align the value to use for buffer size alignment\n @return the size in bytes required for the image buffer, a negative\n error code in case of failure"]
     pub fn av_image_alloc(
         pointers: *mut *mut u8,
@@ -23758,7 +23758,7 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy image plane from src to dst.\n That is, copy \"height\" number of lines of \"bytewidth\" bytes each.\n The first byte of each successive line is separated by *_linesize\n bytes.\n\n bytewidth must be contained by both absolute values of dst_linesize\n and src_linesize, otherwise the function behavior is undefined.\n\n @param dst          destination plane to copy to\n @param dst_linesize linesize for the image plane in dst\n @param src          source plane to copy from\n @param src_linesize linesize for the image plane in src\n @param height       height (number of lines) of the plane"]
     pub fn av_image_copy_plane(
         dst: *mut u8,
@@ -23769,7 +23769,7 @@ extern "C" {
         height: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy image data located in uncacheable (e.g. GPU mapped) memory. Where\n available, this function will use special functionality for reading from such\n memory, which may result in greatly improved performance compared to plain\n av_image_copy_plane().\n\n bytewidth must be contained by both absolute values of dst_linesize\n and src_linesize, otherwise the function behavior is undefined.\n\n @note The linesize parameters have the type ptrdiff_t here, while they are\n       int for av_image_copy_plane().\n @note On x86, the linesizes currently need to be aligned to the cacheline\n       size (i.e. 64) to get improved performance."]
     pub fn av_image_copy_plane_uc_from(
         dst: *mut u8,
@@ -23780,7 +23780,7 @@ extern "C" {
         height: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy image in src_data to dst_data.\n\n @param dst_data      destination image data buffer to copy to\n @param dst_linesizes linesizes for the image in dst_data\n @param src_data      source image data buffer to copy from\n @param src_linesizes linesizes for the image in src_data\n @param pix_fmt       the AVPixelFormat of the image\n @param width         width of the image in pixels\n @param height        height of the image in pixels"]
     pub fn av_image_copy(
         dst_data: *const *mut u8,
@@ -23792,7 +23792,7 @@ extern "C" {
         height: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy image data located in uncacheable (e.g. GPU mapped) memory. Where\n available, this function will use special functionality for reading from such\n memory, which may result in greatly improved performance compared to plain\n av_image_copy().\n\n The data pointers and the linesizes must be aligned to the maximum required\n by the CPU architecture.\n\n @note The linesize parameters have the type ptrdiff_t here, while they are\n       int for av_image_copy().\n @note On x86, the linesizes currently need to be aligned to the cacheline\n       size (i.e. 64) to get improved performance."]
     pub fn av_image_copy_uc_from(
         dst_data: *const *mut u8,
@@ -23804,7 +23804,7 @@ extern "C" {
         height: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Setup the data pointers and linesizes based on the specified image\n parameters and the provided array.\n\n The fields of the given image are filled in by using the src\n address which points to the image data buffer. Depending on the\n specified pixel format, one or multiple image data pointers and\n line sizes will be set.  If a planar format is specified, several\n pointers will be set pointing to the different picture planes and\n the line sizes of the different planes will be stored in the\n lines_sizes array. Call with src == NULL to get the required\n size for the src buffer.\n\n To allocate the buffer and fill in the dst_data and dst_linesize in\n one call, use av_image_alloc().\n\n @param dst_data      data pointers to be filled in\n @param dst_linesize  linesizes for the image in dst_data to be filled in\n @param src           buffer which will contain or contains the actual image data, can be NULL\n @param pix_fmt       the pixel format of the image\n @param width         the width of the image in pixels\n @param height        the height of the image in pixels\n @param align         the value used in src for linesize alignment\n @return the size in bytes required for src, a negative error code\n in case of failure"]
     pub fn av_image_fill_arrays(
         dst_data: *mut *mut u8,
@@ -23816,7 +23816,7 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the size in bytes of the amount of data required to store an\n image with the given parameters.\n\n @param pix_fmt  the pixel format of the image\n @param width    the width of the image in pixels\n @param height   the height of the image in pixels\n @param align    the assumed linesize alignment\n @return the buffer size in bytes, a negative error code in case of failure"]
     pub fn av_image_get_buffer_size(
         pix_fmt: AVPixelFormat,
@@ -23825,7 +23825,7 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Copy image data from an image into a buffer.\n\n av_image_get_buffer_size() can be used to compute the required size\n for the buffer to fill.\n\n @param dst           a buffer into which picture data will be copied\n @param dst_size      the size in bytes of dst\n @param src_data      pointers containing the source image data\n @param src_linesize  linesizes for the image in src_data\n @param pix_fmt       the pixel format of the source image\n @param width         the width of the source image in pixels\n @param height        the height of the source image in pixels\n @param align         the assumed linesize alignment for dst\n @return the number of bytes written to dst, or a negative value\n (error code) on error"]
     pub fn av_image_copy_to_buffer(
         dst: *mut u8,
@@ -23838,7 +23838,7 @@ extern "C" {
         align: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if the given dimension of an image is valid, meaning that all\n bytes of the image can be addressed with a signed int.\n\n @param w the width of the picture\n @param h the height of the picture\n @param log_offset the offset to sum to the log level for logging with log_ctx\n @param log_ctx the parent logging context, it may be NULL\n @return >= 0 if valid, a negative error code otherwise"]
     pub fn av_image_check_size(
         w: ::std::os::raw::c_uint,
@@ -23847,7 +23847,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if the given dimension of an image is valid, meaning that all\n bytes of a plane of an image with the specified pix_fmt can be addressed\n with a signed int.\n\n @param w the width of the picture\n @param h the height of the picture\n @param max_pixels the maximum number of pixels the user wants to accept\n @param pix_fmt the pixel format, can be AV_PIX_FMT_NONE if unknown.\n @param log_offset the offset to sum to the log level for logging with log_ctx\n @param log_ctx the parent logging context, it may be NULL\n @return >= 0 if valid, a negative error code otherwise"]
     pub fn av_image_check_size2(
         w: ::std::os::raw::c_uint,
@@ -23858,7 +23858,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if the given sample aspect ratio of an image is valid.\n\n It is considered invalid if the denominator is 0 or if applying the ratio\n to the image size would make the smaller dimension less than 1. If the\n sar numerator is 0, it is considered unknown and will return as valid.\n\n @param w width of the image\n @param h height of the image\n @param sar sample aspect ratio of the image\n @return 0 if valid, a negative AVERROR code otherwise"]
     pub fn av_image_check_sar(
         w: ::std::os::raw::c_uint,
@@ -23866,7 +23866,7 @@ extern "C" {
         sar: AVRational,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Overwrite the image data with black. This is suitable for filling a\n sub-rectangle of an image, meaning the padding between the right most pixel\n and the left most pixel on the next line will not be overwritten. For some\n formats, the image size might be rounded up due to inherent alignment.\n\n If the pixel format has alpha, the alpha is cleared to opaque.\n\n This can return an error if the pixel format is not supported. Normally, all\n non-hwaccel pixel formats should be supported.\n\n Passing NULL for dst_data is allowed. Then the function returns whether the\n operation would have succeeded. (It can return an error if the pix_fmt is\n not supported.)\n\n @param dst_data      data pointers to destination image\n @param dst_linesize  linesizes for the destination image\n @param pix_fmt       the pixel format of the image\n @param range         the color range of the image (important for colorspaces such as YUV)\n @param width         the width of the image in pixels\n @param height        the height of the image in pixels\n @return 0 if the image data was cleared, a negative AVERROR code otherwise"]
     pub fn av_image_fill_black(
         dst_data: *const *mut u8,
@@ -23877,7 +23877,7 @@ extern "C" {
         height: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Overwrite the image data with a color. This is suitable for filling a\n sub-rectangle of an image, meaning the padding between the right most pixel\n and the left most pixel on the next line will not be overwritten. For some\n formats, the image size might be rounded up due to inherent alignment.\n\n If the pixel format has alpha, it is also replaced. Color component values\n are interpreted as native integers (or intfloats) regardless of actual pixel\n format endianness.\n\n This can return an error if the pixel format is not supported. Normally, all\n non-hwaccel pixel formats should be supported.\n\n Passing NULL for dst_data is allowed. Then the function returns whether the\n operation would have succeeded. (It can return an error if the pix_fmt is\n not supported.)\n\n @param dst_data      data pointers to destination image\n @param dst_linesize  linesizes for the destination image\n @param pix_fmt       the pixel format of the image\n @param color         the color components to be used for the fill\n @param width         the width of the image in pixels\n @param height        the height of the image in pixels\n @param flags         currently unused\n @return 0 if the image data was filled, a negative AVERROR code otherwise"]
     pub fn av_image_fill_color(
         dst_data: *const *mut u8,
@@ -24151,10 +24151,10 @@ fn bindgen_test_layout_AVLFG() {
         "Offset of field: AVLFG::index"
     );
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_lfg_init(c: *mut AVLFG, seed: ::std::os::raw::c_uint);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Seed the state of the ALFG using binary data.\n\n @return 0 on success, negative value (AVERROR) on failure."]
     pub fn av_lfg_init_from_data(
         c: *mut AVLFG,
@@ -24162,11 +24162,11 @@ extern "C" {
         length: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the next two numbers generated by a Box-Muller Gaussian\n generator using the random numbers issued by lfg.\n\n @param lfg pointer to the context structure\n @param out array where the two generated numbers are placed"]
     pub fn av_bmg_get(lfg: *mut AVLFG, out: *mut f64);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @brief Decodes LZO 1x compressed data.\n @param out output buffer\n @param outlen size of output buffer, number of bytes left are returned here\n @param in input buffer\n @param inlen size of input buffer, number of bytes left are returned here\n @return 0 on success, otherwise a combination of the error flags above\n\n Make sure all buffers are appropriately padded, in must provide\n AV_LZO_INPUT_PADDING, out must provide AV_LZO_OUTPUT_PADDING additional bytes."]
     pub fn av_lzo1x_decode(
         out: *mut ::std::os::raw::c_void,
@@ -24238,17 +24238,17 @@ fn bindgen_test_layout_AVMasteringDisplayMetadata() {
         "Offset of field: AVMasteringDisplayMetadata::has_luminance"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVMasteringDisplayMetadata structure and set its fields to\n default values. The resulting struct can be freed using av_freep().\n\n @return An AVMasteringDisplayMetadata filled with default values or NULL\n         on failure."]
     pub fn av_mastering_display_metadata_alloc() -> *mut AVMasteringDisplayMetadata;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVMasteringDisplayMetadata structure and set its fields to\n default values. The resulting struct can be freed using av_freep().\n\n @return An AVMasteringDisplayMetadata filled with default values or NULL\n         on failure."]
     pub fn av_mastering_display_metadata_alloc_size(
         size: *mut usize,
     ) -> *mut AVMasteringDisplayMetadata;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a complete AVMasteringDisplayMetadata and add it to the frame.\n\n @param frame The frame which side data is added to.\n\n @return The AVMasteringDisplayMetadata structure to be filled by caller."]
     pub fn av_mastering_display_metadata_create_side_data(
         frame: *mut AVFrame,
@@ -24289,17 +24289,17 @@ fn bindgen_test_layout_AVContentLightMetadata() {
         "Offset of field: AVContentLightMetadata::MaxFALL"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVContentLightMetadata structure and set its fields to\n default values. The resulting struct can be freed using av_freep().\n\n @return An AVContentLightMetadata filled with default values or NULL\n         on failure."]
     pub fn av_content_light_metadata_alloc(size: *mut usize) -> *mut AVContentLightMetadata;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a complete AVContentLightMetadata and add it to the frame.\n\n @param frame The frame which side data is added to.\n\n @return The AVContentLightMetadata structure to be filled by caller."]
     pub fn av_content_light_metadata_create_side_data(
         frame: *mut AVFrame,
     ) -> *mut AVContentLightMetadata;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup lavu_md5 MD5\n @ingroup lavu_hash\n MD5 hash function implementation.\n\n @{"]
     pub static av_md5_size: ::std::os::raw::c_int;
 }
@@ -24308,23 +24308,23 @@ extern "C" {
 pub struct AVMD5 {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVMD5 context."]
     pub fn av_md5_alloc() -> *mut AVMD5;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize MD5 hashing.\n\n @param ctx pointer to the function context (of size av_md5_size)"]
     pub fn av_md5_init(ctx: *mut AVMD5);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Update hash value.\n\n @param ctx hash function context\n @param src input data to update hash with\n @param len input data length"]
     pub fn av_md5_update(ctx: *mut AVMD5, src: *const u8, len: usize);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finish hashing and output digest value.\n\n @param ctx hash function context\n @param dst buffer where output digest value is stored"]
     pub fn av_md5_final(ctx: *mut AVMD5, dst: *mut u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Hash an array of data.\n\n @param dst The output buffer to write the digest into\n @param src The data to hash\n @param len The length of the data, in bytes"]
     pub fn av_md5_sum(dst: *mut u8, src: *const u8, len: usize);
 }
@@ -24428,23 +24428,23 @@ fn bindgen_test_layout_AVMotionVector() {
 pub struct AVMurMur3 {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVMurMur3 hash context.\n\n @return Uninitialized hash context or `NULL` in case of error"]
     pub fn av_murmur3_alloc() -> *mut AVMurMur3;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize or reinitialize an AVMurMur3 hash context with a seed.\n\n @param[out] c    Hash context\n @param[in]  seed Random seed\n\n @see av_murmur3_init()\n @see @ref lavu_murmur3_seedinfo \"Detailed description\" on a discussion of\n seeds for MurmurHash3."]
     pub fn av_murmur3_init_seeded(c: *mut AVMurMur3, seed: u64);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize or reinitialize an AVMurMur3 hash context.\n\n Equivalent to av_murmur3_init_seeded() with a built-in seed.\n\n @param[out] c    Hash context\n\n @see av_murmur3_init_seeded()\n @see @ref lavu_murmur3_seedinfo \"Detailed description\" on a discussion of\n seeds for MurmurHash3."]
     pub fn av_murmur3_init(c: *mut AVMurMur3);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Update hash context with new data.\n\n @param[out] c    Hash context\n @param[in]  src  Input data to update hash with\n @param[in]  len  Number of bytes to read from `src`"]
     pub fn av_murmur3_update(c: *mut AVMurMur3, src: *const u8, len: usize);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finish hashing and output digest value.\n\n @param[in,out] c    Hash context\n @param[out]    dst  Buffer where output digest value is stored"]
     pub fn av_murmur3_final(c: *mut AVMurMur3, dst: *mut u8);
 }
@@ -24561,19 +24561,19 @@ fn bindgen_test_layout_itimerspec() {
 pub struct sigevent {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clock() -> clock_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn time(__timer: *mut time_t) -> time_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn difftime(__time1: time_t, __time0: time_t) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn mktime(__tp: *mut tm) -> time_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strftime(
         __s: *mut ::std::os::raw::c_char,
         __maxsize: usize,
@@ -24581,7 +24581,7 @@ extern "C" {
         __tp: *const tm,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn strftime_l(
         __s: *mut ::std::os::raw::c_char,
         __maxsize: usize,
@@ -24590,82 +24590,82 @@ extern "C" {
         __loc: locale_t,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn gmtime(__timer: *const time_t) -> *mut tm;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn localtime(__timer: *const time_t) -> *mut tm;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn gmtime_r(__timer: *const time_t, __tp: *mut tm) -> *mut tm;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn localtime_r(__timer: *const time_t, __tp: *mut tm) -> *mut tm;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asctime(__tp: *const tm) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ctime(__timer: *const time_t) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn asctime_r(
         __tp: *const tm,
         __buf: *mut ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn ctime_r(
         __timer: *const time_t,
         __buf: *mut ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut __tzname: [*mut ::std::os::raw::c_char; 2usize];
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut __daylight: ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut __timezone: ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut tzname: [*mut ::std::os::raw::c_char; 2usize];
 }
-extern "C" {
+unsafe extern "C" {
     pub fn tzset();
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut daylight: ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub static mut timezone: ::std::os::raw::c_long;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn timegm(__tp: *mut tm) -> time_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn timelocal(__tp: *mut tm) -> time_t;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn dysize(__year: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn nanosleep(
         __requested_time: *const timespec,
         __remaining: *mut timespec,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clock_getres(__clock_id: clockid_t, __res: *mut timespec) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clock_gettime(__clock_id: clockid_t, __tp: *mut timespec) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clock_settime(__clock_id: clockid_t, __tp: *const timespec) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clock_nanosleep(
         __clock_id: clockid_t,
         __flags: ::std::os::raw::c_int,
@@ -24673,20 +24673,20 @@ extern "C" {
         __rem: *mut timespec,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn clock_getcpuclockid(__pid: pid_t, __clock_id: *mut clockid_t) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn timer_create(
         __clock_id: clockid_t,
         __evp: *mut sigevent,
         __timerid: *mut timer_t,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn timer_delete(__timerid: timer_t) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn timer_settime(
         __timerid: timer_t,
         __flags: ::std::os::raw::c_int,
@@ -24694,19 +24694,19 @@ extern "C" {
         __ovalue: *mut itimerspec,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn timer_gettime(__timerid: timer_t, __value: *mut itimerspec) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn timer_getoverrun(__timerid: timer_t) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn timespec_get(
         __ts: *mut timespec,
         __base: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse str and store the parsed ratio in q.\n\n Note that a ratio with infinite (1/0) or negative value is\n considered valid, so you should check on the returned value if you\n want to exclude those values.\n\n The undefined value can be expressed using the \"0:0\" string.\n\n @param[in,out] q pointer to the AVRational which will contain the ratio\n @param[in] str the string to parse: it has to be a string in the format\n num:den, a float number or an expression\n @param[in] max the maximum allowed numerator and denominator\n @param[in] log_offset log level offset which is applied to the log\n level of log_ctx\n @param[in] log_ctx parent logging context\n @return >= 0 on success, a negative error code otherwise"]
     pub fn av_parse_ratio(
         q: *mut AVRational,
@@ -24716,7 +24716,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse str and put in width_ptr and height_ptr the detected values.\n\n @param[in,out] width_ptr pointer to the variable which will contain the detected\n width value\n @param[in,out] height_ptr pointer to the variable which will contain the detected\n height value\n @param[in] str the string to parse: it has to be a string in the format\n width x height or a valid video size abbreviation.\n @return >= 0 on success, a negative error code otherwise"]
     pub fn av_parse_video_size(
         width_ptr: *mut ::std::os::raw::c_int,
@@ -24724,14 +24724,14 @@ extern "C" {
         str_: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse str and store the detected values in *rate.\n\n @param[in,out] rate pointer to the AVRational which will contain the detected\n frame rate\n @param[in] str the string to parse: it has to be a string in the format\n rate_num / rate_den, a float number or a valid video rate abbreviation\n @return >= 0 on success, a negative error code otherwise"]
     pub fn av_parse_video_rate(
         rate: *mut AVRational,
         str_: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Put the RGBA values that correspond to color_string in rgba_color.\n\n @param rgba_color 4-elements array of uint8_t values, where the respective\n red, green, blue and alpha component values are written.\n @param color_string a string specifying a color. It can be the name of\n a color (case insensitive match) or a [0x|#]RRGGBB[AA] sequence,\n possibly followed by \"@\" and a string representing the alpha\n component.\n The alpha component may be a string composed by \"0x\" followed by an\n hexadecimal number or a decimal number between 0.0 and 1.0, which\n represents the opacity value (0x00/0.0 means completely transparent,\n 0xff/1.0 completely opaque).\n If the alpha component is not specified then 0xff is assumed.\n The string \"random\" will result in a random color.\n @param slen length of the initial part of color_string containing the\n color. It can be set to -1 if color_string is a null terminated string\n containing nothing else than the color.\n @param log_ctx a pointer to an arbitrary struct of which the first field\n is a pointer to an AVClass struct (used for av_log()). Can be NULL.\n @return >= 0 in case of success, a negative value in case of\n failure (for example if color_string cannot be parsed)."]
     pub fn av_parse_color(
         rgba_color: *mut u8,
@@ -24740,14 +24740,14 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the name of a color from the internal table of hard-coded named\n colors.\n\n This function is meant to enumerate the color names recognized by\n av_parse_color().\n\n @param color_idx index of the requested color, starting from 0\n @param rgb      if not NULL, will point to a 3-elements array with the color value in RGB\n @return the color name string or NULL if color_idx is not in the array"]
     pub fn av_get_known_color_name(
         color_idx: ::std::os::raw::c_int,
         rgb: *mut *const u8,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse timestr and return in *time a corresponding number of\n microseconds.\n\n @param timeval puts here the number of microseconds corresponding\n to the string in timestr. If the string represents a duration, it\n is the number of microseconds contained in the time interval.  If\n the string is a date, is the number of microseconds since 1st of\n January, 1970 up to the time of the parsed date.  If timestr cannot\n be successfully parsed, set *time to INT64_MIN.\n\n @param timestr a string representing a date or a duration.\n - If a date the syntax is:\n @code\n [{YYYY-MM-DD|YYYYMMDD}[T|t| ]]{{HH:MM:SS[.m...]]]}|{HHMMSS[.m...]]]}}[Z]\n now\n @endcode\n If the value is \"now\" it takes the current time.\n Time is local time unless Z is appended, in which case it is\n interpreted as UTC.\n If the year-month-day part is not specified it takes the current\n year-month-day.\n - If a duration the syntax is:\n @code\n [-][HH:]MM:SS[.m...]\n [-]S+[.m...]\n @endcode\n @param duration flag which tells how to interpret timestr, if not\n zero timestr is interpreted as a duration, otherwise as a date\n @return >= 0 in case of success, a negative value corresponding to an\n AVERROR code otherwise"]
     pub fn av_parse_time(
         timeval: *mut i64,
@@ -24755,7 +24755,7 @@ extern "C" {
         duration: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Attempt to find a specific tag in a URL.\n\n syntax: '?tag1=val1&tag2=val2...'. Little URL decoding is done.\n Return 1 if found."]
     pub fn av_find_info_tag(
         arg: *mut ::std::os::raw::c_char,
@@ -24764,7 +24764,7 @@ extern "C" {
         info: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Simplified version of strptime\n\n Parse the input string p according to the format string fmt and\n store its results in the structure dt.\n This implementation supports only a subset of the formats supported\n by the standard strptime().\n\n The supported input field descriptors are listed below.\n - `%%H`: the hour as a decimal number, using a 24-hour clock, in the\n   range '00' through '23'\n - `%%J`: hours as a decimal number, in the range '0' through INT_MAX\n - `%%M`: the minute as a decimal number, using a 24-hour clock, in the\n   range '00' through '59'\n - `%%S`: the second as a decimal number, using a 24-hour clock, in the\n   range '00' through '59'\n - `%%Y`: the year as a decimal number, using the Gregorian calendar\n - `%%m`: the month as a decimal number, in the range '1' through '12'\n - `%%d`: the day of the month as a decimal number, in the range '1'\n   through '31'\n - `%%T`: alias for `%%H:%%M:%%S`\n - `%%`: a literal `%`\n\n @return a pointer to the first character not processed in this function\n         call. In case the input string contains more characters than\n         required by the format string the return value points right after\n         the last consumed input character. In case the whole input string\n         is consumed the return value points to the null byte at the end of\n         the string. On failure NULL is returned."]
     pub fn av_small_strptime(
         p: *const ::std::os::raw::c_char,
@@ -24772,7 +24772,7 @@ extern "C" {
         dt: *mut tm,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert the decomposed UTC time in tm to a time_t value."]
     pub fn av_timegm(tm: *mut tm) -> time_t;
 }
@@ -24785,7 +24785,7 @@ pub type av_pixelutils_sad_fn = ::std::option::Option<
         stride2: isize,
     ) -> ::std::os::raw::c_int,
 >;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a potentially optimized pointer to a Sum-of-absolute-differences\n function (see the av_pixelutils_sad_fn prototype).\n\n @param w_bits  1<<w_bits is the requested width of the block size\n @param h_bits  1<<h_bits is the requested height of the block size\n @param aligned If set to 2, the returned sad function will assume src1 and\n                src2 addresses are aligned on the block size.\n                If set to 1, the returned sad function will assume src1 is\n                aligned on the block size.\n                If set to 0, the returned sad function assume no particular\n                alignment.\n @param log_ctx context used for logging, can be NULL\n\n @return a pointer to the SAD function or NULL in case of error (because of\n         invalid parameters)"]
     pub fn av_pixelutils_get_sad_fn(
         w_bits: ::std::os::raw::c_int,
@@ -24794,11 +24794,11 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> av_pixelutils_sad_fn;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get a seed to use in conjunction with random functions.\n This function tries to provide a good seed at a best effort bases.\n Its possible to call this function multiple times if more bits are needed.\n It can be quite slow, which is why it should only be used as seed for a faster\n PRNG. The quality of the seed depends on the platform."]
     pub fn av_get_random_seed() -> u32;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Generate cryptographically secure random data, i.e. suitable for use as\n encryption keys and similar.\n\n @param buf buffer into which the random data will be written\n @param len size of buf in bytes\n\n @retval 0                         success, len bytes of random data was written\n                                   into buf\n @retval \"a negative AVERROR code\" random data could not be generated"]
     pub fn av_random_bytes(buf: *mut u8, len: usize) -> ::std::os::raw::c_int;
 }
@@ -24836,11 +24836,11 @@ fn bindgen_test_layout_AVRC4() {
         "Offset of field: AVRC4::y"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVRC4 context."]
     pub fn av_rc4_alloc() -> *mut AVRC4;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @brief Initializes an AVRC4 context.\n\n @param d pointer to the AVRC4 context\n @param key buffer containing the key\n @param key_bits must be a multiple of 8\n @param decrypt 0 for encryption, 1 for decryption, currently has no effect\n @return zero on success, negative value otherwise"]
     pub fn av_rc4_init(
         d: *mut AVRC4,
@@ -24849,7 +24849,7 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @brief Encrypts / decrypts using the RC4 algorithm.\n\n @param d pointer to the AVRC4 context\n @param count number of bytes\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst, may be NULL\n @param iv not (yet) used for RC4, should be NULL\n @param decrypt 0 for encryption, 1 for decryption, not (yet) used"]
     pub fn av_rc4_crypt(
         d: *mut AVRC4,
@@ -24908,7 +24908,7 @@ fn bindgen_test_layout_AVReplayGain() {
         "Offset of field: AVReplayGain::album_peak"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup lavu_ripemd RIPEMD\n @ingroup lavu_hash\n RIPEMD hash function implementation.\n\n @{"]
     pub static av_ripemd_size: ::std::os::raw::c_int;
 }
@@ -24917,26 +24917,26 @@ extern "C" {
 pub struct AVRIPEMD {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVRIPEMD context."]
     pub fn av_ripemd_alloc() -> *mut AVRIPEMD;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize RIPEMD hashing.\n\n @param context pointer to the function context (of size av_ripemd_size)\n @param bits    number of bits in digest (128, 160, 256 or 320 bits)\n @return        zero if initialization succeeded, -1 otherwise"]
     pub fn av_ripemd_init(
         context: *mut AVRIPEMD,
         bits: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Update hash value.\n\n @param context hash function context\n @param data    input data to update hash with\n @param len     input data length"]
     pub fn av_ripemd_update(context: *mut AVRIPEMD, data: *const u8, len: usize);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finish hashing and output digest value.\n\n @param context hash function context\n @param digest  buffer where output digest value is stored"]
     pub fn av_ripemd_final(context: *mut AVRIPEMD, digest: *mut u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup lavu_sha SHA\n @ingroup lavu_hash\n SHA-1 and SHA-256 (Secure Hash Algorithm) hash function implementations.\n\n This module supports the following SHA hash functions:\n\n - SHA-1: 160 bits\n - SHA-224: 224 bits, as a variant of SHA-2\n - SHA-256: 256 bits, as a variant of SHA-2\n\n @see For SHA-384, SHA-512, and variants thereof, see @ref lavu_sha512.\n\n @{"]
     pub static av_sha_size: ::std::os::raw::c_int;
 }
@@ -24945,23 +24945,23 @@ extern "C" {
 pub struct AVSHA {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVSHA context."]
     pub fn av_sha_alloc() -> *mut AVSHA;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize SHA-1 or SHA-2 hashing.\n\n @param context pointer to the function context (of size av_sha_size)\n @param bits    number of bits in digest (SHA-1 - 160 bits, SHA-2 224 or 256 bits)\n @return        zero if initialization succeeded, -1 otherwise"]
     pub fn av_sha_init(context: *mut AVSHA, bits: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Update hash value.\n\n @param ctx     hash function context\n @param data    input data to update hash with\n @param len     input data length"]
     pub fn av_sha_update(ctx: *mut AVSHA, data: *const u8, len: usize);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finish hashing and output digest value.\n\n @param context hash function context\n @param digest  buffer where output digest value is stored"]
     pub fn av_sha_final(context: *mut AVSHA, digest: *mut u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup lavu_sha512 SHA-512\n @ingroup lavu_hash\n SHA-512 (Secure Hash Algorithm) hash function implementations.\n\n This module supports the following SHA-2 hash functions:\n\n - SHA-512/224: 224 bits\n - SHA-512/256: 256 bits\n - SHA-384: 384 bits\n - SHA-512: 512 bits\n\n @see For SHA-1, SHA-256, and variants thereof, see @ref lavu_sha.\n\n @{"]
     pub static av_sha512_size: ::std::os::raw::c_int;
 }
@@ -24970,22 +24970,22 @@ extern "C" {
 pub struct AVSHA512 {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVSHA512 context."]
     pub fn av_sha512_alloc() -> *mut AVSHA512;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize SHA-2 512 hashing.\n\n @param context pointer to the function context (of size av_sha512_size)\n @param bits    number of bits in digest (224, 256, 384 or 512 bits)\n @return        zero if initialization succeeded, -1 otherwise"]
     pub fn av_sha512_init(
         context: *mut AVSHA512,
         bits: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Update hash value.\n\n @param context hash function context\n @param data    input data to update hash with\n @param len     input data length"]
     pub fn av_sha512_update(context: *mut AVSHA512, data: *const u8, len: usize);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finish hashing and output digest value.\n\n @param context hash function context\n @param digest  buffer where output digest value is stored"]
     pub fn av_sha512_final(context: *mut AVSHA512, digest: *mut u8);
 }
@@ -25088,11 +25088,11 @@ fn bindgen_test_layout_AVSphericalMapping() {
         "Offset of field: AVSphericalMapping::padding"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a AVSphericalVideo structure and initialize its fields to default\n values.\n\n @return the newly allocated struct or NULL on failure"]
     pub fn av_spherical_alloc(size: *mut usize) -> *mut AVSphericalMapping;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert the @ref bounding fields from an AVSphericalVideo\n from 0.32 fixed point to pixels.\n\n @param map    The AVSphericalVideo map to read bound values from.\n @param width  Width of the current frame or stream.\n @param height Height of the current frame or stream.\n @param left   Pixels from the left edge.\n @param top    Pixels from the top edge.\n @param right  Pixels from the right edge.\n @param bottom Pixels from the bottom edge."]
     pub fn av_spherical_tile_bounds(
         map: *const AVSphericalMapping,
@@ -25104,13 +25104,13 @@ extern "C" {
         bottom: *mut usize,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Provide a human-readable name of a given AVSphericalProjection.\n\n @param projection The input AVSphericalProjection.\n\n @return The name of the AVSphericalProjection, or \"unknown\"."]
     pub fn av_spherical_projection_name(
         projection: AVSphericalProjection,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVSphericalProjection form a human-readable name.\n\n @param name The input string.\n\n @return The AVSphericalProjection value, or -1 if not found."]
     pub fn av_spherical_from_name(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
@@ -25223,48 +25223,48 @@ fn bindgen_test_layout_AVStereo3D() {
         "Offset of field: AVStereo3D::horizontal_field_of_view"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVStereo3D structure and set its fields to default values.\n The resulting struct can be freed using av_freep().\n\n @return An AVStereo3D filled with default values or NULL on failure."]
     pub fn av_stereo3d_alloc() -> *mut AVStereo3D;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVStereo3D structure and set its fields to default values.\n The resulting struct can be freed using av_freep().\n\n @return An AVStereo3D filled with default values or NULL on failure."]
     pub fn av_stereo3d_alloc_size(size: *mut usize) -> *mut AVStereo3D;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a complete AVFrameSideData and add it to the frame.\n\n @param frame The frame which side data is added to.\n\n @return The AVStereo3D structure to be filled by caller."]
     pub fn av_stereo3d_create_side_data(frame: *mut AVFrame) -> *mut AVStereo3D;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Provide a human-readable name of a given stereo3d type.\n\n @param type The input stereo3d type value.\n\n @return The name of the stereo3d value, or \"unknown\"."]
     pub fn av_stereo3d_type_name(type_: ::std::os::raw::c_uint) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVStereo3DType form a human-readable name.\n\n @param name The input string.\n\n @return The AVStereo3DType value, or -1 if not found."]
     pub fn av_stereo3d_from_name(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Provide a human-readable name of a given stereo3d view.\n\n @param type The input stereo3d view value.\n\n @return The name of the stereo3d view value, or \"unknown\"."]
     pub fn av_stereo3d_view_name(view: ::std::os::raw::c_uint) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVStereo3DView form a human-readable name.\n\n @param name The input string.\n\n @return The AVStereo3DView value, or -1 if not found."]
     pub fn av_stereo3d_view_from_name(name: *const ::std::os::raw::c_char)
         -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Provide a human-readable name of a given stereo3d primary eye.\n\n @param type The input stereo3d primary eye value.\n\n @return The name of the stereo3d primary eye value, or \"unknown\"."]
     pub fn av_stereo3d_primary_eye_name(
         eye: ::std::os::raw::c_uint,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVStereo3DPrimaryEye form a human-readable name.\n\n @param name The input string.\n\n @return The AVStereo3DPrimaryEye value, or -1 if not found."]
     pub fn av_stereo3d_primary_eye_from_name(
         name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @file\n @brief Public header for libavutil TEA algorithm\n @defgroup lavu_tea TEA\n @ingroup lavu_crypto\n @{"]
     pub static av_tea_size: ::std::os::raw::c_int;
 }
@@ -25273,15 +25273,15 @@ extern "C" {
 pub struct AVTEA {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVTEA context\n To free the struct: av_free(ptr)"]
     pub fn av_tea_alloc() -> *mut AVTEA;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVTEA context.\n\n @param ctx an AVTEA context\n @param key a key of 16 bytes used for encryption/decryption\n @param rounds the number of rounds in TEA (64 is the \"standard\")"]
     pub fn av_tea_init(ctx: *mut AVTEA, key: *const u8, rounds: ::std::os::raw::c_int);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context.\n\n @param ctx an AVTEA context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 8 byte blocks\n @param iv initialization vector for CBC mode, if NULL then ECB will be used\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_tea_crypt(
         ctx: *mut AVTEA,
@@ -25300,7 +25300,7 @@ pub struct AVThreadMessageQueue {
 #[doc = " Perform non-blocking operation.\n If this flag is set, send and recv operations are non-blocking and\n return AVERROR(EAGAIN) immediately if they can not proceed."]
 pub const AV_THREAD_MESSAGE_NONBLOCK: AVThreadMessageFlags = 1;
 pub type AVThreadMessageFlags = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate a new message queue.\n\n @param mq      pointer to the message queue\n @param nelem   maximum number of elements in the queue\n @param elsize  size of each element in the queue\n @return  >=0 for success; <0 for error, in particular AVERROR(ENOSYS) if\n          lavu was built without thread support"]
     pub fn av_thread_message_queue_alloc(
         mq: *mut *mut AVThreadMessageQueue,
@@ -25308,11 +25308,11 @@ extern "C" {
         elsize: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free a message queue.\n\n The message queue must no longer be in use by another thread."]
     pub fn av_thread_message_queue_free(mq: *mut *mut AVThreadMessageQueue);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Send a message on the queue."]
     pub fn av_thread_message_queue_send(
         mq: *mut AVThreadMessageQueue,
@@ -25320,7 +25320,7 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Receive a message from the queue."]
     pub fn av_thread_message_queue_recv(
         mq: *mut AVThreadMessageQueue,
@@ -25328,49 +25328,49 @@ extern "C" {
         flags: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the sending error code.\n\n If the error code is set to non-zero, av_thread_message_queue_send() will\n return it immediately. Conventional values, such as AVERROR_EOF or\n AVERROR(EAGAIN), can be used to cause the sending thread to stop or\n suspend its operation."]
     pub fn av_thread_message_queue_set_err_send(
         mq: *mut AVThreadMessageQueue,
         err: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the receiving error code.\n\n If the error code is set to non-zero, av_thread_message_queue_recv() will\n return it immediately when there are no longer available messages.\n Conventional values, such as AVERROR_EOF or AVERROR(EAGAIN), can be used\n to cause the receiving thread to stop or suspend its operation."]
     pub fn av_thread_message_queue_set_err_recv(
         mq: *mut AVThreadMessageQueue,
         err: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set the optional free message callback function which will be called if an\n operation is removing messages from the queue."]
     pub fn av_thread_message_queue_set_free_func(
         mq: *mut AVThreadMessageQueue,
         free_func: ::std::option::Option<unsafe extern "C" fn(msg: *mut ::std::os::raw::c_void)>,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the current number of messages in the queue.\n\n @return the current number of messages or AVERROR(ENOSYS) if lavu was built\n         without thread support"]
     pub fn av_thread_message_queue_nb_elems(mq: *mut AVThreadMessageQueue)
         -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Flush the message queue\n\n This function is mostly equivalent to reading and free-ing every message\n except that it will be done in a single operation (no lock/unlock between\n reads)."]
     pub fn av_thread_message_flush(mq: *mut AVThreadMessageQueue);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the current time in microseconds."]
     pub fn av_gettime() -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the current time in microseconds since some unspecified starting point.\n On platforms that support it, the time comes from a monotonic clock\n This property makes this time source ideal for measuring relative time.\n The returned values may not be monotonic on platforms where a monotonic\n clock is not available."]
     pub fn av_gettime_relative() -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Indicates with a boolean result if the av_gettime_relative() time source\n is monotonic."]
     pub fn av_gettime_relative_is_monotonic() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Sleep for a period of time.  Although the duration is expressed in\n microseconds, the actual delay may be rounded to the precision of the\n system timer.\n\n @param  usec Number of microseconds to sleep.\n @return zero on success or (negative) error code."]
     pub fn av_usleep(usec: ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
 }
@@ -25428,21 +25428,21 @@ fn bindgen_test_layout_AVTimecode() {
         "Offset of field: AVTimecode::fps"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Adjust frame number for NTSC drop frame time code.\n\n @param framenum frame number to adjust\n @param fps      frame per second, multiples of 30\n @return         adjusted frame number\n @warning        adjustment is only valid for multiples of NTSC 29.97"]
     pub fn av_timecode_adjust_ntsc_framenum2(
         framenum: ::std::os::raw::c_int,
         fps: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert frame number to SMPTE 12M binary representation.\n\n @param tc       timecode data correctly initialized\n @param framenum frame number\n @return         the SMPTE binary representation\n\n See SMPTE ST 314M-2005 Sec 4.4.2.2.1 \"Time code pack (TC)\"\n the format description as follows:\n bits 0-5:   hours, in BCD(6bits)\n bits 6:     BGF1\n bits 7:     BGF2 (NTSC) or FIELD (PAL)\n bits 8-14:  minutes, in BCD(7bits)\n bits 15:    BGF0 (NTSC) or BGF2 (PAL)\n bits 16-22: seconds, in BCD(7bits)\n bits 23:    FIELD (NTSC) or BGF0 (PAL)\n bits 24-29: frames, in BCD(6bits)\n bits 30:    drop  frame flag (0: non drop,    1: drop)\n bits 31:    color frame flag (0: unsync mode, 1: sync mode)\n @note BCD numbers (6 or 7 bits): 4 or 5 lower bits for units, 2 higher bits for tens.\n @note Frame number adjustment is automatically done in case of drop timecode,\n       you do NOT have to call av_timecode_adjust_ntsc_framenum2().\n @note The frame number is relative to tc->start.\n @note Color frame (CF) and binary group flags (BGF) bits are set to zero."]
     pub fn av_timecode_get_smpte_from_framenum(
         tc: *const AVTimecode,
         framenum: ::std::os::raw::c_int,
     ) -> u32;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert sei info to SMPTE 12M binary representation.\n\n @param rate     frame rate in rational form\n @param drop     drop flag\n @param hh       hour\n @param mm       minute\n @param ss       second\n @param ff       frame number\n @return         the SMPTE binary representation"]
     pub fn av_timecode_get_smpte(
         rate: AVRational,
@@ -25453,7 +25453,7 @@ extern "C" {
         ff: ::std::os::raw::c_int,
     ) -> u32;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Load timecode string in buf.\n\n @param tc       timecode data correctly initialized\n @param buf      destination buffer, must be at least AV_TIMECODE_STR_SIZE long\n @param framenum frame number\n @return         the buf parameter\n\n @note Timecode representation can be a negative timecode and have more than\n       24 hours, but will only be honored if the flags are correctly set.\n @note The frame number is relative to tc->start."]
     pub fn av_timecode_make_string(
         tc: *const AVTimecode,
@@ -25461,7 +25461,7 @@ extern "C" {
         framenum: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the timecode string from the SMPTE timecode format.\n\n In contrast to av_timecode_make_smpte_tc_string this function supports 50/60\n fps timecodes by using the field bit.\n\n @param buf        destination buffer, must be at least AV_TIMECODE_STR_SIZE long\n @param rate       frame rate of the timecode\n @param tcsmpte    the 32-bit SMPTE timecode\n @param prevent_df prevent the use of a drop flag when it is known the DF bit\n                   is arbitrary\n @param skip_field prevent the use of a field flag when it is known the field\n                   bit is arbitrary (e.g. because it is used as PC flag)\n @return           the buf parameter"]
     pub fn av_timecode_make_smpte_tc_string2(
         buf: *mut ::std::os::raw::c_char,
@@ -25471,7 +25471,7 @@ extern "C" {
         skip_field: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the timecode string from the SMPTE timecode format.\n\n @param buf        destination buffer, must be at least AV_TIMECODE_STR_SIZE long\n @param tcsmpte    the 32-bit SMPTE timecode\n @param prevent_df prevent the use of a drop flag when it is known the DF bit\n                   is arbitrary\n @return           the buf parameter"]
     pub fn av_timecode_make_smpte_tc_string(
         buf: *mut ::std::os::raw::c_char,
@@ -25479,14 +25479,14 @@ extern "C" {
         prevent_df: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the timecode string from the 25-bit timecode format (MPEG GOP format).\n\n @param buf     destination buffer, must be at least AV_TIMECODE_STR_SIZE long\n @param tc25bit the 25-bits timecode\n @return        the buf parameter"]
     pub fn av_timecode_make_mpeg_tc_string(
         buf: *mut ::std::os::raw::c_char,
         tc25bit: u32,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Init a timecode struct with the passed parameters.\n\n @param tc          pointer to an allocated AVTimecode\n @param rate        frame rate in rational form\n @param flags       miscellaneous flags such as drop frame, +24 hours, ...\n                    (see AVTimecodeFlag)\n @param frame_start the first frame number\n @param log_ctx     a pointer to an arbitrary struct of which the first field\n                    is a pointer to an AVClass struct (used for av_log)\n @return            0 on success, AVERROR otherwise"]
     pub fn av_timecode_init(
         tc: *mut AVTimecode,
@@ -25496,7 +25496,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Init a timecode struct from the passed timecode components.\n\n @param tc          pointer to an allocated AVTimecode\n @param rate        frame rate in rational form\n @param flags       miscellaneous flags such as drop frame, +24 hours, ...\n                    (see AVTimecodeFlag)\n @param hh          hours\n @param mm          minutes\n @param ss          seconds\n @param ff          frames\n @param log_ctx     a pointer to an arbitrary struct of which the first field\n                    is a pointer to an AVClass struct (used for av_log)\n @return            0 on success, AVERROR otherwise"]
     pub fn av_timecode_init_from_components(
         tc: *mut AVTimecode,
@@ -25509,7 +25509,7 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parse timecode representation (hh:mm:ss[:;.]ff).\n\n @param tc      pointer to an allocated AVTimecode\n @param rate    frame rate in rational form\n @param str     timecode string which will determine the frame start\n @param log_ctx a pointer to an arbitrary struct of which the first field is a\n                pointer to an AVClass struct (used for av_log).\n @return        0 on success, AVERROR otherwise"]
     pub fn av_timecode_init_from_string(
         tc: *mut AVTimecode,
@@ -25518,11 +25518,11 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if the timecode feature is available for the given frame rate\n\n @return 0 if supported, <0 otherwise"]
     pub fn av_timecode_check_frame_rate(rate: AVRational) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Fill the provided buffer with a string containing a timestamp time\n representation.\n\n @param buf a buffer with size in bytes of at least AV_TS_MAX_STRING_SIZE\n @param ts the timestamp to represent\n @param tb the timebase of the timestamp\n @return the buffer in input"]
     pub fn av_ts_make_time_string2(
         buf: *mut ::std::os::raw::c_char,
@@ -25536,14 +25536,14 @@ extern "C" {
 pub struct AVTreeNode {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     pub static av_tree_node_size: ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVTreeNode."]
     pub fn av_tree_node_alloc() -> *mut AVTreeNode;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find an element.\n @param root a pointer to the root node of the tree\n @param next If next is not NULL, then next[0] will contain the previous\n             element and next[1] the next element. If either does not exist,\n             then the corresponding entry in next is unchanged.\n @param cmp compare function used to compare elements in the tree,\n            API identical to that of Standard C's qsort\n            It is guaranteed that the first and only the first argument to cmp()\n            will be the key parameter to av_tree_find(), thus it could if the\n            user wants, be a different type (like an opaque context).\n @return An element with cmp(key, elem) == 0 or NULL if no such element\n         exists in the tree."]
     pub fn av_tree_find(
         root: *const AVTreeNode,
@@ -25557,7 +25557,7 @@ extern "C" {
         next: *mut *mut ::std::os::raw::c_void,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Insert or remove an element.\n\n If *next is NULL, then the supplied element will be removed if it exists.\n If *next is non-NULL, then the supplied element will be inserted, unless\n it already exists in the tree.\n\n @param rootp A pointer to a pointer to the root node of the tree; note that\n              the root node can change during insertions, this is required\n              to keep the tree balanced.\n @param key  pointer to the element key to insert in the tree\n @param next Used to allocate and free AVTreeNodes. For insertion the user\n             must set it to an allocated and zeroed object of at least\n             av_tree_node_size bytes size. av_tree_insert() will set it to\n             NULL if it has been consumed.\n             For deleting elements *next is set to NULL by the user and\n             av_tree_insert() will set it to the AVTreeNode which was\n             used for the removed element.\n             This allows the use of flat arrays, which have\n             lower overhead compared to many malloced elements.\n             You might want to define a function like:\n             @code\n             void *tree_insert(struct AVTreeNode **rootp, void *key,\n                               int (*cmp)(void *key, const void *b),\n                               AVTreeNode **next)\n             {\n                 if (!*next)\n                     *next = av_mallocz(av_tree_node_size);\n                 return av_tree_insert(rootp, key, cmp, next);\n             }\n             void *tree_remove(struct AVTreeNode **rootp, void *key,\n                               int (*cmp)(void *key, const void *b, AVTreeNode **next))\n             {\n                 av_freep(next);\n                 return av_tree_insert(rootp, key, cmp, next);\n             }\n             @endcode\n @param cmp compare function used to compare elements in the tree, API identical\n            to that of Standard C's qsort\n @return If no insertion happened, the found element; if an insertion or\n         removal happened, then either key or NULL will be returned.\n         Which one it is depends on the tree state and the implementation. You\n         should make no assumptions that it's one or the other in the code."]
     pub fn av_tree_insert(
         rootp: *mut *mut AVTreeNode,
@@ -25571,10 +25571,10 @@ extern "C" {
         next: *mut *mut AVTreeNode,
     ) -> *mut ::std::os::raw::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn av_tree_destroy(t: *mut AVTreeNode);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Apply enu(opaque, &elem) to all the elements in the tree in a given range.\n\n @param cmp a comparison function that returns < 0 for an element below the\n            range, > 0 for an element above the range and == 0 for an\n            element inside the range\n\n @note The cmp function should use the same ordering used to construct the\n       tree."]
     pub fn av_tree_enumerate(
         t: *mut AVTreeNode,
@@ -25593,7 +25593,7 @@ extern "C" {
         >,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @file\n @brief Public header for libavutil TWOFISH algorithm\n @defgroup lavu_twofish TWOFISH\n @ingroup lavu_crypto\n @{"]
     pub static av_twofish_size: ::std::os::raw::c_int;
 }
@@ -25602,11 +25602,11 @@ extern "C" {
 pub struct AVTWOFISH {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVTWOFISH context\n To free the struct: av_free(ptr)"]
     pub fn av_twofish_alloc() -> *mut AVTWOFISH;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVTWOFISH context.\n\n @param ctx an AVTWOFISH context\n @param key a key of size ranging from 1 to 32 bytes used for encryption/decryption\n @param key_bits number of keybits: 128, 192, 256 If less than the required, padded with zeroes to nearest valid value; return value is 0 if key_bits is 128/192/256, -1 if less than 0, 1 otherwise"]
     pub fn av_twofish_init(
         ctx: *mut AVTWOFISH,
@@ -25614,7 +25614,7 @@ extern "C" {
         key_bits: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context\n\n @param ctx an AVTWOFISH context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 16 byte blocks\n @param iv initialization vector for CBC mode, NULL for ECB mode\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_twofish_crypt(
         ctx: *mut AVTWOFISH,
@@ -25783,7 +25783,7 @@ pub const AV_TX_REAL_TO_REAL: AVTXFlags = 8;
 pub const AV_TX_REAL_TO_IMAGINARY: AVTXFlags = 16;
 #[doc = " Flags for av_tx_init()"]
 pub type AVTXFlags = ::std::os::raw::c_uint;
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize a transform context with the given configuration\n (i)MDCTs with an odd length are currently not supported.\n\n @param ctx the context to allocate, will be NULL on error\n @param tx pointer to the transform function pointer to set\n @param type type the type of transform\n @param inv whether to do an inverse or a forward transform\n @param len the size of the transform in samples\n @param scale pointer to the value to scale the output if supported by type\n @param flags a bitmask of AVTXFlags or 0\n\n @return 0 on success, negative error code on failure"]
     pub fn av_tx_init(
         ctx: *mut *mut AVTXContext,
@@ -25795,23 +25795,23 @@ extern "C" {
         flags: u64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Frees a context and sets *ctx to NULL, does nothing when *ctx == NULL."]
     pub fn av_tx_uninit(ctx: *mut *mut AVTXContext);
 }
 pub type AVUUID = [u8; 16usize];
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parses a string representation of a UUID formatted according to IETF RFC 4122\n into an AVUUID. The parsing is case-insensitive. The string must be 37\n characters long, including the terminating NUL character.\n\n Example string representation: \"2fceebd0-7017-433d-bafb-d073a7116696\"\n\n @param[in]  in  String representation of a UUID,\n                 e.g. 2fceebd0-7017-433d-bafb-d073a7116696\n @param[out] uu  AVUUID\n @return         A non-zero value in case of an error."]
     pub fn av_uuid_parse(in_: *const ::std::os::raw::c_char, uu: *mut u8) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parses a URN representation of a UUID, as specified at IETF RFC 4122,\n into an AVUUID. The parsing is case-insensitive. The string must be 46\n characters long, including the terminating NUL character.\n\n Example string representation: \"urn:uuid:2fceebd0-7017-433d-bafb-d073a7116696\"\n\n @param[in]  in  URN UUID\n @param[out] uu  AVUUID\n @return         A non-zero value in case of an error."]
     pub fn av_uuid_urn_parse(
         in_: *const ::std::os::raw::c_char,
         uu: *mut u8,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Parses a string representation of a UUID formatted according to IETF RFC 4122\n into an AVUUID. The parsing is case-insensitive.\n\n @param[in]  in_start Pointer to the first character of the string representation\n @param[in]  in_end   Pointer to the character after the last character of the\n                      string representation. That memory location is never\n                      accessed. It is an error if `in_end - in_start != 36`.\n @param[out] uu       AVUUID\n @return              A non-zero value in case of an error."]
     pub fn av_uuid_parse_range(
         in_start: *const ::std::os::raw::c_char,
@@ -25819,7 +25819,7 @@ extern "C" {
         uu: *mut u8,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Serializes a AVUUID into a string representation according to IETF RFC 4122.\n The string is lowercase and always 37 characters long, including the\n terminating NUL character.\n\n @param[in]  uu  AVUUID\n @param[out] out Pointer to an array of no less than 37 characters."]
     pub fn av_uuid_unparse(uu: *const u8, out: *mut ::std::os::raw::c_char);
 }
@@ -25947,7 +25947,7 @@ fn bindgen_test_layout_AVVideoBlockParams() {
         "Offset of field: AVVideoBlockParams::delta_qp"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates memory for AVVideoEncParams of the given type, plus an array of\n {@code nb_blocks} AVVideoBlockParams and initializes the variables. Can be\n freed with a normal av_free() call.\n\n @param out_size if non-NULL, the size in bytes of the resulting data array is\n written here."]
     pub fn av_video_enc_params_alloc(
         type_: AVVideoEncParamsType,
@@ -25955,7 +25955,7 @@ extern "C" {
         out_size: *mut usize,
     ) -> *mut AVVideoEncParams;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocates memory for AVEncodeInfoFrame plus an array of\n {@code nb_blocks} AVEncodeInfoBlock in the given AVFrame {@code frame}\n as AVFrameSideData of type AV_FRAME_DATA_VIDEO_ENC_PARAMS\n and initializes the variables."]
     pub fn av_video_enc_params_create_side_data(
         frame: *mut AVFrame,
@@ -26055,11 +26055,11 @@ fn bindgen_test_layout_AVVideoHint() {
         "Offset of field: AVVideoHint::type_"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate memory for the AVVideoHint struct along with an nb_rects-sized\n arrays of AVVideoRect.\n\n The side data contains a list of rectangles for the portions of the frame\n which changed from the last encoded one (and the remainder are assumed to be\n changed), or, alternately (depending on the type parameter) the unchanged\n ones (and the remaining ones are those which changed).\n Macroblocks will thus be hinted either to be P_SKIP-ped or go through the\n regular encoding procedure.\n\n It's responsibility of the caller to fill the AVRects accordingly, and to set\n the proper AVVideoHintType field.\n\n @param out_size if non-NULL, the size in bytes of the resulting data array is\n                 written here\n\n @return newly allocated AVVideoHint struct (must be freed by the caller using\n         av_free()) on success, NULL on memory allocation failure"]
     pub fn av_video_hint_alloc(nb_rects: usize, out_size: *mut usize) -> *mut AVVideoHint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Same as av_video_hint_alloc(), except newly-allocated AVVideoHint is attached\n as side data of type AV_FRAME_DATA_VIDEO_HINT_INFO to frame."]
     pub fn av_video_hint_create_side_data(frame: *mut AVFrame, nb_rects: usize)
         -> *mut AVVideoHint;
@@ -26086,19 +26086,19 @@ fn bindgen_test_layout_AVXTEA() {
         "Offset of field: AVXTEA::key"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an AVXTEA context."]
     pub fn av_xtea_alloc() -> *mut AVXTEA;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVXTEA context.\n\n @param ctx an AVXTEA context\n @param key a key of 16 bytes used for encryption/decryption,\n            interpreted as big endian 32 bit numbers"]
     pub fn av_xtea_init(ctx: *mut AVXTEA, key: *const u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize an AVXTEA context.\n\n @param ctx an AVXTEA context\n @param key a key of 16 bytes used for encryption/decryption,\n            interpreted as little endian 32 bit numbers"]
     pub fn av_xtea_le_init(ctx: *mut AVXTEA, key: *const u8);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context,\n in big endian format.\n\n @param ctx an AVXTEA context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 8 byte blocks\n @param iv initialization vector for CBC mode, if NULL then ECB will be used\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_xtea_crypt(
         ctx: *mut AVXTEA,
@@ -26109,7 +26109,7 @@ extern "C" {
         decrypt: ::std::os::raw::c_int,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Encrypt or decrypt a buffer using a previously initialized context,\n in little endian format.\n\n @param ctx an AVXTEA context\n @param dst destination array, can be equal to src\n @param src source array, can be equal to dst\n @param count number of 8 byte blocks\n @param iv initialization vector for CBC mode, if NULL then ECB will be used\n @param decrypt 0 for encryption, 1 for decryption"]
     pub fn av_xtea_le_crypt(
         ctx: *mut AVXTEA,
@@ -26158,23 +26158,23 @@ pub type SwrFilterType = ::std::os::raw::c_uint;
 pub struct SwrContext {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVClass for SwrContext. It can be used in combination with\n AV_OPT_SEARCH_FAKE_OBJ for examining options.\n\n @see av_opt_find().\n @return the AVClass of SwrContext"]
     pub fn swr_get_class() -> *const AVClass;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate SwrContext.\n\n If you use this function you will need to set the parameters (manually or\n with swr_alloc_set_opts2()) before calling swr_init().\n\n @see swr_alloc_set_opts2(), swr_init(), swr_free()\n @return NULL on error, allocated context otherwise"]
     pub fn swr_alloc() -> *mut SwrContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize context after user parameters have been set.\n @note The context must be configured using the AVOption API.\n\n @see av_opt_set_int()\n @see av_opt_set_dict()\n\n @param[in,out]   s Swr context to initialize\n @return AVERROR error code in case of failure."]
     pub fn swr_init(s: *mut SwrContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check whether an swr context has been initialized or not.\n\n @param[in]       s Swr context to check\n @see swr_init()\n @return positive if it has been initialized, 0 if not initialized"]
     pub fn swr_is_initialized(s: *mut SwrContext) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate SwrContext if needed and set/reset common parameters.\n\n This function does not require *ps to be allocated with swr_alloc(). On the\n other hand, swr_alloc() can use swr_alloc_set_opts2() to set the parameters\n on the allocated context.\n\n @param ps              Pointer to an existing Swr context if available, or to NULL if not.\n                        On success, *ps will be set to the allocated context.\n @param out_ch_layout   output channel layout (e.g. AV_CHANNEL_LAYOUT_*)\n @param out_sample_fmt  output sample format (AV_SAMPLE_FMT_*).\n @param out_sample_rate output sample rate (frequency in Hz)\n @param in_ch_layout    input channel layout (e.g. AV_CHANNEL_LAYOUT_*)\n @param in_sample_fmt   input sample format (AV_SAMPLE_FMT_*).\n @param in_sample_rate  input sample rate (frequency in Hz)\n @param log_offset      logging level offset\n @param log_ctx         parent logging context, can be NULL\n\n @see swr_init(), swr_free()\n @return 0 on success, a negative AVERROR code on error.\n         On error, the Swr context is freed and *ps set to NULL."]
     pub fn swr_alloc_set_opts2(
         ps: *mut *mut SwrContext,
@@ -26188,15 +26188,15 @@ extern "C" {
         log_ctx: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the given SwrContext and set the pointer to NULL.\n\n @param[in] s a pointer to a pointer to Swr context"]
     pub fn swr_free(s: *mut *mut SwrContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Closes the context so that swr_is_initialized() returns 0.\n\n The context can be brought back to life by running swr_init(),\n swr_init() can also be used without swr_close().\n This function is mainly provided for simplifying the usecase\n where one tries to support libavresample and libswresample.\n\n @param[in,out] s Swr context to be closed"]
     pub fn swr_close(s: *mut SwrContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert audio.\n\n in and in_count can be set to 0 to flush the last few samples out at the\n end.\n\n If more input is provided than output space, then the input will be buffered.\n You can avoid this buffering by using swr_get_out_samples() to retrieve an\n upper bound on the required number of output samples for the given number of\n input samples. Conversion will run directly without copying whenever possible.\n\n @param s         allocated Swr context, with parameters set\n @param out       output buffers, only the first one need be set in case of packed audio\n @param out_count amount of space available for output in samples per channel\n @param in        input buffers, only the first one need to be set in case of packed audio\n @param in_count  number of input samples available in one channel\n\n @return number of samples output per channel, negative value on error"]
     pub fn swr_convert(
         s: *mut SwrContext,
@@ -26206,11 +26206,11 @@ extern "C" {
         in_count: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert the next timestamp from input to output\n timestamps are in 1/(in_sample_rate * out_sample_rate) units.\n\n @note There are 2 slightly differently behaving modes.\n       @li When automatic timestamp compensation is not used, (min_compensation >= FLT_MAX)\n              in this case timestamps will be passed through with delays compensated\n       @li When automatic timestamp compensation is used, (min_compensation < FLT_MAX)\n              in this case the output timestamps will match output sample numbers.\n              See ffmpeg-resampler(1) for the two modes of compensation.\n\n @param[in] s     initialized Swr context\n @param[in] pts   timestamp for the next input sample, INT64_MIN if unknown\n @see swr_set_compensation(), swr_drop_output(), and swr_inject_silence() are\n      function used internally for timestamp compensation.\n @return the output timestamp for the next output sample"]
     pub fn swr_next_pts(s: *mut SwrContext, pts: i64) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Activate resampling compensation (\"soft\" compensation). This function is\n internally called when needed in swr_next_pts().\n\n @param[in,out] s             allocated Swr context. If it is not initialized,\n                              or SWR_FLAG_RESAMPLE is not set, swr_init() is\n                              called with the flag set.\n @param[in]     sample_delta  delta in PTS per sample\n @param[in]     compensation_distance number of samples to compensate for\n @return    >= 0 on success, AVERROR error codes if:\n            @li @c s is NULL,\n            @li @c compensation_distance is less than 0,\n            @li @c compensation_distance is 0 but sample_delta is not,\n            @li compensation unsupported by resampler, or\n            @li swr_init() fails when called."]
     pub fn swr_set_compensation(
         s: *mut SwrContext,
@@ -26218,14 +26218,14 @@ extern "C" {
         compensation_distance: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set a customized input channel mapping.\n\n @param[in,out] s           allocated Swr context, not yet initialized\n @param[in]     channel_map customized input channel mapping (array of channel\n                            indexes, -1 for a muted channel)\n @return >= 0 on success, or AVERROR error code in case of failure."]
     pub fn swr_set_channel_mapping(
         s: *mut SwrContext,
         channel_map: *const ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Generate a channel mixing matrix.\n\n This function is the one used internally by libswresample for building the\n default mixing matrix. It is made public just as a utility function for\n building custom matrices.\n\n @param in_layout           input channel layout\n @param out_layout          output channel layout\n @param center_mix_level    mix level for the center channel\n @param surround_mix_level  mix level for the surround channel(s)\n @param lfe_mix_level       mix level for the low-frequency effects channel\n @param rematrix_maxval     if 1.0, coefficients will be normalized to prevent\n                            overflow. if INT_MAX, coefficients will not be\n                            normalized.\n @param[out] matrix         mixing coefficients; matrix[i + stride * o] is\n                            the weight of input channel i in output channel o.\n @param stride              distance between adjacent input channels in the\n                            matrix array\n @param matrix_encoding     matrixed stereo downmix mode (e.g. dplii)\n @param log_ctx             parent logging context, can be NULL\n @return                    0 on success, negative AVERROR code on failure"]
     pub fn swr_build_matrix2(
         in_layout: *const AVChannelLayout,
@@ -26241,7 +26241,7 @@ extern "C" {
         log_context: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Set a customized remix matrix.\n\n @param s       allocated Swr context, not yet initialized\n @param matrix  remix coefficients; matrix[i + stride * o] is\n                the weight of input channel i in output channel o\n @param stride  offset between lines of the matrix\n @return  >= 0 on success, or AVERROR error code in case of failure."]
     pub fn swr_set_matrix(
         s: *mut SwrContext,
@@ -26249,44 +26249,44 @@ extern "C" {
         stride: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Drops the specified number of output samples.\n\n This function, along with swr_inject_silence(), is called by swr_next_pts()\n if needed for \"hard\" compensation.\n\n @param s     allocated Swr context\n @param count number of samples to be dropped\n\n @return >= 0 on success, or a negative AVERROR code on failure"]
     pub fn swr_drop_output(
         s: *mut SwrContext,
         count: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Injects the specified number of silence samples.\n\n This function, along with swr_drop_output(), is called by swr_next_pts()\n if needed for \"hard\" compensation.\n\n @param s     allocated Swr context\n @param count number of samples to be dropped\n\n @return >= 0 on success, or a negative AVERROR code on failure"]
     pub fn swr_inject_silence(
         s: *mut SwrContext,
         count: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Gets the delay the next input sample will experience relative to the next output sample.\n\n Swresample can buffer data if more input has been provided than available\n output space, also converting between sample rates needs a delay.\n This function returns the sum of all such delays.\n The exact delay is not necessarily an integer value in either input or\n output sample rate. Especially when downsampling by a large value, the\n output sample rate may be a poor choice to represent the delay, similarly\n for upsampling and the input sample rate.\n\n @param s     swr context\n @param base  timebase in which the returned delay will be:\n              @li if it's set to 1 the returned delay is in seconds\n              @li if it's set to 1000 the returned delay is in milliseconds\n              @li if it's set to the input sample rate then the returned\n                  delay is in input samples\n              @li if it's set to the output sample rate then the returned\n                  delay is in output samples\n              @li if it's the least common multiple of in_sample_rate and\n                  out_sample_rate then an exact rounding-free delay will be\n                  returned\n @returns     the delay in 1 / @c base units."]
     pub fn swr_get_delay(s: *mut SwrContext, base: i64) -> i64;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Find an upper bound on the number of samples that the next swr_convert\n call will output, if called with in_samples of input samples. This\n depends on the internal state, and anything changing the internal state\n (like further swr_convert() calls) will may change the number of samples\n swr_get_out_samples() returns for the same number of input samples.\n\n @param in_samples    number of input samples.\n @note any call to swr_inject_silence(), swr_convert(), swr_next_pts()\n       or swr_set_compensation() invalidates this limit\n @note it is recommended to pass the correct available buffer size\n       to all functions like swr_convert() even if swr_get_out_samples()\n       indicates that less would be used.\n @returns an upper bound on the number of samples that the next swr_convert\n          will output or a negative value to indicate an error"]
     pub fn swr_get_out_samples(
         s: *mut SwrContext,
         in_samples: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the @ref LIBSWRESAMPLE_VERSION_INT constant.\n\n This is useful to check if the build-time libswresample has the same version\n as the run-time one.\n\n @returns     the unsigned int-typed version"]
     pub fn swresample_version() -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the swr build-time configuration.\n\n @returns     the build-time @c ./configure flags"]
     pub fn swresample_configuration() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the swr license.\n\n @returns     the license of libswresample, determined at build-time"]
     pub fn swresample_license() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert the samples in the input AVFrame and write them to the output AVFrame.\n\n Input and output AVFrames must have channel_layout, sample_rate and format set.\n\n If the output AVFrame does not have the data pointers allocated the nb_samples\n field will be set using av_frame_get_buffer()\n is called to allocate the frame.\n\n The output AVFrame can be NULL or have fewer allocated samples than required.\n In this case, any remaining samples not written to the output will be added\n to an internal FIFO buffer, to be returned at the next call to this function\n or to swr_convert().\n\n If converting sample rate, there may be data remaining in the internal\n resampling delay buffer. swr_get_delay() tells the number of\n remaining samples. To get this data as output, call this function or\n swr_convert() with NULL input.\n\n If the SwrContext configuration does not match the output and\n input AVFrame settings the conversion does not take place and depending on\n which AVFrame is not matching AVERROR_OUTPUT_CHANGED, AVERROR_INPUT_CHANGED\n or the result of a bitwise-OR of them is returned.\n\n @see swr_delay()\n @see swr_convert()\n @see swr_get_delay()\n\n @param swr             audio resample context\n @param output          output AVFrame\n @param input           input AVFrame\n @return                0 on success, AVERROR on failure or nonmatching\n                        configuration."]
     pub fn swr_convert_frame(
         swr: *mut SwrContext,
@@ -26294,7 +26294,7 @@ extern "C" {
         input: *const AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Configure or reconfigure the SwrContext using the information\n provided by the AVFrames.\n\n The original resampling context is reset even on failure.\n The function calls swr_close() internally if the context is open.\n\n @see swr_close();\n\n @param swr             audio resample context\n @param out             output AVFrame\n @param in              input AVFrame\n @return                0 on success, AVERROR on failure."]
     pub fn swr_config_frame(
         swr: *mut SwrContext,
@@ -26302,19 +26302,19 @@ extern "C" {
         in_: *const AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @defgroup libsws libswscale\n Color conversion and scaling library.\n\n @{\n\n Return the LIBSWSCALE_VERSION_INT constant."]
     pub fn swscale_version() -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libswscale build-time configuration."]
     pub fn swscale_configuration() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return the libswscale license."]
     pub fn swscale_license() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the AVClass for SwsContext. It can be used in combination with\n AV_OPT_SEARCH_FAKE_OBJ for examining options.\n\n @see av_opt_find()."]
     pub fn sws_get_class() -> *const AVClass;
 }
@@ -26552,54 +26552,54 @@ fn bindgen_test_layout_SwsContext() {
         "Offset of field: SwsContext::intent"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate an empty SwsContext and set its fields to default values."]
     pub fn sws_alloc_context() -> *mut SwsContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the context and everything associated with it, and write NULL\n to the provided pointer."]
     pub fn sws_free_context(ctx: *mut *mut SwsContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Test if a given (software) pixel format is supported.\n\n @param output  If 0, test if compatible with the source/input frame;\n                otherwise, with the destination/output frame.\n @param format  The format to check.\n\n @return A positive integer if supported, 0 otherwise."]
     pub fn sws_test_format(
         format: AVPixelFormat,
         output: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Test if a given hardware pixel format is supported.\n\n @param format  The hardware format to check, or AV_PIX_FMT_NONE.\n\n @return A positive integer if supported or AV_PIX_FMT_NONE, 0 otherwise."]
     pub fn sws_test_hw_format(format: AVPixelFormat) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Test if a given color space is supported.\n\n @param output  If 0, test if compatible with the source/input frame;\n                otherwise, with the destination/output frame.\n @param colorspace The colorspace to check.\n\n @return A positive integer if supported, 0 otherwise."]
     pub fn sws_test_colorspace(
         colorspace: AVColorSpace,
         output: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Test if a given set of color primaries is supported.\n\n @param output  If 0, test if compatible with the source/input frame;\n                otherwise, with the destination/output frame.\n @param primaries The color primaries to check.\n\n @return A positive integer if supported, 0 otherwise."]
     pub fn sws_test_primaries(
         primaries: AVColorPrimaries,
         output: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Test if a given color transfer function is supported.\n\n @param output  If 0, test if compatible with the source/input frame;\n                otherwise, with the destination/output frame.\n @param trc     The color transfer function to check.\n\n @return A positive integer if supported, 0 otherwise."]
     pub fn sws_test_transfer(
         trc: AVColorTransferCharacteristic,
         output: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Helper function to run all sws_test_* against a frame, as well as testing\n the basic frame properties for sanity. Ignores irrelevant properties - for\n example, AVColorSpace is not checked for RGB frames."]
     pub fn sws_test_frame(
         frame: *const AVFrame,
         output: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Like `sws_scale_frame`, but without actually scaling. It will instead\n merely initialize internal state that *would* be required to perform the\n operation, as well as returning the correct error code for unsupported\n frame combinations.\n\n @param ctx   The scaling context.\n @param dst   The destination frame to consider.\n @param src   The source frame to consider.\n @return 0 on success, a negative AVERROR code on failure."]
     pub fn sws_frame_setup(
         ctx: *mut SwsContext,
@@ -26607,11 +26607,11 @@ extern "C" {
         src: *const AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if a given conversion is a noop. Returns a positive integer if\n no operation needs to be performed, 0 otherwise."]
     pub fn sws_is_noop(dst: *const AVFrame, src: *const AVFrame) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Scale source data from `src` and write the output to `dst`.\n\n This function can be used directly on an allocated context, without setting\n up any frame properties or calling `sws_init_context()`. Such usage is fully\n dynamic and does not require reallocation if the frame properties change.\n\n Alternatively, this function can be called on a context that has been\n explicitly initialized. However, this is provided only for backwards\n compatibility. In this usage mode, all frame properties must be correctly\n set at init time, and may no longer change after initialization.\n\n @param ctx   The scaling context.\n @param dst   The destination frame. The data buffers may either be already\n              allocated by the caller or left clear, in which case they will\n              be allocated by the scaler. The latter may have performance\n              advantages - e.g. in certain cases some (or all) output planes\n              may be references to input planes, rather than copies.\n @param src   The source frame. If the data buffers are set to NULL, then\n              this function behaves identically to `sws_frame_setup`.\n @return >= 0 on success, a negative AVERROR code on failure."]
     pub fn sws_scale_frame(
         c: *mut SwsContext,
@@ -26619,7 +26619,7 @@ extern "C" {
         src: *const AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a pointer to yuv<->rgb coefficients for the given colorspace\n suitable for sws_setColorspaceDetails().\n\n @param colorspace One of the SWS_CS_* macros. If invalid,\n SWS_CS_DEFAULT is used."]
     pub fn sws_getCoefficients(colorspace: ::std::os::raw::c_int) -> *const ::std::os::raw::c_int;
 }
@@ -26699,19 +26699,19 @@ fn bindgen_test_layout_SwsFilter() {
         "Offset of field: SwsFilter::chrV"
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a positive value if pix_fmt is a supported input format, 0\n otherwise."]
     pub fn sws_isSupportedInput(pix_fmt: AVPixelFormat) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a positive value if pix_fmt is a supported output format, 0\n otherwise."]
     pub fn sws_isSupportedOutput(pix_fmt: AVPixelFormat) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @param[in]  pix_fmt the pixel format\n @return a positive value if an endianness conversion for pix_fmt is\n supported, 0 otherwise."]
     pub fn sws_isSupportedEndiannessConversion(pix_fmt: AVPixelFormat) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize the swscaler context sws_context.\n\n This function is considered deprecated, and provided only for backwards\n compatibility with sws_scale() and sws_frame_start(). The preferred way to\n use libswscale is to set all frame properties correctly and call\n sws_scale_frame() directly, without explicitly initializing the context.\n\n @return zero or positive value on success, a negative value on\n error"]
     pub fn sws_init_context(
         sws_context: *mut SwsContext,
@@ -26719,11 +26719,11 @@ extern "C" {
         dstFilter: *mut SwsFilter,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Free the swscaler context swsContext.\n If swsContext is NULL, then does nothing."]
     pub fn sws_freeContext(swsContext: *mut SwsContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and return an SwsContext. You need it to perform\n scaling/conversion operations using sws_scale().\n\n @param srcW the width of the source image\n @param srcH the height of the source image\n @param srcFormat the source image format\n @param dstW the width of the destination image\n @param dstH the height of the destination image\n @param dstFormat the destination image format\n @param flags specify which algorithm and options to use for rescaling\n @param param extra parameters to tune the used scaler\n              For SWS_BICUBIC param[0] and [1] tune the shape of the basis\n              function, param[0] tunes f(1) and param[1] f´(1)\n              For SWS_GAUSS param[0] tunes the exponent and thus cutoff\n              frequency\n              For SWS_LANCZOS param[0] tunes the width of the window function\n @return a pointer to an allocated context, or NULL in case of error\n @note this function is to be removed after a saner alternative is\n       written"]
     pub fn sws_getContext(
         srcW: ::std::os::raw::c_int,
@@ -26738,7 +26738,7 @@ extern "C" {
         param: *const f64,
     ) -> *mut SwsContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Scale the image slice in srcSlice and put the resulting scaled\n slice in the image in dst. A slice is a sequence of consecutive\n rows in an image. Requires a context that has previously been\n initialized with sws_init_context().\n\n Slices have to be provided in sequential order, either in\n top-bottom or bottom-top order. If slices are provided in\n non-sequential order the behavior of the function is undefined.\n\n @param c         the scaling context previously created with\n                  sws_getContext()\n @param srcSlice  the array containing the pointers to the planes of\n                  the source slice\n @param srcStride the array containing the strides for each plane of\n                  the source image\n @param srcSliceY the position in the source image of the slice to\n                  process, that is the number (counted starting from\n                  zero) in the image of the first row of the slice\n @param srcSliceH the height of the source slice, that is the number\n                  of rows in the slice\n @param dst       the array containing the pointers to the planes of\n                  the destination image\n @param dstStride the array containing the strides for each plane of\n                  the destination image\n @return          the height of the output slice"]
     pub fn sws_scale(
         c: *mut SwsContext,
@@ -26750,7 +26750,7 @@ extern "C" {
         dstStride: *const ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Initialize the scaling process for a given pair of source/destination frames.\n Must be called before any calls to sws_send_slice() and sws_receive_slice().\n Requires a context that has previously been initialized with sws_init_context().\n\n This function will retain references to src and dst, so they must both use\n refcounted buffers (if allocated by the caller, in case of dst).\n\n @param c   The scaling context\n @param dst The destination frame.\n\n            The data buffers may either be already allocated by the caller or\n            left clear, in which case they will be allocated by the scaler.\n            The latter may have performance advantages - e.g. in certain cases\n            some output planes may be references to input planes, rather than\n            copies.\n\n            Output data will be written into this frame in successful\n            sws_receive_slice() calls.\n @param src The source frame. The data buffers must be allocated, but the\n            frame data does not have to be ready at this point. Data\n            availability is then signalled by sws_send_slice().\n @return 0 on success, a negative AVERROR code on failure\n\n @see sws_frame_end()"]
     pub fn sws_frame_start(
         c: *mut SwsContext,
@@ -26758,11 +26758,11 @@ extern "C" {
         src: *const AVFrame,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Finish the scaling process for a pair of source/destination frames previously\n submitted with sws_frame_start(). Must be called after all sws_send_slice()\n and sws_receive_slice() calls are done, before any new sws_frame_start()\n calls.\n\n @param c   The scaling context"]
     pub fn sws_frame_end(c: *mut SwsContext);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Indicate that a horizontal slice of input data is available in the source\n frame previously provided to sws_frame_start(). The slices may be provided in\n any order, but may not overlap. For vertically subsampled pixel formats, the\n slices must be aligned according to subsampling.\n\n @param c   The scaling context\n @param slice_start first row of the slice\n @param slice_height number of rows in the slice\n\n @return a non-negative number on success, a negative AVERROR code on failure."]
     pub fn sws_send_slice(
         c: *mut SwsContext,
@@ -26770,7 +26770,7 @@ extern "C" {
         slice_height: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Request a horizontal slice of the output data to be written into the frame\n previously provided to sws_frame_start().\n\n @param c   The scaling context\n @param slice_start first row of the slice; must be a multiple of\n                    sws_receive_slice_alignment()\n @param slice_height number of rows in the slice; must be a multiple of\n                     sws_receive_slice_alignment(), except for the last slice\n                     (i.e. when slice_start+slice_height is equal to output\n                     frame height)\n\n @return a non-negative number if the data was successfully written into the output\n         AVERROR(EAGAIN) if more input data needs to be provided before the\n                         output can be produced\n         another negative AVERROR code on other kinds of scaling failure"]
     pub fn sws_receive_slice(
         c: *mut SwsContext,
@@ -26778,11 +26778,11 @@ extern "C" {
         slice_height: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Get the alignment required for slices. Requires a context that has\n previously been initialized with sws_init_context().\n\n @param c   The scaling context\n @return alignment required for output slices requested with sws_receive_slice().\n         Slice offsets and sizes passed to sws_receive_slice() must be\n         multiples of the value returned from this function."]
     pub fn sws_receive_slice_alignment(c: *const SwsContext) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @param c the scaling context\n @param dstRange flag indicating the white-black range of the output (1=jpeg / 0=mpeg)\n @param srcRange flag indicating the white-black range of the input (1=jpeg / 0=mpeg)\n @param table the yuv2rgb coefficients describing the output yuv space, normally ff_yuv2rgb_coeffs[x]\n @param inv_table the yuv2rgb coefficients describing the input yuv space, normally ff_yuv2rgb_coeffs[x]\n @param brightness 16.16 fixed point brightness correction\n @param contrast 16.16 fixed point contrast correction\n @param saturation 16.16 fixed point saturation correction\n\n @return A negative error code on error, non negative otherwise.\n         If `LIBSWSCALE_VERSION_MAJOR < 7`, returns -1 if not supported."]
     pub fn sws_setColorspaceDetails(
         c: *mut SwsContext,
@@ -26795,7 +26795,7 @@ extern "C" {
         saturation: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " @return A negative error code on error, non negative otherwise.\n         If `LIBSWSCALE_VERSION_MAJOR < 7`, returns -1 if not supported."]
     pub fn sws_getColorspaceDetails(
         c: *mut SwsContext,
@@ -26808,26 +26808,26 @@ extern "C" {
         saturation: *mut ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Allocate and return an uninitialized vector with length coefficients."]
     pub fn sws_allocVec(length: ::std::os::raw::c_int) -> *mut SwsVector;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Return a normalized Gaussian curve used to filter stuff\n quality = 3 is high quality, lower is lower quality."]
     pub fn sws_getGaussianVec(variance: f64, quality: f64) -> *mut SwsVector;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Scale all the coefficients of a by the scalar value."]
     pub fn sws_scaleVec(a: *mut SwsVector, scalar: f64);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Scale all the coefficients of a so that their sum equals height."]
     pub fn sws_normalizeVec(a: *mut SwsVector, height: f64);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sws_freeVec(a: *mut SwsVector);
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sws_getDefaultFilter(
         lumaGBlur: f32,
         chromaGBlur: f32,
@@ -26838,10 +26838,10 @@ extern "C" {
         verbose: ::std::os::raw::c_int,
     ) -> *mut SwsFilter;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn sws_freeFilter(filter: *mut SwsFilter);
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Check if context can be reused, otherwise reallocate a new one.\n\n If context is NULL, just calls sws_getContext() to get a new\n context. Otherwise, checks if the parameters are the ones already\n saved in context. If that is the case, returns the current\n context. Otherwise, frees context and gets a new context with\n the new parameters.\n\n Be warned that srcFilter and dstFilter are not checked, they\n are assumed to remain the same."]
     pub fn sws_getCachedContext(
         context: *mut SwsContext,
@@ -26857,7 +26857,7 @@ extern "C" {
         param: *const f64,
     ) -> *mut SwsContext;
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert an 8-bit paletted frame into a frame with a color depth of 32 bits.\n\n The output frame will have the same packed format as the palette.\n\n @param src        source frame buffer\n @param dst        destination frame buffer\n @param num_pixels number of pixels to convert\n @param palette    array with [256] entries, which must match color arrangement (RGB or BGR) of src"]
     pub fn sws_convertPalette8ToPacked32(
         src: *const u8,
@@ -26866,7 +26866,7 @@ extern "C" {
         palette: *const u8,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[doc = " Convert an 8-bit paletted frame into a frame with a color depth of 24 bits.\n\n With the palette format \"ABCD\", the destination frame ends up with the format \"ABC\".\n\n @param src        source frame buffer\n @param dst        destination frame buffer\n @param num_pixels number of pixels to convert\n @param palette    array with [256] entries, which must match color arrangement (RGB or BGR) of src"]
     pub fn sws_convertPalette8ToPacked24(
         src: *const u8,

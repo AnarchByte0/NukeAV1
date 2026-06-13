@@ -155,6 +155,7 @@ fn main() {
     // 4. Generate Premiere Pro Bindings
     let bindings = bindgen::Builder::default()
         .header("src/ffi/wrapper.hpp")
+        .rust_target(bindgen::RustTarget::Nightly)
         .clang_arg(format!("-I{}", sdk_headers.display()))
         .clang_arg("-x")
         .clang_arg("c++")
@@ -165,8 +166,13 @@ fn main() {
 
     match bindings {
         Ok(b) => {
-            b.write_to_file(out_dir.join("pr_sdk_bindings.rs"))
+            let path = out_dir.join("pr_sdk_bindings.rs");
+            b.write_to_file(&path)
                 .expect("Couldn't write bindings!");
+            if let Ok(content) = fs::read_to_string(&path) {
+                let patched = content.replace("extern \"C\" {", "unsafe extern \"C\" {");
+                let _ = fs::write(&path, patched);
+            }
         }
         Err(e) => {
             panic!("Cannot generate bindings for Premiere Pro SDK: {:?}", e);
