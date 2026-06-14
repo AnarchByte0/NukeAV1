@@ -10,7 +10,7 @@ A high-performance **AV1, VP8 & VP9 Importer and Exporter plugin for Adobe Premi
 ## Key Features ✨
 
 - **Cross-Platform Support:** Native support for both **Windows** (`.prm`) and **macOS** (`.bundle` for both Apple Silicon M1/M2/M3 and Intel).
-- **High-Performance Importer (Decoder):** Decode AV1 and VP9 streams natively within the Premiere Pro timeline.
+- **High-Performance Importer (Decoder):** Decode AV1, VP8 and VP9 streams natively within the Premiere Pro timeline.
 - **Advanced Exporter (Encoder):** Encode sequences into AV1, VP8, and VP9 video streams.
 - **Dynamic Parameter UI Update:**
   - Real-time interface updates when selecting **Rate Control** modes (Constant Bitrate, Constant QP, Variable Bitrate, or Variable Bitrate with Target Quality).
@@ -32,7 +32,7 @@ The project is structured as follows:
   - `adobe.rs`: Auto-generated bindings to Premiere Pro C++ SDK.
   - `ffmpeg.rs`: FFI bindings to static FFmpeg libraries.
 - **`src/plugin/`**: Core video plugin logic.
-  - `importer/`: Handles importing, frame-by-frame decoding, and asynchronous parsing of AV1/VP9 video.
+  - `importer/`: Handles importing, frame-by-frame decoding, and asynchronous parsing of AV1, VP8 and VP9 video.
   - `exporter/`: Manages exporting configurations, multiplexer preferences, and interfacing with FFmpeg encoders.
   - `shared.rs`: Common pixel format and color space conversion utilities shared between importer and exporter to minimize binary size.
 - **`src/utils/`**: Shared helper files (UIBuilder, cache preference check, string conversions).
