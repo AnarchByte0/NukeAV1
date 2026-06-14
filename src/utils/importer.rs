@@ -1,3 +1,6 @@
+use std::path::PathBuf;
+
+#[cfg(target_os = "windows")]
 #[repr(C)]
 #[allow(non_snake_case)]
 struct MEMORYSTATUSEX {
@@ -12,14 +15,19 @@ struct MEMORYSTATUSEX {
     ullAvailExtendedVirtual: u64,
 }
 
+#[cfg(target_os = "windows")]
 unsafe extern "system" {
     fn GlobalMemoryStatusEx(lpBuffer: *mut MEMORYSTATUSEX) -> i32;
 }
 
-
 pub fn get_adobe_pref_str(key: &str) -> Option<String> {
-    let user_profile = std::env::var("USERPROFILE").ok()?;
-    let path = std::path::PathBuf::from(user_profile)
+    let base_dir = if cfg!(target_os = "windows") {
+        std::env::var("USERPROFILE").ok()
+    } else {
+        std::env::var("HOME").ok()
+    }?;
+    
+    let path = PathBuf::from(base_dir)
         .join("Documents")
         .join("Adobe")
         .join("Premiere Pro");
@@ -93,41 +101,63 @@ pub fn is_gpu_acceleration_enabled() -> bool {
 }
 
 pub fn get_dynamic_cache_size() -> usize {
-    let mut mem_info = MEMORYSTATUSEX {
-        dwLength: std::mem::size_of::<MEMORYSTATUSEX>() as u32,
-        dwMemoryLoad: 0,
-        ullTotalPhys: 0,
-        ullAvailPhys: 0,
-        ullTotalPageFile: 0,
-        ullAvailPageFile: 0,
-        ullTotalVirtual: 0,
-        ullAvailVirtual: 0,
-        ullAvailExtendedVirtual: 0,
-    };
-    
-    let res = unsafe { GlobalMemoryStatusEx(&mut mem_info) };
-    if res != 0 {
-        let total_gb = mem_info.ullTotalPhys / (1024 * 1024 * 1024);
-        if total_gb < 8 {
-            4
-        } else if total_gb < 16 {
-            8
-        } else if total_gb < 32 {
-            16
-        } else {
-            32 // 32 GB or more: cache up to 32 frames for smooth scrubbing
+    let mut total_gb = 16; // default fallback
+
+    #[cfg(target_os = "windows")]
+    {
+        let mut mem_info = MEMORYSTATUSEX {
+            dwLength: std::mem::size_of::<MEMORYSTATUSEX>() as u32,
+            dwMemoryLoad: 0,
+            ullTotalPhys: 0,
+            ullAvailPhys: 0,
+            ullTotalPageFile: 0,
+            ullAvailPageFile: 0,
+            ullTotalVirtual: 0,
+            ullAvailVirtual: 0,
+            ullAvailExtendedVirtual: 0,
+        };
+        if unsafe { GlobalMemoryStatusEx(&mut mem_info) } != 0 {
+            total_gb = mem_info.ullTotalPhys / (1024 * 1024 * 1024);
         }
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let mut mem: u64 = 0;
+        let mut len = std::mem::size_of::<u64>();
+        unsafe {
+            if let Ok(name) = std::ffi::CString::new("hw.memsize") {
+                if libc::sysctlbyname(name.as_ptr(), &mut mem as *mut u64 as *mut _, &mut len, std::ptr::null_mut(), 0) == 0 {
+                    total_gb = mem / (1024 * 1024 * 1024);
+                }
+            }
+        }
+    }
+
+    if total_gb < 8 {
+        4
+    } else if total_gb < 16 {
+        8
+    } else if total_gb < 32 {
+        16
     } else {
-        16 // Default fallback
+        32 // 32 GB or more: cache up to 32 frames for smooth scrubbing
     }
 }
 
 pub fn should_avoid_audio_conform() -> bool {
-    let appdata = match std::env::var("APPDATA") {
-        Ok(val) => val,
-        Err(_) => return false,
+    let appdata = if cfg!(target_os = "windows") {
+        std::env::var("APPDATA").ok()
+    } else {
+        std::env::var("HOME").ok().map(|h| format!("{}/Library/Application Support", h))
     };
-    let dir = std::path::PathBuf::from(appdata).join("NukeAV1");
+    
+    let appdata_val = match appdata {
+        Some(val) => val,
+        None => return false,
+    };
+    
+    let dir = PathBuf::from(appdata_val).join("NukeAV1");
     if !dir.exists() {
         let _ = std::fs::create_dir_all(&dir);
     }

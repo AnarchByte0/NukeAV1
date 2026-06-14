@@ -132,7 +132,6 @@ fn main() {
             &[
                 "install",
                 &format!("{}:{}", ffmpeg_features, triplet),
-                "--no-binarycaching"
             ],
             &vcpkg_dir
         );
@@ -168,7 +167,6 @@ fn main() {
                 &[
                     "install",
                     &format!("{}:{}", ffmpeg_features, triplet),
-                    "--no-binarycaching"
                 ],
                 &vcpkg_dir
             );
