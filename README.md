@@ -1,6 +1,6 @@
 # NukeAV1 🚀
 
-A high-performance **AV1 & VP9 Importer and Exporter plugin for Adobe Premiere Pro**, built natively in Rust. It utilizes **FFmpeg** (via static build) to support decoding and encoding, with robust support for hardware acceleration (NVENC, AMF, QSV) and rich exporter settings.
+A high-performance **AV1, VP8 & VP9 Importer and Exporter plugin for Adobe Premiere Pro**, built natively in Rust. It utilizes **FFmpeg** (via static build) to support decoding and encoding, with robust support for hardware acceleration (NVENC, AMF, QSV) and rich exporter settings.
 
 ---
 
