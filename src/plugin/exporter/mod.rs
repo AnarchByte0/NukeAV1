@@ -31,7 +31,7 @@ pub unsafe fn handle_export_selector(
         PrExportSelector_exSelGetParamSummary => crate::exporter::query::handle_query_param_summary(std_parms, param1),
         PrExportSelector_exSelPostProcessParams => crate::exporter::params::handle_post_process_params(std_parms, param1),
         PrExportSelector_exSelValidateOutputSettings => malNoError as prMALError,
-        PrExportSelector_exSelValidateParamChanged => malNoError as prMALError,
+        PrExportSelector_exSelValidateParamChanged => crate::exporter::params::handle_validate_param_changed(std_parms, param1),
         PrExportSelector_exSelQueryExportFileExtension => crate::exporter::query::handle_query_export_file_extension(std_parms, param1),
         PrExportSelector_exSelQueryExportColorSpace => crate::exporter::query::handle_query_export_color_space(std_parms, param1),
         _ => PrExportReturnValue_exportReturn_Unsupported as prMALError,
