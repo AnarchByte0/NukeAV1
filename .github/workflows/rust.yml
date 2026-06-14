@@ -1,4 +1,4 @@
-name: Rust CI & Release Build
+Name: Rust CI & Release Build
 
 on:
   push:
@@ -64,13 +64,6 @@ jobs:
     - name: Build plugin in Release Mode
       run: cargo build --release
 
-    - name: Parse cargo version
-      id: get_version
-      shell: bash
-      run: |
-        VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-
     - name: Package Release Artifact
       shell: bash
       run: |
@@ -81,7 +74,7 @@ jobs:
     - name: Upload Windows Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: NukeAV1-${{ steps.get_version.outputs.version }}-Windows
+        name: NukeAV1-Windows-Artifact
         path: output/NukeAV1.prm
         compression-level: 0
         if-no-files-found: error
@@ -191,7 +184,7 @@ jobs:
     - name: Upload macOS Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: NukeAV1-${{ steps.get_version.outputs.version }}-macOS
+        name: NukeAV1-macOS-Artifact
         path: output/NukeAV1-macOS.zip
         compression-level: 0
         if-no-files-found: error
@@ -202,6 +195,10 @@ jobs:
     # Only run on tag pushes, after both builds succeed
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [ build-windows, build-macos ]
+    
+    # КЛЮЧОВЕ ВИПРАВЛЕННЯ: Надаємо екшену права на створення релізу
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout repository
@@ -216,13 +213,13 @@ jobs:
     - name: Download Windows artifact
       uses: actions/download-artifact@v4
       with:
-        name: NukeAV1-${{ steps.get_version.outputs.version }}-Windows
+        name: NukeAV1-Windows-Artifact
         path: release-assets/windows
 
     - name: Download macOS artifact
       uses: actions/download-artifact@v4
       with:
-        name: NukeAV1-${{ steps.get_version.outputs.version }}-macOS
+        name: NukeAV1-macOS-Artifact
         path: release-assets/macos
 
     - name: Rename assets for release
