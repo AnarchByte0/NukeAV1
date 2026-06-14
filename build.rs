@@ -223,6 +223,7 @@ fn main() {
             b.write_to_file(&path)
                 .expect("Couldn't write bindings!");
             if let Ok(content) = fs::read_to_string(&path) {
+                // Patch: fix unsafe extern "C" for newer Rust editions
                 let patched = content.replace("extern \"C\" {", "unsafe extern \"C\" {");
                 let _ = fs::write(&path, patched);
             }

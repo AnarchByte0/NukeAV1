@@ -19,7 +19,8 @@ pub unsafe fn handle_export_selector(
     param1: *mut c_void,
     _param2: *mut c_void,
 ) -> prMALError {
-    match selector {
+    #[allow(non_upper_case_globals)]
+    match selector as PrExportSelector {
         PrExportSelector_exSelStartup => handle_startup(param1),
         PrExportSelector_exSelBeginInstance => malNoError as prMALError,
         PrExportSelector_exSelExport => handle_export(std_parms, param1),

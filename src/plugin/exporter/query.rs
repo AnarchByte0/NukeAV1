@@ -28,10 +28,10 @@ pub unsafe fn handle_query_output_settings(std_parms: *mut exportStdParms, param
                             
                             if qs.inExportVideo != 0 {
                                 get_param_value(qs.exporterPluginID, 0, ADBEVideoWidth.as_ptr() as *const c_char, &mut val);
-                                qs.outVideoWidth = val.value.__bindgen_anon_1.intValue;
+                                qs.outVideoWidth = val.value.__bindgen_anon_1.intValue as _;
                                 
                                 get_param_value(qs.exporterPluginID, 0, ADBEVideoHeight.as_ptr() as *const c_char, &mut val);
-                                qs.outVideoHeight = val.value.__bindgen_anon_1.intValue;
+                                qs.outVideoHeight = val.value.__bindgen_anon_1.intValue as _;
                                 
                                 get_param_value(qs.exporterPluginID, 0, ADBEVideoFPS.as_ptr() as *const c_char, &mut val);
                                 qs.outVideoFrameRate = val.value.__bindgen_anon_1.timeValue;
@@ -41,7 +41,7 @@ pub unsafe fn handle_query_output_settings(std_parms: *mut exportStdParms, param
                                 qs.outVideoAspectDen = val.value.__bindgen_anon_1.ratioValue.denominator;
                                 
                                 get_param_value(qs.exporterPluginID, 0, ADBEVideoFieldType.as_ptr() as *const c_char, &mut val);
-                                qs.outVideoFieldType = val.value.__bindgen_anon_1.intValue;
+                                qs.outVideoFieldType = val.value.__bindgen_anon_1.intValue as _;
                             }
                             
                             let mut target_bitrate = 10.0;
@@ -53,7 +53,7 @@ pub unsafe fn handle_query_output_settings(std_parms: *mut exportStdParms, param
                                 qs.outAudioSampleType = PrAudioSampleType_kPrAudioSampleType_32BitFloat;
                                 
                                 get_param_value(qs.exporterPluginID, 0, ADBEAudioNumChannels.as_ptr() as *const c_char, &mut val);
-                                qs.outAudioChannelType = val.value.__bindgen_anon_1.intValue;
+                                qs.outAudioChannelType = val.value.__bindgen_anon_1.intValue as _;
                             }
 
                             if qs.inExportVideo != 0 {
@@ -137,7 +137,7 @@ pub unsafe fn handle_query_param_summary(std_parms: *mut exportStdParms, param1:
                         get_param_value(sr.exporterPluginID, 0, ADBEAudioRatePerSecond.as_ptr() as *const c_char, &mut val);
                         sample_rate = val.value.__bindgen_anon_1.floatValue;
                         get_param_value(sr.exporterPluginID, 0, ADBEAudioNumChannels.as_ptr() as *const c_char, &mut val);
-                        channels = val.value.__bindgen_anon_1.intValue;
+                        channels = val.value.__bindgen_anon_1.intValue as _;
                     }
                     if let Some(release_suite) = basic_suite.ReleaseSuite {
                         release_suite(kPrSDKExportParamSuite.as_ptr() as *const i8, kPrSDKExportParamSuiteVersion as i32);

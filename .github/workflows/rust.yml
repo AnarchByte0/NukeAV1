@@ -3,6 +3,8 @@ name: Rust CI & Release Build
 on:
   push:
     branches: [ "master", "main" ]
+    tags:
+      - "v*"
   pull_request:
     branches: [ "master", "main" ]
 
@@ -111,7 +113,6 @@ jobs:
         if [ -n "$ADOBE_SDK_URL" ]; then
           echo "Downloading Adobe SDK from secrets..."
           curl -L -o sdk/SDK.zip "$ADOBE_SDK_URL"
-          # Supports both Mac and Windows archive layouts
           mv sdk/SDK.zip "sdk/Premiere Pro 26.0 C++ SDK Mac.zip"
         else
           echo "No ADOBE_SDK_URL secret provided. Checking if cached SDK is present..."
@@ -136,10 +137,10 @@ jobs:
       run: |
         VERSION="${{ steps.get_version.outputs.version }}"
         mkdir -p output/NukeAV1.bundle/Contents/MacOS
-        
+
         # Copy compiled dynamic library as the bundle executable
         cp target/release/libNukeAV1.dylib output/NukeAV1.bundle/Contents/MacOS/NukeAV1
-        
+
         # Generate Info.plist dynamically
         cat <<EOF > output/NukeAV1.bundle/Contents/Info.plist
         <?xml version="1.0" encoding="UTF-8"?>
@@ -167,10 +168,64 @@ jobs:
         EOF
         echo "macOS Bundle prepared at output/NukeAV1.bundle"
 
+        # Zip the bundle so it uploads as a single file asset
+        cd output
+        zip -r NukeAV1-macOS.zip NukeAV1.bundle
+        echo "Zipped bundle at output/NukeAV1-macOS.zip"
+
     - name: Upload macOS Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: NukeAV1-${{ steps.get_version.outputs.version }}-macOS
-        path: output/NukeAV1.bundle
+        path: output/NukeAV1-macOS.zip
         compression-level: 0
         if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    # Only run on tag pushes, after both builds succeed
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [ build-windows, build-macos ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Parse version from tag
+      id: get_version
+      run: |
+        VERSION="${GITHUB_REF#refs/tags/v}"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Download Windows artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: NukeAV1-${{ steps.get_version.outputs.version }}-Windows
+        path: release-assets/windows
+
+    - name: Download macOS artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: NukeAV1-${{ steps.get_version.outputs.version }}-macOS
+        path: release-assets/macos
+
+    - name: Rename assets for release
+      run: |
+        VERSION="${{ steps.get_version.outputs.version }}"
+        mv release-assets/windows/NukeAV1.prm        release-assets/NukeAV1-${VERSION}-Windows.prm
+        mv release-assets/macos/NukeAV1-macOS.zip    release-assets/NukeAV1-${VERSION}-macOS.zip
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: "NukeAV1 ${{ steps.get_version.outputs.version }}"
+        tag_name: ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        files: |
+          release-assets/NukeAV1-${{ steps.get_version.outputs.version }}-Windows.prm
+          release-assets/NukeAV1-${{ steps.get_version.outputs.version }}-macOS.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

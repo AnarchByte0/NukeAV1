@@ -1,8 +1,7 @@
 #![allow(dead_code)]
 #![allow(unsafe_op_in_unsafe_fn)]
+// NukeAV1 lib name is mandated by Adobe Premiere Pro plugin format (.prm/.dll must match)
 #![allow(non_snake_case)]
-#![allow(non_upper_case_globals)]
-#![allow(unused_imports)]
 
 pub mod ffi;
 pub use crate::ffi::adobe::*;
