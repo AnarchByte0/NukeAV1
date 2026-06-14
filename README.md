@@ -71,15 +71,6 @@ Restart Adobe Premiere Pro to load the new plugin.
 
 ---
 
-## Support the Project ☕
-
-If you find this plugin useful and want to support its active development, you can sponsor or donate through these platforms:
-
-[![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/anarchbyte)
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/anarchbyte)
-
----
-
 ## License 📄
 
 This project is licensed under the **GNU General Public License v3.0** with the **Adobe SDK Linking Exception** under the name **AnarchByte**. See the [LICENSE](LICENSE) file for details.
