@@ -661,3 +661,12 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
     }
 }
 
+pub unsafe fn handle_validate_param_changed(_std_parms: *mut exportStdParms, param1: *mut c_void) -> prMALError {
+    let rec = param1 as *mut exParamChangedRec;
+    if !rec.is_null() {
+        let rec = &mut *rec;
+        rec.rebuildAllParams = 1;
+    }
+    malNoError as prMALError
+}
+
