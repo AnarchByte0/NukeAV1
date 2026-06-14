@@ -8,6 +8,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   MACOSX_DEPLOYMENT_TARGET: "11.0"
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
 
 jobs:
   build-windows:
@@ -27,6 +28,14 @@ jobs:
         key: ${{ runner.os }}-vcpkg-${{ hashFiles('Cargo.toml', 'build.rs') }}
         restore-keys: |
           ${{ runner.os }}-vcpkg-
+
+    - name: Cache vcpkg binary cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/vcpkg-cache
+        key: ${{ runner.os }}-vcpkg-binaries-${{ hashFiles('Cargo.toml', 'build.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-binaries-
 
     - name: Set up Rust toolchain
       uses: dtolnay/rust-toolchain@stable
@@ -94,6 +103,14 @@ jobs:
         key: ${{ runner.os }}-vcpkg-${{ hashFiles('Cargo.toml', 'build.rs') }}
         restore-keys: |
           ${{ runner.os }}-vcpkg-
+
+    - name: Cache vcpkg binary cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/vcpkg-cache
+        key: ${{ runner.os }}-vcpkg-binaries-${{ hashFiles('Cargo.toml', 'build.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-binaries-
 
     - name: Set up Rust toolchain
       uses: dtolnay/rust-toolchain@stable
