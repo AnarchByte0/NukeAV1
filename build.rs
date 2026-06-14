@@ -51,6 +51,11 @@ fn run_command_streaming(cmd_program: &Path, cmd_args: &[&str], current_dir: &Pa
 }
 
 fn main() {
+    // Ensure vcpkg binary cache directory exists if specified
+    if let Ok(cache_dir) = env::var("VCPKG_DEFAULT_BINARY_CACHE") {
+        let _ = fs::create_dir_all(cache_dir);
+    }
+
     println!("cargo:rerun-if-changed=src/ffi/wrapper.hpp");
     
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
