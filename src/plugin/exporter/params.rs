@@ -346,8 +346,9 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                         let mut max_label = "Max Bitrate [Mbps]";
 
                         if let Some(get_param_value) = param_suite.GetParamValue {
-                            get_param_value(rec.exporterPluginID, 0, ADBEVideoBitrateEncoding.as_ptr() as *const c_char, &mut rc_val);
+                            let res = get_param_value(rec.exporterPluginID, 0, ADBEVideoBitrateEncoding.as_ptr() as *const c_char, &mut rc_val);
                             let rate_control = rc_val.value.__bindgen_anon_1.intValue;
+                            crate::log_debug!("handle_post_process_params: GetParamValue result = {}, rate_control = {}", res, rate_control);
                             match rate_control {
                                 0 => { // CBR
                                     target_label = "Target Bitrate [Mbps]";
@@ -484,8 +485,13 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
         let mut val: exParamValues = core::mem::zeroed();
         let mut got_val = false;
         if let Some(get_param_value) = param_suite.GetParamValue {
-            if unsafe { get_param_value(ex_id, 0, param_id.as_ptr() as *const c_char, &mut val) } == 0 {
+            let res = unsafe { get_param_value(ex_id, 0, param_id.as_ptr() as *const c_char, &mut val) };
+            if res == 0 {
                 got_val = true;
+            }
+            if param_id == ADBEVideoBitrateEncoding {
+                let cur_val = val.value.__bindgen_anon_1.intValue;
+                crate::log_debug!("rebuild_int_dropdown: ADBEVideoBitrateEncoding current value = {}, get_res = {}", cur_val, res);
             }
         }
         clear_constrained(param_id);
@@ -494,6 +500,10 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
         }
         if got_val {
             if let Some(change_param) = param_suite.ChangeParam {
+                if param_id == ADBEVideoBitrateEncoding {
+                    let cur_val = val.value.__bindgen_anon_1.intValue;
+                    crate::log_debug!("rebuild_int_dropdown: restoring ADBEVideoBitrateEncoding to {}", cur_val);
+                }
                 unsafe { change_param(ex_id, 0, param_id.as_ptr() as *const c_char, &val) };
             }
         }
