@@ -301,6 +301,9 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                     if !param_suite_ptr.is_null() {
                         let param_suite = &*(param_suite_ptr as *const PrSDKExportParamSuite);
                         
+                        let file_type = rec.fileType;
+                        rebuild_dropdowns(rec.exporterPluginID, file_type, param_suite);
+
                         let set_name = |param_id: &[u8], name: &str| {
                             if let Some(set_param_name) = param_suite.SetParamName {
                                 set_param_name(
@@ -376,7 +379,6 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                         set_name(b"NukeBFrames\0", "B-Frames");
                         set_name(b"NukeBFrameRef\0", "B-Frame as Reference");
                         
-                        let file_type = rec.fileType;
                         let nuka = u32::from_be_bytes(*b"NukA");
                         let nuk8 = u32::from_be_bytes(*b"Nuk8");
                         let nuk9 = u32::from_be_bytes(*b"Nuk9");
@@ -400,8 +402,6 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                             set_name(b"NukeAdvancedGroup\0", "Advanced Settings");
                             set_name(b"NukeVP9KeyFrame\0", "Key Frame Distance");
                         }
-                        
-                        rebuild_dropdowns(rec.exporterPluginID, file_type, param_suite);
                         
                         if let Some(release_suite) = basic_suite.ReleaseSuite {
                             release_suite(kPrSDKExportParamSuite.as_ptr() as *const i8, kPrSDKExportParamSuiteVersion as i32);
@@ -480,184 +480,279 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
         }
     };
 
+    let rebuild_int_dropdown = |param_id: &[u8], items: &[(i32, &str)]| {
+        let mut val: exParamValues = core::mem::zeroed();
+        let mut got_val = false;
+        if let Some(get_param_value) = param_suite.GetParamValue {
+            if unsafe { get_param_value(ex_id, 0, param_id.as_ptr() as *const c_char, &mut val) } == 0 {
+                got_val = true;
+            }
+        }
+        clear_constrained(param_id);
+        for &(v, name) in items {
+            add_val(param_id, v, name);
+        }
+        if got_val {
+            if let Some(change_param) = param_suite.ChangeParam {
+                unsafe { change_param(ex_id, 0, param_id.as_ptr() as *const c_char, &val) };
+            }
+        }
+    };
+
+    let rebuild_float_dropdown = |param_id: &[u8], items: &[(f64, &str)]| {
+        let mut val: exParamValues = core::mem::zeroed();
+        let mut got_val = false;
+        if let Some(get_param_value) = param_suite.GetParamValue {
+            if unsafe { get_param_value(ex_id, 0, param_id.as_ptr() as *const c_char, &mut val) } == 0 {
+                got_val = true;
+            }
+        }
+        clear_constrained(param_id);
+        for &(v, name) in items {
+            add_val_float(param_id, v, name);
+        }
+        if got_val {
+            if let Some(change_param) = param_suite.ChangeParam {
+                unsafe { change_param(ex_id, 0, param_id.as_ptr() as *const c_char, &val) };
+            }
+        }
+    };
+
+    let rebuild_time_dropdown = |param_id: &[u8], items: &[(i64, &str)]| {
+        let mut val: exParamValues = core::mem::zeroed();
+        let mut got_val = false;
+        if let Some(get_param_value) = param_suite.GetParamValue {
+            if unsafe { get_param_value(ex_id, 0, param_id.as_ptr() as *const c_char, &mut val) } == 0 {
+                got_val = true;
+            }
+        }
+        clear_constrained(param_id);
+        for &(v, name) in items {
+            add_val_time(param_id, v, name);
+        }
+        if got_val {
+            if let Some(change_param) = param_suite.ChangeParam {
+                unsafe { change_param(ex_id, 0, param_id.as_ptr() as *const c_char, &val) };
+            }
+        }
+    };
+
+    let rebuild_ratio_dropdown = |param_id: &[u8], items: &[(i32, i32, &str)]| {
+        let mut val: exParamValues = core::mem::zeroed();
+        let mut got_val = false;
+        if let Some(get_param_value) = param_suite.GetParamValue {
+            if unsafe { get_param_value(ex_id, 0, param_id.as_ptr() as *const c_char, &mut val) } == 0 {
+                got_val = true;
+            }
+        }
+        clear_constrained(param_id);
+        for &(num, den, name) in items {
+            add_val_ratio(param_id, num, den, name);
+        }
+        if got_val {
+            if let Some(change_param) = param_suite.ChangeParam {
+                unsafe { change_param(ex_id, 0, param_id.as_ptr() as *const c_char, &val) };
+            }
+        }
+    };
+
     // Width
-    clear_constrained(ADBEVideoWidth);
-    add_val(ADBEVideoWidth, 4096, "4K (4096)");
-    add_val(ADBEVideoWidth, 3840, "UHD (3840)");
-    add_val(ADBEVideoWidth, 2560, "Quad HD (2560)");
-    add_val(ADBEVideoWidth, 1920, "Full HD (1920)");
-    add_val(ADBEVideoWidth, 1280, "HD (1280)");
-    add_val(ADBEVideoWidth, 854, "SD NTSC Wide (854)");
-    add_val(ADBEVideoWidth, 720, "SD NTSC (720)");
-    add_val(ADBEVideoWidth, -1, "Custom");
+    rebuild_int_dropdown(ADBEVideoWidth, &[
+        (4096, "4K (4096)"),
+        (3840, "UHD (3840)"),
+        (2560, "Quad HD (2560)"),
+        (1920, "Full HD (1920)"),
+        (1280, "HD (1280)"),
+        (854, "SD NTSC Wide (854)"),
+        (720, "SD NTSC (720)"),
+        (-1, "Custom"),
+    ]);
 
     // Height
-    clear_constrained(ADBEVideoHeight);
-    add_val(ADBEVideoHeight, 2160, "4K / UHD (2160)");
-    add_val(ADBEVideoHeight, 1440, "Quad HD (1440)");
-    add_val(ADBEVideoHeight, 1080, "Full HD (1080)");
-    add_val(ADBEVideoHeight, 720, "HD (720)");
-    add_val(ADBEVideoHeight, 480, "SD NTSC (480)");
-    add_val(ADBEVideoHeight, -1, "Custom");
+    rebuild_int_dropdown(ADBEVideoHeight, &[
+        (2160, "4K / UHD (2160)"),
+        (1440, "Quad HD (1440)"),
+        (1080, "Full HD (1080)"),
+        (720, "HD (720)"),
+        (480, "SD NTSC (480)"),
+        (-1, "Custom"),
+    ]);
 
     // Frame Rate
-    clear_constrained(ADBEVideoFPS);
-    add_val_time(ADBEVideoFPS, 10594627200, "23.976");
-    add_val_time(ADBEVideoFPS, 10584000000, "24");
-    add_val_time(ADBEVideoFPS, 10160640000, "25");
-    add_val_time(ADBEVideoFPS, 8475283200, "29.97");
-    add_val_time(ADBEVideoFPS, 8467200000, "30");
-    add_val_time(ADBEVideoFPS, 5080320000, "50");
-    add_val_time(ADBEVideoFPS, 4237641600, "59.94");
-    add_val_time(ADBEVideoFPS, 4233600000, "60");
-    add_val_time(ADBEVideoFPS, 2822400000, "90");
-    add_val_time(ADBEVideoFPS, 2540160000, "100");
-    add_val_time(ADBEVideoFPS, 2118820800, "119.88");
-    add_val_time(ADBEVideoFPS, 2116800000, "120");
-    add_val_time(ADBEVideoFPS, 1764000000, "144");
-    add_val_time(ADBEVideoFPS, 1058400000, "240");
-    add_val_time(ADBEVideoFPS, 846720000, "300");
-    add_val_time(ADBEVideoFPS, -1, "Custom");
+    rebuild_time_dropdown(ADBEVideoFPS, &[
+        (10594627200, "23.976"),
+        (10584000000, "24"),
+        (10160640000, "25"),
+        (8475283200, "29.97"),
+        (8467200000, "30"),
+        (5080320000, "50"),
+        (4237641600, "59.94"),
+        (4233600000, "60"),
+        (2822400000, "90"),
+        (2540160000, "100"),
+        (2118820800, "119.88"),
+        (2116800000, "120"),
+        (1764000000, "144"),
+        (1058400000, "240"),
+        (846720000, "300"),
+        (-1, "Custom"),
+    ]);
 
     // Aspect
-    clear_constrained(ADBEVideoAspect);
-    add_val_ratio(ADBEVideoAspect, 1, 1, "Square Pixels (1.0)");
-    add_val_ratio(ADBEVideoAspect, 10, 11, "D1/DV NTSC (0.9091)");
-    add_val_ratio(ADBEVideoAspect, 40, 33, "D1/DV NTSC Widescreen 16:9 (1.2121)");
-    add_val_ratio(ADBEVideoAspect, 59, 54, "D1/DV PAL (1.0940)");
-    add_val_ratio(ADBEVideoAspect, 118, 81, "D1/DV PAL Widescreen 16:9 (1.4587)");
-    add_val_ratio(ADBEVideoAspect, 2, 1, "Anamorphic 2:1 (2.0)");
-    add_val_ratio(ADBEVideoAspect, 4, 3, "HD Anamorphic 1080 (1.333)");
-    add_val_ratio(ADBEVideoAspect, 3, 2, "DVCPRO HD (1.5)");
-    add_val_ratio(ADBEVideoAspect, -1, -1, "Custom");
+    rebuild_ratio_dropdown(ADBEVideoAspect, &[
+        (1, 1, "Square Pixels (1.0)"),
+        (10, 11, "D1/DV NTSC (0.9091)"),
+        (40, 33, "D1/DV NTSC Widescreen 16:9 (1.2121)"),
+        (59, 54, "D1/DV PAL (1.0940)"),
+        (118, 81, "D1/DV PAL Widescreen 16:9 (1.4587)"),
+        (2, 1, "Anamorphic 2:1 (2.0)"),
+        (4, 3, "HD Anamorphic 1080 (1.333)"),
+        (3, 2, "DVCPRO HD (1.5)"),
+        (-1, -1, "Custom"),
+    ]);
 
     // Field Type
-    clear_constrained(ADBEVideoFieldType);
-    add_val(ADBEVideoFieldType, 0, "Progressive");
+    rebuild_int_dropdown(ADBEVideoFieldType, &[(0, "Progressive")]);
 
     // Container File Extension
     let container_id = b"ADBEVideoContainer\0";
-    clear_constrained(container_id);
-    add_val(container_id, 0, "Matroska Video (.mkv)");
-    add_val(container_id, 1, "MPEG-4 (.mp4)");
-    add_val(container_id, 2, "Hybrid MP4 (.mp4)");
-    add_val(container_id, 3, "Fragmented MP4 (.mp4)");
-    add_val(container_id, 4, "QuickTime (.mov)");
-    add_val(container_id, 5, "Hybrid MOV (.mov)");
-    add_val(container_id, 6, "Fragmented MOV (.mov)");
+    rebuild_int_dropdown(container_id, &[
+        (0, "Matroska Video (.mkv)"),
+        (1, "MPEG-4 (.mp4)"),
+        (2, "Hybrid MP4 (.mp4)"),
+        (3, "Fragmented MP4 (.mp4)"),
+        (4, "QuickTime (.mov)"),
+        (5, "Hybrid MOV (.mov)"),
+        (6, "Fragmented MOV (.mov)"),
+    ]);
 
     // Color Space
     let colorspace_id = b"NukeVideoColorSpace\0";
-    clear_constrained(colorspace_id);
-    add_val(colorspace_id, 0, "Rec.709 (SDR 8-bit)");
-    add_val(colorspace_id, 1, "Rec.2020 PQ (HDR 10-bit)");
-    add_val(colorspace_id, 2, "Rec.2020 HLG (HDR 10-bit)");
+    rebuild_int_dropdown(colorspace_id, &[
+        (0, "Rec.709 (SDR 8-bit)"),
+        (1, "Rec.2020 PQ (HDR 10-bit)"),
+        (2, "Rec.2020 HLG (HDR 10-bit)"),
+    ]);
 
     // Audio Rate Per Second
-    clear_constrained(ADBEAudioRatePerSecond);
-    add_val_float(ADBEAudioRatePerSecond, 32000.0, "32000 Hz");
-    add_val_float(ADBEAudioRatePerSecond, 44100.0, "44100 Hz");
-    add_val_float(ADBEAudioRatePerSecond, 48000.0, "48000 Hz");
-    add_val_float(ADBEAudioRatePerSecond, 88200.0, "88200 Hz");
-    add_val_float(ADBEAudioRatePerSecond, 96000.0, "96000 Hz");
+    rebuild_float_dropdown(ADBEAudioRatePerSecond, &[
+        (32000.0, "32000 Hz"),
+        (44100.0, "44100 Hz"),
+        (48000.0, "48000 Hz"),
+        (88200.0, "88200 Hz"),
+        (96000.0, "96000 Hz"),
+    ]);
 
     // Audio Channels
-    clear_constrained(ADBEAudioNumChannels);
-    add_val(ADBEAudioNumChannels, 1, "Mono");
-    add_val(ADBEAudioNumChannels, 2, "Stereo");
-    add_val(ADBEAudioNumChannels, 3, "5.1");
+    rebuild_int_dropdown(ADBEAudioNumChannels, &[
+        (1, "Mono"),
+        (2, "Stereo"),
+        (3, "5.1"),
+    ]);
 
     // Audio Bitrate
-    clear_constrained(ADBEAudioBitrate);
-    add_val(ADBEAudioBitrate, 0, "96 kbps");
-    add_val(ADBEAudioBitrate, 1, "128 kbps");
-    add_val(ADBEAudioBitrate, 2, "160 kbps");
-    add_val(ADBEAudioBitrate, 3, "192 kbps");
-    add_val(ADBEAudioBitrate, 4, "256 kbps");
-    add_val(ADBEAudioBitrate, 5, "320 kbps");
+    rebuild_int_dropdown(ADBEAudioBitrate, &[
+        (0, "96 kbps"),
+        (1, "128 kbps"),
+        (2, "160 kbps"),
+        (3, "192 kbps"),
+        (4, "256 kbps"),
+        (5, "320 kbps"),
+    ]);
 
     // Rate Control
-    clear_constrained(ADBEVideoBitrateEncoding);
-    add_val(ADBEVideoBitrateEncoding, 0, "Constant Bitrate");
-    add_val(ADBEVideoBitrateEncoding, 1, "Constant QP");
-    add_val(ADBEVideoBitrateEncoding, 2, "Variable Bitrate");
-    add_val(ADBEVideoBitrateEncoding, 3, "Variable Bitrate with Target Quality");
+    rebuild_int_dropdown(ADBEVideoBitrateEncoding, &[
+        (0, "Constant Bitrate"),
+        (1, "Constant QP"),
+        (2, "Variable Bitrate"),
+        (3, "Variable Bitrate with Target Quality"),
+    ]);
 
     // Presets
     let nuke_preset_id = b"NukePreset\0";
-    clear_constrained(nuke_preset_id);
-    add_val(nuke_preset_id, 0, "P1: Fastest (Lowest Quality)");
-    add_val(nuke_preset_id, 1, "P2: Faster");
-    add_val(nuke_preset_id, 2, "P3: Fast");
-    add_val(nuke_preset_id, 3, "P4: Medium");
-    add_val(nuke_preset_id, 4, "P5: Slow (Good Quality)");
-    add_val(nuke_preset_id, 5, "P6: Slower");
-    add_val(nuke_preset_id, 6, "P7: Slowest (Best Quality)");
+    rebuild_int_dropdown(nuke_preset_id, &[
+        (0, "P1: Fastest (Lowest Quality)"),
+        (1, "P2: Faster"),
+        (2, "P3: Fast"),
+        (3, "P4: Medium"),
+        (4, "P5: Slow (Good Quality)"),
+        (5, "P6: Slower"),
+        (6, "P7: Slowest (Best Quality)"),
+    ]);
 
     // Tuning
     let nuke_tuning_id = b"NukeTuning\0";
-    clear_constrained(nuke_tuning_id);
-    add_val(nuke_tuning_id, 0, "High Quality");
-    add_val(nuke_tuning_id, 1, "Low Latency");
-    add_val(nuke_tuning_id, 2, "Ultra Low Latency");
+    rebuild_int_dropdown(nuke_tuning_id, &[
+        (0, "High Quality"),
+        (1, "Low Latency"),
+        (2, "Ultra Low Latency"),
+    ]);
 
     // Multipass Mode
     let nuke_multipass_id = b"NukeMultipass\0";
-    clear_constrained(nuke_multipass_id);
-    add_val(nuke_multipass_id, 0, "Disabled");
-    add_val(nuke_multipass_id, 1, "Two Passes (Quarter Resolution)");
-    add_val(nuke_multipass_id, 2, "Two Passes (Full Resolution)");
+    rebuild_int_dropdown(nuke_multipass_id, &[
+        (0, "Disabled"),
+        (1, "Two Passes (Quarter Resolution)"),
+        (2, "Two Passes (Full Resolution)"),
+    ]);
 
     // B-Frame Ref
     let bframe_ref_id = b"NukeBFrameRef\0";
-    clear_constrained(bframe_ref_id);
-    add_val(bframe_ref_id, 0, "Disabled");
-    add_val(bframe_ref_id, 1, "Each B-Frame");
-    add_val(bframe_ref_id, 2, "Middle B-Frame");
+    rebuild_int_dropdown(bframe_ref_id, &[
+        (0, "Disabled"),
+        (1, "Each B-Frame"),
+        (2, "Middle B-Frame"),
+    ]);
 
     // Exporter Multiplexer
     let multiplexer_dropdown = b"ADBEExporterMultiplexerDropdown\0";
-    clear_constrained(multiplexer_dropdown);
-    add_val(multiplexer_dropdown, 0, "MP4");
-    add_val(multiplexer_dropdown, 1, "3GPP");
-    add_val(multiplexer_dropdown, 2, "None");
+    rebuild_int_dropdown(multiplexer_dropdown, &[
+        (0, "MP4"),
+        (1, "3GPP"),
+        (2, "None"),
+    ]);
 
     let nuka = u32::from_be_bytes(*b"NukA");
     let nuk9 = u32::from_be_bytes(*b"Nuk9");
 
     if file_type == nuka {
         let encoder_id = b"NukeAV1Encoder\0";
-        clear_constrained(encoder_id);
-        add_val(encoder_id, 0, "Auto (Recommended)");
-        add_val(encoder_id, 1, "Software Only (CPU)");
-        add_val(encoder_id, 2, "Hardware Encoding (NVENC)");
-        add_val(encoder_id, 3, "Hardware Encoding (AMF)");
-        add_val(encoder_id, 4, "Hardware Encoding (QSV)");
+        rebuild_int_dropdown(encoder_id, &[
+            (0, "Auto (Recommended)"),
+            (1, "Software Only (CPU)"),
+            (2, "Hardware Encoding (NVENC)"),
+            (3, "Hardware Encoding (AMF)"),
+            (4, "Hardware Encoding (QSV)"),
+        ]);
 
         let profile_id = b"NukeAV1Profile\0";
-        clear_constrained(profile_id);
-        add_val(profile_id, 0, "Main");
-        add_val(profile_id, 1, "High");
-        add_val(profile_id, 2, "Professional");
+        rebuild_int_dropdown(profile_id, &[
+            (0, "Main"),
+            (1, "High"),
+            (2, "Professional"),
+        ]);
 
         let level_id = b"NukeAV1Level\0";
-        clear_constrained(level_id);
-        add_val(level_id, 0, "5.0");
-        add_val(level_id, 1, "5.1");
-        add_val(level_id, 2, "5.2");
-        add_val(level_id, 3, "6.0");
+        rebuild_int_dropdown(level_id, &[
+            (0, "5.0"),
+            (1, "5.1"),
+            (2, "5.2"),
+            (3, "6.0"),
+        ]);
 
         let tier_id = b"NukeAV1Tier\0";
-        clear_constrained(tier_id);
-        add_val(tier_id, 0, "Main");
-        add_val(tier_id, 1, "High");
+        rebuild_int_dropdown(tier_id, &[
+            (0, "Main"),
+            (1, "High"),
+        ]);
     } else if file_type == nuk9 {
         let profile_id = b"NukeVP9Profile\0";
-        clear_constrained(profile_id);
-        add_val(profile_id, 0, "Profile 0 (8-bit 4:2:0)");
-        add_val(profile_id, 1, "Profile 1 (8-bit 4:2:2/4:4:4)");
-        add_val(profile_id, 2, "Profile 2 (10/12-bit 4:2:0)");
-        add_val(profile_id, 3, "Profile 3 (10/12-bit 4:2:2/4:4:4)");
+        rebuild_int_dropdown(profile_id, &[
+            (0, "Profile 0 (8-bit 4:2:0)"),
+            (1, "Profile 1 (8-bit 4:2:2/4:4:4)"),
+            (2, "Profile 2 (10/12-bit 4:2:0)"),
+            (3, "Profile 3 (10/12-bit 4:2:2/4:4:4)"),
+        ]);
     }
 }
 

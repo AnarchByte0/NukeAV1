@@ -655,7 +655,7 @@ dependencies = [
 
 [[package]]
 name = "nuke_av1"
-version = "1.0.5"
+version = "1.0.6"
 dependencies = [
  "bindgen",
  "cc",
