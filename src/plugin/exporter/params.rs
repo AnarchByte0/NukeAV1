@@ -149,7 +149,9 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             builder.add_dropdown_item(ADBEVideoBitrateEncoding, 2, "Variable Bitrate");
                             builder.add_dropdown_item(ADBEVideoBitrateEncoding, 3, "Variable Bitrate with Target Quality");
 
-                            builder.add_float_param(encoder_settings_group, ADBEVideoTargetBitrate, "Bitrate [Mbps]", 10.0, 0.1, 300.0);
+                            builder.add_float_param(encoder_settings_group, ADBEVideoTargetBitrate, "Target Bitrate [Mbps]", 10.0, 0.1, 300.0);
+                            builder.add_float_param(encoder_settings_group, b"NukeVideoConstantQP\0", "Constant QP (CQ / CQP Value)", 30.0, 0.0, 63.0);
+                            builder.add_float_param(encoder_settings_group, b"NukeVideoTargetQuality\0", "Target Quality (CQ Value)", 30.0, 0.1, 300.0);
                             builder.add_float_param(encoder_settings_group, ADBEVideoMaxBitrate, "Max Bitrate [Mbps]", 12.0, 0.1, 300.0);
 
                             // Presets
@@ -340,38 +342,8 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                         set_name(b"ADBEExporterMultiplexerGroup\0", "Basic Settings");
                         set_name(b"ADBEExporterMultiplexerDropdown\0", "Multiplexer");
 
-                        // Get current Rate Control choice to dynamically rename bitrate parameters
-                        let mut rc_val: exParamValues = core::mem::zeroed();
-                        let mut target_label = "Bitrate [Mbps]";
-                        let mut max_label = "Max Bitrate [Mbps]";
+                        update_param_visibility(rec.exporterPluginID, param_suite);
 
-                        if let Some(get_param_value) = param_suite.GetParamValue {
-                            let res = get_param_value(rec.exporterPluginID, 0, ADBEVideoBitrateEncoding.as_ptr() as *const c_char, &mut rc_val);
-                            let rate_control = rc_val.value.__bindgen_anon_1.intValue;
-                            crate::log_debug!("handle_post_process_params: GetParamValue result = {}, rate_control = {}", res, rate_control);
-                            match rate_control {
-                                0 => { // CBR
-                                    target_label = "Target Bitrate [Mbps]";
-                                    max_label = "Max Bitrate (Unused in CBR)";
-                                }
-                                1 => { // CQP
-                                    target_label = "Constant QP (CQ / CQP Value)";
-                                    max_label = "Max Bitrate (Unused in CQP)";
-                                }
-                                2 => { // VBR
-                                    target_label = "Target Bitrate [Mbps]";
-                                    max_label = "Max Bitrate [Mbps]";
-                                }
-                                3 => { // VBR with Target Quality
-                                    target_label = "Target Quality (CQ Value)";
-                                    max_label = "Max Bitrate [Mbps]";
-                                }
-                                _ => {}
-                            }
-                        }
-
-                        set_name(ADBEVideoTargetBitrate, target_label);
-                        set_name(ADBEVideoMaxBitrate, max_label);
                         set_name(b"NukePreset\0", "Preset");
                         set_name(b"NukeTuning\0", "Tuning");
                         set_name(b"NukeMultipass\0", "Multipass Mode");
@@ -413,6 +385,36 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
         }
     }
     malNoError as prMALError
+}
+
+unsafe fn update_param_visibility(ex_id: csSDK_uint32, param_suite: &PrSDKExportParamSuite) {
+    use std::os::raw::c_char;
+    let mut rc_val: exParamValues = core::mem::zeroed();
+    if let Some(get_param_value) = param_suite.GetParamValue {
+        get_param_value(ex_id, 0, ADBEVideoBitrateEncoding.as_ptr() as *const c_char, &mut rc_val);
+    }
+    let rate_control = rc_val.value.__bindgen_anon_1.intValue;
+
+    let set_hidden = |param_id: &[u8], hidden: bool| {
+        let mut val: exParamValues = core::mem::zeroed();
+        if let Some(get_param_value) = param_suite.GetParamValue {
+            if get_param_value(ex_id, 0, param_id.as_ptr() as *const c_char, &mut val) == 0 {
+                let is_hidden = val.hidden != 0;
+                if is_hidden != hidden {
+                    val.hidden = if hidden { 1 } else { 0 };
+                    if let Some(change_param) = param_suite.ChangeParam {
+                        change_param(ex_id, 0, param_id.as_ptr() as *const c_char, &val);
+                    }
+                }
+            }
+        }
+    };
+    
+    // rate_control: 0=CBR, 1=CQP, 2=VBR, 3=VBR-Q
+    set_hidden(ADBEVideoTargetBitrate, rate_control == 1 || rate_control == 3);
+    set_hidden(ADBEVideoMaxBitrate, rate_control == 0 || rate_control == 1);
+    set_hidden(b"NukeVideoTargetQuality\0", rate_control != 3);
+    set_hidden(b"NukeVideoConstantQP\0", rate_control != 1);
 }
 
 unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_suite: &PrSDKExportParamSuite) {
@@ -771,6 +773,32 @@ pub unsafe fn handle_validate_param_changed(_std_parms: *mut exportStdParms, par
     if !rec.is_null() {
         let rec = &mut *rec;
         rec.rebuildAllParams = 1;
+        
+        let std_parms = _std_parms as *mut exportStdParms;
+        if !std_parms.is_null() {
+            if let Some(get_basic_suite) = (*std_parms).getSPBasicSuite {
+                let basic_suite_ptr = get_basic_suite();
+                if !basic_suite_ptr.is_null() {
+                    let basic_suite = &*(basic_suite_ptr as *const SPBasicSuite);
+                    if let Some(acquire_suite) = basic_suite.AcquireSuite {
+                        let mut param_suite_ptr: *const c_void = core::ptr::null();
+                        let err = acquire_suite(
+                            kPrSDKExportParamSuite.as_ptr() as *const i8,
+                            kPrSDKExportParamSuiteVersion as i32,
+                            &mut param_suite_ptr
+                        );
+                        
+                        if err == 0 && !param_suite_ptr.is_null() {
+                            let param_suite = &*(param_suite_ptr as *const PrSDKExportParamSuite);
+                            update_param_visibility(rec.exporterPluginID, param_suite);
+                            if let Some(release_suite) = basic_suite.ReleaseSuite {
+                                release_suite(kPrSDKExportParamSuite.as_ptr() as *const i8, kPrSDKExportParamSuiteVersion as i32);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     malNoError as prMALError
 }

@@ -154,12 +154,20 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                 width = val.value.__bindgen_anon_1.intValue;
                                 get_param_value(export_rec.exporterPluginID, 0, ADBEVideoHeight.as_ptr() as *const c_char, &mut val);
                                 height = val.value.__bindgen_anon_1.intValue;
-                                get_param_value(export_rec.exporterPluginID, 0, ADBEVideoTargetBitrate.as_ptr() as *const c_char, &mut val);
+                                get_param_value(export_rec.exporterPluginID, 0, ADBEVideoBitrateEncoding.as_ptr() as *const c_char, &mut val);
+                                bitrate_mode = val.value.__bindgen_anon_1.intValue;
+
+                                let mut target_param: &[u8] = ADBEVideoTargetBitrate;
+                                if bitrate_mode == 1 {
+                                    target_param = b"NukeVideoConstantQP\0";
+                                } else if bitrate_mode == 3 {
+                                    target_param = b"NukeVideoTargetQuality\0";
+                                }
+
+                                get_param_value(export_rec.exporterPluginID, 0, target_param.as_ptr() as *const c_char, &mut val);
                                 target_bitrate = val.value.__bindgen_anon_1.floatValue;
                                 get_param_value(export_rec.exporterPluginID, 0, ADBEVideoMaxBitrate.as_ptr() as *const c_char, &mut val);
                                 max_bitrate = val.value.__bindgen_anon_1.floatValue;
-                                get_param_value(export_rec.exporterPluginID, 0, ADBEVideoBitrateEncoding.as_ptr() as *const c_char, &mut val);
-                                bitrate_mode = val.value.__bindgen_anon_1.intValue;
 
                                 // Read OBS options
                                 get_param_value(export_rec.exporterPluginID, 0, b"NukePreset\0".as_ptr() as *const c_char, &mut val);
