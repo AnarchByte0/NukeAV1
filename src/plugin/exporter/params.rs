@@ -104,6 +104,7 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             builder.add_dropdown_item(container_id, 4, "QuickTime (.mov)");
                             builder.add_dropdown_item(container_id, 5, "Hybrid MOV (.mov)");
                             builder.add_dropdown_item(container_id, 6, "Fragmented MOV (.mov)");
+                            builder.add_dropdown_item(container_id, 7, "WebM Video (.webm)");
 
                             // Color Space & Bit Depth
                             let colorspace_id = b"NukeVideoColorSpace\0";
@@ -111,6 +112,10 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             builder.add_dropdown_item(colorspace_id, 0, "Rec.709 (SDR 8-bit)");
                             builder.add_dropdown_item(colorspace_id, 1, "Rec.2020 PQ (HDR 10-bit)");
                             builder.add_dropdown_item(colorspace_id, 2, "Rec.2020 HLG (HDR 10-bit)");
+                            builder.add_dropdown_item(colorspace_id, 3, "RGBA (8-bit with Alpha)");
+
+                            // Custom FFmpeg flags (hidden)
+                            builder.add_string_param(ADBEBasicVideoGroup, b"NukeCustomFFmpegFlags\0", "Custom FFmpeg Flags", "");
 
                             // 2. Audio Settings
                             builder.add_group(ADBETopParamGroup, ADBEAudioTabGroup, "Audio");
@@ -138,6 +143,13 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             builder.add_dropdown_item(ADBEAudioBitrate, 4, "256 kbps");
                             builder.add_dropdown_item(ADBEAudioBitrate, 5, "320 kbps");
                             
+                            // Audio Codec
+                            let audio_codec_id = b"NukeAudioCodec\0";
+                            builder.add_dropdown(ADBEBasicAudioGroup, audio_codec_id, "Audio Codec", 0);
+                            builder.add_dropdown_item(audio_codec_id, 0, "Advanced Audio Coding (AAC)");
+                            builder.add_dropdown_item(audio_codec_id, 1, "Opus");
+                            builder.add_dropdown_item(audio_codec_id, 2, "Uncompressed (PCM)");
+                            
                             // 3. OBS-like Encoder Settings Group
                             let encoder_settings_group = b"NukeBitrateGroup\0";
                             builder.add_group(ADBEVideoTabGroup, encoder_settings_group, "Encoder Settings");
@@ -146,8 +158,9 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             builder.add_dropdown(encoder_settings_group, ADBEVideoBitrateEncoding, "Rate Control", 0);
                             builder.add_dropdown_item(ADBEVideoBitrateEncoding, 0, "Constant Bitrate");
                             builder.add_dropdown_item(ADBEVideoBitrateEncoding, 1, "Constant QP");
-                            builder.add_dropdown_item(ADBEVideoBitrateEncoding, 2, "Variable Bitrate");
+                            builder.add_dropdown_item(ADBEVideoBitrateEncoding, 2, "VBR, 1 pass");
                             builder.add_dropdown_item(ADBEVideoBitrateEncoding, 3, "Variable Bitrate with Target Quality");
+                            builder.add_dropdown_item(ADBEVideoBitrateEncoding, 4, "VBR, 2 pass");
 
                             builder.add_float_param(encoder_settings_group, ADBEVideoTargetBitrate, "Target Bitrate [Mbps]", 10.0, 0.1, 300.0);
                             builder.add_float_param(encoder_settings_group, b"NukeVideoConstantQP\0", "Constant QP (CQ / CQP Value)", 30.0, 0.0, 63.0);
@@ -232,6 +245,12 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                                 let adv_group = b"NukeAdvancedGroup\0";
                                 builder.add_group(ADBEVideoTabGroup, adv_group, "Advanced Settings");
                                 builder.add_float_param(adv_group, b"NukeAV1KeyFrame\0", "Key Frame Distance", 33.0, 1.0, 300.0);
+
+                                let effects_tab = b"NukeEffectsTab\0";
+                                let effects_group = b"NukeEffectsGroup\0";
+                                builder.add_group(ADBETopParamGroup, effects_tab, "AV1 Effects");
+                                builder.add_group(effects_tab, effects_group, "Effects");
+                                builder.add_float_param(effects_group, b"NukeVideoFilmGrain\0", "Film Grain Synthesis", 0.0, 0.0, 50.0);
                              } else if file_type == nuk8 {
                                 let codec_group = b"NukeVP8EncodingGroup\0";
                                 builder.add_group(ADBEVideoTabGroup, codec_group, "Encoding Settings");
@@ -328,12 +347,14 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                         set_name(ADBEVideoFieldType, "Field Order");
                         set_name(b"ADBEVideoContainer\0", "File Extension");
                         set_name(b"NukeVideoColorSpace\0", "Color Space & Bit Depth");
+                        set_name(b"NukeCustomFFmpegFlags\0", "Custom FFmpeg Flags");
                         
                         set_name(ADBEAudioTabGroup, "Audio");
                         set_name(ADBEBasicAudioGroup, "Basic Audio Settings");
                         set_name(ADBEAudioRatePerSecond, "Sample Rate");
                         set_name(ADBEAudioNumChannels, "Channels");
                         set_name(ADBEAudioBitrate, "Audio Bitrate");
+                        set_name(b"NukeAudioCodec\0", "Audio Codec");
                         
                         set_name(b"NukeBitrateGroup\0", "Encoder Settings");
                         set_name(ADBEVideoBitrateEncoding, "Rate Control");
@@ -365,6 +386,10 @@ pub unsafe fn handle_post_process_params(std_parms: *mut exportStdParms, param1:
                             
                             set_name(b"NukeAdvancedGroup\0", "Advanced Settings");
                             set_name(b"NukeAV1KeyFrame\0", "Key Frame Distance");
+                            
+                            set_name(b"NukeEffectsTab\0", "AV1 Effects");
+                            set_name(b"NukeEffectsGroup\0", "Effects");
+                            set_name(b"NukeVideoFilmGrain\0", "Film Grain Synthesis");
                         } else if file_type == nuk8 {
                             set_name(b"NukeVP8EncodingGroup\0", "Encoding Settings");
                             set_name(b"NukeAdvancedGroup\0", "Advanced Settings");
@@ -409,6 +434,8 @@ unsafe fn update_param_visibility(ex_id: csSDK_uint32, param_suite: &PrSDKExport
             }
         }
     };
+    
+    set_hidden(b"NukeCustomFFmpegFlags\0", true); // Always hidden in UI
     
     // rate_control: 0=CBR, 1=CQP, 2=VBR, 3=VBR-Q
     set_hidden(ADBEVideoTargetBitrate, rate_control == 1 || rate_control == 3);
@@ -636,6 +663,7 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
         (4, "QuickTime (.mov)"),
         (5, "Hybrid MOV (.mov)"),
         (6, "Fragmented MOV (.mov)"),
+        (7, "WebM Video (.webm)"),
     ]);
 
     // Color Space
@@ -644,6 +672,7 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
         (0, "Rec.709 (SDR 8-bit)"),
         (1, "Rec.2020 PQ (HDR 10-bit)"),
         (2, "Rec.2020 HLG (HDR 10-bit)"),
+        (3, "RGBA (8-bit with Alpha)"),
     ]);
 
     // Audio Rate Per Second
@@ -672,12 +701,20 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
         (5, "320 kbps"),
     ]);
 
+    // Audio Codec
+    rebuild_int_dropdown(b"NukeAudioCodec\0", &[
+        (0, "Advanced Audio Coding (AAC)"),
+        (1, "Opus"),
+        (2, "Uncompressed (PCM)"),
+    ]);
+
     // Rate Control
     rebuild_int_dropdown(ADBEVideoBitrateEncoding, &[
         (0, "Constant Bitrate"),
         (1, "Constant QP"),
-        (2, "Variable Bitrate"),
+        (2, "VBR, 1 pass"),
         (3, "Variable Bitrate with Target Quality"),
+        (4, "VBR, 2 pass"),
     ]);
 
     // Presets

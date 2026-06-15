@@ -201,6 +201,35 @@ impl<'a> UIBuilder<'a> {
         }
     }
 
+    pub fn add_string_param(&self, parent_id: &[u8], param_id: &[u8], name: &str, default_val: &str) {
+        if let Some(add_param) = self.suite.AddParam {
+            unsafe {
+                let mut param_info: exNewParamInfo = core::mem::zeroed();
+                param_info.structVersion = 1;
+                
+                let id_len = param_id.len().min(255);
+                for i in 0..id_len { param_info.identifier[i] = param_id[i] as c_char; }
+                param_info.identifier[id_len] = 0;
+
+                let name_ptr = core::ptr::addr_of_mut!(param_info.name) as *mut prUTF16Char;
+                crate::str_to_utf16(name, name_ptr, 256);
+
+                param_info.paramType = exParamType_exParamType_string;
+                param_info.flags = 0;
+                
+                let string_ptr = core::ptr::addr_of_mut!(param_info.paramValues.paramString) as *mut prUTF16Char;
+                crate::str_to_utf16(default_val, string_ptr, 256);
+                
+                add_param(
+                    self.plugin_id,
+                    self.group_index,
+                    parent_id.as_ptr() as *const c_char,
+                    &param_info
+                );
+            }
+        }
+    }
+
     pub fn add_dropdown_item(&self, param_id: &[u8], value: i32, name: &str) {
         if let Some(add_constrained_pair) = self.suite.AddConstrainedValuePair {
             unsafe {

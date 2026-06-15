@@ -133,11 +133,14 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                             let mut bitrate_mode = 0; // default VBR
                             let mut max_bitrate = 12.0;
                             let mut audio_bitrate_choice = 1; // default 128 kbps
+                            let mut audio_codec_choice = 0; // AAC
                             let mut gop_size = 33;
                             let mut profile = 0;
                             let mut level = 0;
                             let mut tier = 0;
                             let mut colorspace = 0;
+                            let mut film_grain = 0.0;
+                            let mut custom_flags = String::new();
                             
                             let mut preset = 4;
                             let mut tuning = 0;
@@ -191,6 +194,8 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                 channels = val.value.__bindgen_anon_1.intValue;
                                 get_param_value(export_rec.exporterPluginID, 0, ADBEAudioBitrate.as_ptr() as *const c_char, &mut val);
                                 audio_bitrate_choice = val.value.__bindgen_anon_1.intValue;
+                                get_param_value(export_rec.exporterPluginID, 0, b"NukeAudioCodec\0".as_ptr() as *const c_char, &mut val);
+                                audio_codec_choice = val.value.__bindgen_anon_1.intValue;
 
                                 get_param_value(export_rec.exporterPluginID, 0, b"ADBEVideoContainer\0".as_ptr() as *const c_char, &mut val);
                                 container_choice = val.value.__bindgen_anon_1.intValue;
@@ -198,6 +203,9 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                 multiplexer_choice = val.value.__bindgen_anon_1.intValue;
                                 get_param_value(export_rec.exporterPluginID, 0, b"NukeVideoColorSpace\0".as_ptr() as *const c_char, &mut val);
                                 colorspace = val.value.__bindgen_anon_1.intValue;
+                                
+                                get_param_value(export_rec.exporterPluginID, 0, b"NukeCustomFFmpegFlags\0".as_ptr() as *const c_char, &mut val);
+                                custom_flags = crate::utils::get_utf16_string(core::ptr::addr_of!(val.paramString) as *const _);
 
                                 // Codec-specific parameters
                                 if codec_choice == 0 { // AV1
@@ -209,6 +217,8 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                     level = val.value.__bindgen_anon_1.intValue;
                                     get_param_value(export_rec.exporterPluginID, 0, b"NukeAV1Tier\0".as_ptr() as *const c_char, &mut val);
                                     tier = val.value.__bindgen_anon_1.intValue;
+                                    get_param_value(export_rec.exporterPluginID, 0, b"NukeVideoFilmGrain\0".as_ptr() as *const c_char, &mut val);
+                                    film_grain = val.value.__bindgen_anon_1.floatValue;
                                 } else if codec_choice == 1 { // VP9
                                     get_param_value(export_rec.exporterPluginID, 0, b"NukeVP9KeyFrame\0".as_ptr() as *const c_char, &mut val);
                                     gop_size = val.value.__bindgen_anon_1.floatValue as i32;
@@ -268,11 +278,10 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                  _ => "libaom_av1",
                              };
 
-                            let audio_codec = if container_choice == 0 {
-                                // Matroska Video (.mkv) supports Opus
-                                "opus"
-                            } else {
-                                "aac"
+                            let audio_codec = match audio_codec_choice {
+                                1 => "opus",
+                                2 => "pcm_s16le",
+                                _ => "aac",
                             };
 
                             let audio_enabled = export_rec.exportAudio != 0;
@@ -340,36 +349,46 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                          let output_path = os_string;
                                          log_debug(&format!("output_path: {}", output_path));
                                         
-                                        match crate::exporter::ffmpeg::FFmpegEncoder::new(
-                                            &output_path,
-                                            vcodec,
-                                            width as i32,
-                                            height as i32,
-                                            fps as i32,
-                                            (target_bitrate * 1000000.0) as i64,
-                                            audio_render_initialized && multiplexer_choice != 2,
-                                            audio_codec,
-                                            sample_rate as i32,
-                                            channels as i32,
-                                            bitrate_mode,
-                                            (max_bitrate * 1000000.0) as i64,
-                                            audio_bitrate,
-                                            gop_size,
-                                            profile,
-                                            level,
-                                            tier,
-                                            colorspace,
+                                        let total_passes = if bitrate_mode == 4 { 2 } else { 1 };
+                                        let mut stats_in_buffer = Vec::<u8>::new();
+                                        
+                                        for pass_num in 1..=total_passes {
+                                            let current_stats_in = if pass_num == 2 { Some(stats_in_buffer.as_slice()) } else { None };
                                             
-                                            // OBS-like options
-                                            preset,
-                                            tuning,
-                                            multipass,
-                                            lookahead,
-                                            spatial_aq,
-                                            bframes,
-                                            bframe_ref,
-                                            container_choice,
-                                        ) {
+                                            match crate::exporter::ffmpeg::FFmpegEncoder::new(
+                                                &output_path,
+                                                vcodec,
+                                                width as i32,
+                                                height as i32,
+                                                fps as i32,
+                                                (target_bitrate * 1000000.0) as i64,
+                                                audio_render_initialized && multiplexer_choice != 2 && pass_num == total_passes,
+                                                audio_codec,
+                                                sample_rate as i32,
+                                                channels as i32,
+                                                bitrate_mode,
+                                                (max_bitrate * 1000000.0) as i64,
+                                                audio_bitrate,
+                                                gop_size,
+                                                profile,
+                                                level,
+                                                tier,
+                                                colorspace,
+                                                
+                                                // OBS-like options
+                                                preset,
+                                                tuning,
+                                                multipass,
+                                                lookahead,
+                                                spatial_aq,
+                                                bframes,
+                                                bframe_ref,
+                                                container_choice,
+                                                film_grain,
+                                                &custom_flags,
+                                                pass_num,
+                                                current_stats_in,
+                                            ) {
                                             Ok(mut encoder) => {
                                                 log_debug("FFmpegEncoder initialized successfully");
                                                 // Render Loop
@@ -566,23 +585,31 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                                     log_debug(&format!("Error during encoder.finish: {}", e));
                                                 } else {
                                                     log_debug("Encoder finished and trailer written successfully");
+                                                    if pass_num == 1 && total_passes == 2 {
+                                                        stats_in_buffer = encoder.get_stats_out();
+                                                    }
                                                 }
                                                 
                                                 if export_aborted {
                                                     aborted_flag = true;
-                                                }
-                                                
-                                                if audio_render_initialized {
-                                                    let audio_suite = &*(audio_suite_ptr as *const PrSDKSequenceAudioSuite);
-                                                    if let Some(release_audio) = audio_suite.ReleaseAudioRenderer {
-                                                        release_audio(export_rec.exporterPluginID, audio_render_id);
-                                                    }
                                                 }
                                             }
                                             Err(e) => {
                                                 log_debug(&format!("FFmpegEncoder::new failed: {}", e));
                                             }
                                         }
+                                        
+                                        if aborted_flag {
+                                            break;
+                                        }
+                                    } // for pass_num
+                                    
+                                    if audio_render_initialized {
+                                        let audio_suite = &*(audio_suite_ptr as *const PrSDKSequenceAudioSuite);
+                                        if let Some(release_audio) = audio_suite.ReleaseAudioRenderer {
+                                            release_audio(export_rec.exporterPluginID, audio_render_id);
+                                        }
+                                    }
                                     }
                                 }
                             }

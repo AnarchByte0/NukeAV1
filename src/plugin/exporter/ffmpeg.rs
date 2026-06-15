@@ -55,6 +55,10 @@ impl FFmpegEncoder {
         bframes: i32,
         bframe_ref: i32,
         container_choice: i32,
+        film_grain: f64,
+        custom_flags: &str,
+        pass: i32,
+        stats_in: Option<&[u8]>,
     ) -> Result<Self, String> {
         let c_output_path = CString::new(output_path).map_err(|_| "Invalid path")?;
         let c_vcodec_name = CString::new(vcodec_name).map_err(|_| "Invalid codec name")?;
@@ -91,6 +95,8 @@ impl FFmpegEncoder {
         
         let dst_fmt = if colorspace == 1 || colorspace == 2 {
             AV_PIX_FMT_YUV420P10LE
+        } else if colorspace == 3 {
+            AV_PIX_FMT_RGBA
         } else {
             AV_PIX_FMT_YUV420P
         };
@@ -236,6 +242,41 @@ impl FFmpegEncoder {
             if let Some(cpu_val) = cpu_used_val {
                 if vcodec_name.contains("libaom") || vcodec_name.contains("libvpx") {
                     av_opt_set((*codec_ctx).priv_data, CString::new("cpu-used").unwrap().as_ptr(), CString::new(cpu_val).unwrap().as_ptr(), 0);
+                }
+            }
+        }
+
+        // Film grain
+        if film_grain > 0.0 && vcodec_name.contains("av1") {
+            let grain_str = format!("{}", film_grain as i32);
+            if let (Ok(grain_opt), Ok(grain_val)) = (CString::new("film-grain"), CString::new(grain_str)) {
+                av_opt_set((*codec_ctx).priv_data, grain_opt.as_ptr(), grain_val.as_ptr(), 0);
+            }
+        }
+
+        // Custom FFmpeg flags (format: key=val,key2=val2)
+        if !custom_flags.is_empty() {
+            for pair in custom_flags.split(',') {
+                let kv: Vec<&str> = pair.split('=').collect();
+                if kv.len() == 2 {
+                    if let (Ok(key), Ok(val)) = (CString::new(kv[0].trim()), CString::new(kv[1].trim())) {
+                        av_opt_set((*codec_ctx).priv_data, key.as_ptr(), val.as_ptr(), 0);
+                    }
+                }
+            }
+        }
+
+        // Pass control
+        if pass == 1 {
+            (*codec_ctx).flags |= 1 << 9; // AV_CODEC_FLAG_PASS1
+        } else if pass == 2 {
+            (*codec_ctx).flags |= 1 << 10; // AV_CODEC_FLAG_PASS2
+            if let Some(stats) = stats_in {
+                let ptr = av_malloc(stats.len() + 1) as *mut u8;
+                if !ptr.is_null() {
+                    core::ptr::copy_nonoverlapping(stats.as_ptr(), ptr, stats.len());
+                    *ptr.add(stats.len()) = 0;
+                    (*codec_ctx).stats_in = ptr as *mut std::os::raw::c_char;
                 }
             }
         }
@@ -747,6 +788,17 @@ impl FFmpegEncoder {
 
         av_write_trailer(self.fmt_ctx);
         Ok(())
+    }
+
+    pub fn get_stats_out(&self) -> Vec<u8> {
+        unsafe {
+            if !self.codec_ctx.is_null() && !(*self.codec_ctx).stats_out.is_null() {
+                let c_str = std::ffi::CStr::from_ptr((*self.codec_ctx).stats_out);
+                c_str.to_bytes().to_vec()
+            } else {
+                Vec::new()
+            }
+        }
     }
 }
 

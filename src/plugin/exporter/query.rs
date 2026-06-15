@@ -57,9 +57,8 @@ pub unsafe fn handle_query_output_settings(std_parms: *mut exportStdParms, param
                             }
 
                             if qs.inExportVideo != 0 {
-                                let mut bitrate_mode = 0;
                                 get_param_value(qs.exporterPluginID, qs.inMultiGroupIndex, ADBEVideoBitrateEncoding.as_ptr() as *const c_char, &mut val);
-                                bitrate_mode = val.value.__bindgen_anon_1.intValue;
+                                let bitrate_mode = val.value.__bindgen_anon_1.intValue;
 
                                 let mut target_param: &[u8] = ADBEVideoTargetBitrate;
                                 if bitrate_mode == 1 {
