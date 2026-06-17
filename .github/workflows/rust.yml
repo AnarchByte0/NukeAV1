@@ -29,7 +29,7 @@ jobs:
         path: |
           target/vcpkg
           target/release/build
-        key: ${{ runner.os }}-vcpkg-${{ hashFiles('build.rs') }}
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('Cargo.lock', 'build.rs') }}
         restore-keys: |
           ${{ runner.os }}-vcpkg-
 
@@ -37,7 +37,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/vcpkg-cache
-        key: ${{ runner.os }}-vcpkg-binaries-${{ hashFiles('build.rs') }}
+        key: ${{ runner.os }}-vcpkg-binaries-${{ hashFiles('Cargo.lock', 'build.rs') }}
         restore-keys: |
           ${{ runner.os }}-vcpkg-binaries-
 
