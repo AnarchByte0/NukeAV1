@@ -158,9 +158,8 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             builder.add_dropdown(encoder_settings_group, ADBEVideoBitrateEncoding, "Rate Control", 0);
                             builder.add_dropdown_item(ADBEVideoBitrateEncoding, 0, "Constant Bitrate");
                             builder.add_dropdown_item(ADBEVideoBitrateEncoding, 1, "Constant QP");
-                            builder.add_dropdown_item(ADBEVideoBitrateEncoding, 2, "VBR, 1 pass");
+                            builder.add_dropdown_item(ADBEVideoBitrateEncoding, 2, "Variable Bitrate");
                             builder.add_dropdown_item(ADBEVideoBitrateEncoding, 3, "Variable Bitrate with Target Quality");
-                            builder.add_dropdown_item(ADBEVideoBitrateEncoding, 4, "VBR, 2 pass");
 
                             builder.add_float_param(encoder_settings_group, ADBEVideoTargetBitrate, "Target Bitrate [Mbps]", 10.0, 0.1, 300.0);
                             builder.add_float_param(encoder_settings_group, b"NukeVideoConstantQP\0", "Constant QP (CQ / CQP Value)", 30.0, 0.0, 63.0);
@@ -188,7 +187,7 @@ pub unsafe fn handle_generate_default_params(std_parms: *mut exportStdParms, par
                             // Multipass Mode
                             let nuke_multipass_id = b"NukeMultipass\0";
                             builder.add_dropdown(encoder_settings_group, nuke_multipass_id, "Multipass Mode", 1); // default Quarter Resolution
-                            builder.add_dropdown_item(nuke_multipass_id, 0, "Disabled");
+                            builder.add_dropdown_item(nuke_multipass_id, 0, "Single Pass");
                             builder.add_dropdown_item(nuke_multipass_id, 1, "Two Passes (Quarter Resolution)");
                             builder.add_dropdown_item(nuke_multipass_id, 2, "Two Passes (Full Resolution)");
 
@@ -712,9 +711,8 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
     rebuild_int_dropdown(ADBEVideoBitrateEncoding, &[
         (0, "Constant Bitrate"),
         (1, "Constant QP"),
-        (2, "VBR, 1 pass"),
+        (2, "Variable Bitrate"),
         (3, "Variable Bitrate with Target Quality"),
-        (4, "VBR, 2 pass"),
     ]);
 
     // Presets
@@ -740,7 +738,7 @@ unsafe fn rebuild_dropdowns(ex_id: csSDK_uint32, file_type: csSDK_uint32, param_
     // Multipass Mode
     let nuke_multipass_id = b"NukeMultipass\0";
     rebuild_int_dropdown(nuke_multipass_id, &[
-        (0, "Disabled"),
+        (0, "Single Pass"),
         (1, "Two Passes (Quarter Resolution)"),
         (2, "Two Passes (Full Resolution)"),
     ]);

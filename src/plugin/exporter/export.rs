@@ -349,7 +349,8 @@ pub unsafe fn handle_export(std_parms: *mut exportStdParms, param1: *mut c_void)
                                          let output_path = os_string;
                                          log_debug(&format!("output_path: {}", output_path));
                                         
-                                        let total_passes = if bitrate_mode == 4 { 2 } else { 1 };
+                                        let is_hardware = vcodec.contains("nvenc") || vcodec.contains("amf") || vcodec.contains("qsv");
+                                        let total_passes = if multipass > 0 && !is_hardware { 2 } else { 1 };
                                         let mut stats_in_buffer = Vec::<u8>::new();
                                         
                                         for pass_num in 1..=total_passes {
