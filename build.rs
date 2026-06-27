@@ -211,7 +211,7 @@ fn main() {
     // 4. Generate Premiere Pro Bindings
     let bindings = bindgen::Builder::default()
         .header("src/ffi/wrapper.hpp")
-        .rust_target(bindgen::RustTarget::Nightly)
+        .rust_target(bindgen::RustTarget::nightly())
         .clang_arg(format!("-I{}", sdk_headers.display()))
         .clang_arg("-x")
         .clang_arg("c++")
@@ -225,11 +225,7 @@ fn main() {
             let path = out_dir.join("pr_sdk_bindings.rs");
             b.write_to_file(&path)
                 .expect("Couldn't write bindings!");
-            if let Ok(content) = fs::read_to_string(&path) {
-                // Patch: fix unsafe extern "C" for newer Rust editions
-                let patched = content.replace("extern \"C\" {", "unsafe extern \"C\" {");
-                let _ = fs::write(&path, patched);
-            }
+            // Removed patch: bindgen 0.72+ already emits unsafe extern "C" when using Rust 2024/nightly target.
         }
         Err(e) => {
             panic!("Cannot generate bindings for Premiere Pro SDK: {:?}", e);
